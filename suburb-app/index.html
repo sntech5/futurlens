@@ -1,0 +1,766 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Suburb Recommendation - Property Investment Assistant</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes spin-slow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .animate-spin-slow {
+      animation: spin-slow 3s linear infinite;
+    }
+    @keyframes pulse-subtle {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+    .animate-pulse-subtle {
+      animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes slide-in-right {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+    @keyframes slide-out-right {
+      from { transform: translateX(0); }
+      to { transform: translateX(100%); }
+    }
+    .slide-in {
+      animation: slide-in-right 0.3s ease-out forwards;
+    }
+    .slide-out {
+      animation: slide-out-right 0.3s ease-out forwards;
+    }
+    .growth-accent { @apply text-emerald-600; }
+    .yield-accent { @apply text-blue-600; }
+    input:focus, select:focus {
+      @apply ring-2 ring-indigo-500;
+    }
+    .detail-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 100%;
+      max-width: 420px;
+      height: 100vh;
+      background: white;
+      box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      display: none;
+      flex-direction: column;
+    }
+    .detail-panel.open {
+      display: flex;
+    }
+    .detail-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 999;
+      display: none;
+    }
+    .detail-overlay.open {
+      display: block;
+    }
+    @media (max-width: 768px) {
+      .detail-panel {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-slate-900">Property Investment Assistant</h1>
+          <p class="text-sm text-slate-600 mt-1">Find the perfect Australian suburb for your investment strategy</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Input Form Section -->
+    <div class="bg-white rounded-lg shadow-md border border-slate-200 overflow-hidden mb-8">
+      <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4">
+        <h2 class="text-xl font-semibold text-white">Investment Criteria</h2>
+      </div>
+
+      <div class="p-6 sm:p-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <!-- Budget Input -->
+          <div class="space-y-2">
+            <label for="budget" class="block text-sm font-semibold text-slate-700">
+              💰 Budget
+            </label>
+            <div class="relative">
+              <span class="absolute left-3 top-3 text-slate-500">$</span>
+              <input 
+                id="budget" 
+                type="number" 
+                placeholder="e.g. 800,000" 
+                class="w-full pl-8 pr-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:border-indigo-500 transition text-slate-900 placeholder-slate-400"
+              />
+            </div>
+            <p class="text-xs text-slate-500">Maximum property price</p>
+          </div>
+
+          <!-- Max OOP Input -->
+          <div class="space-y-2">
+            <label for="maxOop" class="block text-sm font-semibold text-slate-700">
+              📊 Max Weekly Out of Pocket
+            </label>
+            <div class="relative">
+              <span class="absolute left-3 top-3 text-slate-500">$</span>
+              <input 
+                id="maxOop" 
+                type="number" 
+                placeholder="e.g. 250" 
+                class="w-full pl-8 pr-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:border-indigo-500 transition text-slate-900 placeholder-slate-400"
+              />
+            </div>
+            <p class="text-xs text-slate-500">Mortgage + expenses - rental income</p>
+          </div>
+        </div>
+
+        <!-- Strategy Selection -->
+        <div class="mb-8">
+          <label for="strategy" class="block text-sm font-semibold text-slate-700 mb-3">
+            🎯 Investment Strategy
+          </label>
+          <div class="grid grid-cols-2 gap-3">
+            <button type="button" class="strategy-btn strategy-btn-growth p-4 rounded-lg border-2 border-slate-300 hover:border-slate-400 hover:bg-slate-50 transition text-left font-medium text-slate-700" data-strategy="growth">
+              <div class="text-lg">📈</div>
+              <div class="font-semibold text-slate-900">Capital Growth</div>
+              <div class="text-xs text-slate-600">Focus on appreciation</div>
+            </button>
+            <button type="button" class="strategy-btn strategy-btn-yield p-4 rounded-lg border-2 border-slate-300 hover:border-slate-400 hover:bg-slate-50 transition text-left font-medium text-slate-700" data-strategy="yield">
+              <div class="text-lg">💵</div>
+              <div class="font-semibold text-slate-900">Rental Yield</div>
+              <div class="text-xs text-slate-600">Focus on income</div>
+            </button>
+          </div>
+          <select id="strategy" class="hidden">
+            <option value="growth">Growth</option>
+            <option value="yield">Yield</option>
+          </select>
+        </div>
+
+        <!-- Action Button & Status -->
+        <div class="space-y-4">
+          <button 
+            id="generateBtn" 
+            class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center gap-2"
+          >
+            <span id="btnText">Generate Recommendation</span>
+            <span id="btnSpinner" class="hidden animate-spin-slow">⚙️</span>
+          </button>
+          
+          <!-- Status Line -->
+          <div class="flex items-center justify-between">
+            <div class="text-sm font-medium text-slate-700">
+              <span id="status" class="inline-block px-3 py-1 bg-slate-100 rounded-full text-slate-600">Ready</span>
+            </div>
+            <div class="text-xs text-slate-500" id="runInfo">Run ID: -</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="bg-white rounded-lg shadow-md border border-slate-200 overflow-hidden">
+      <div class="bg-gradient-to-r from-slate-600 to-slate-700 px-6 py-4">
+        <h2 class="text-xl font-semibold text-white">Recommended Suburbs</h2>
+      </div>
+
+      <div class="p-6 sm:p-8">
+        <div id="resultArea" class="text-slate-600 text-center py-8">
+          <p class="text-sm">Enter your criteria and generate a recommendation to see results</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Detail Panel Overlay -->
+  <div class="detail-overlay" id="detailOverlay"></div>
+
+  <!-- Detail Panel -->
+  <div class="detail-panel" id="detailPanel">
+    <div class="flex items-center justify-between p-4 border-b border-slate-200">
+      <h2 class="text-lg font-bold text-slate-900" id="detailTitle">Suburb Details</h2>
+      <button id="closeDetailBtn" class="text-slate-500 hover:text-slate-700 text-2xl leading-none">×</button>
+    </div>
+    
+    <div class="flex-1 overflow-y-auto p-4">
+      <div id="detailContent"></div>
+    </div>
+  </div>
+
+  <script src="./config.js"></script>
+  <script>
+    const CONFIG = window.APP_CONFIG || {};
+
+    function getConfigError() {
+      const requiredFields = ['supabaseUrl', 'supabaseKey', 'userProfileId'];
+      const missing = requiredFields.filter((field) => !CONFIG[field]);
+      if (!missing.length) return null;
+      return `Missing app config: ${missing.join(', ')}.\nGenerate config.js from .env by running: node generate-config.mjs`;
+    }
+
+    // Strategy button handling
+    document.querySelectorAll('.strategy-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.strategy-btn').forEach(b => {
+          b.classList.remove('border-emerald-500', 'bg-emerald-50', 'border-blue-500', 'bg-blue-50');
+          b.classList.add('border-slate-300');
+        });
+        
+        const strategy = btn.dataset.strategy;
+        document.getElementById('strategy').value = strategy;
+        
+        if (strategy === 'growth') {
+          btn.classList.add('border-emerald-500', 'bg-emerald-50');
+        } else {
+          btn.classList.add('border-blue-500', 'bg-blue-50');
+        }
+      });
+    });
+
+    // Set default strategy value without visual selection
+    document.getElementById('strategy').value = 'growth';
+
+    function transformSuburb(item, index, strategy) {
+      return {
+        name: formatSuburbName(item.suburb),
+        price: formatMoney(item.price),
+        rent: formatMoney(item.rent),
+        yield: formatYield(item.yield),
+        estimatedOop: formatMoney(item.estimated_oop),
+        rank: index + 1,
+        why: getWhyText(item, strategy),
+        strategy: strategy
+      };
+    }
+
+    function getWhyText(item, strategy) {
+      const reasons = [];
+
+      if (item.estimated_oop !== undefined && item.estimated_oop !== null) {
+        reasons.push(`estimated weekly out of pocket is ${formatMoney(item.estimated_oop)}`);
+      }
+
+      if (item.price) {
+        reasons.push('it fits within your budget');
+      }
+
+      if (strategy === 'growth') {
+        reasons.push('it ranked higher on growth-oriented scoring');
+        reasons.push('the growth score emphasizes demand-supply strength, faster selling, tighter stock, lower discounting, and lower vacancy');
+      } else {
+        if (item.yield) {
+          reasons.push(`it shows a gross rental yield of ${formatYield(item.yield)}`);
+        }
+        reasons.push('it ranked higher on yield-oriented scoring');
+      }
+
+      return reasons.join(', ') + '.';
+    }
+
+    function formatSuburbName(raw) {
+        if (!raw) return '-';
+        return raw
+            .replaceAll('_', ' ')
+            .toLowerCase()
+            .replace(/\b\w/g, (c) => c.toUpperCase());
+    }
+
+    function setStatus(message) {
+      const statusEl = document.getElementById('status');
+      statusEl.textContent = message;
+      statusEl.classList.remove('bg-slate-100', 'text-slate-600', 'bg-emerald-100', 'text-emerald-700', 'bg-red-100', 'text-red-700');
+      
+      if (message.includes('Failed')) {
+        statusEl.classList.add('bg-red-100', 'text-red-700');
+      } else if (message.includes('Done')) {
+        statusEl.classList.add('bg-emerald-100', 'text-emerald-700');
+      } else {
+        statusEl.classList.add('bg-slate-100', 'text-slate-600');
+      }
+    }
+
+    function setRunInfo(runId) {
+      document.getElementById('runInfo').textContent = `Run ID: ${runId || '-'}`;
+    }
+
+    function formatMoney(value) {
+      if (value === null || value === undefined || value === '') return '-';
+      return new Intl.NumberFormat('en-AU', {
+        style: 'currency',
+        currency: 'AUD',
+        maximumFractionDigits: 0
+      }).format(value);
+    }
+
+    function getPercentConfig(metric) {
+      const configs = {
+        gross_yield: { min: 1, max: 20 },
+        vacancy_rate: { min: 0, max: 15 },
+        renters_pct: { min: 5, max: 95 },
+        stock_on_market_pct: { min: 0, max: 30 },
+        vendor_discount_pct: { min: -15, max: 25 },
+        population_growth_pct: { min: -20, max: 20 }
+      };
+      return configs[metric] || { min: -100, max: 100 };
+    }
+
+    function normalizePercentValue(value, metric) {
+      const num = Number(value);
+      if (!Number.isFinite(num)) return null;
+
+      const { min, max } = getPercentConfig(metric);
+      const pointsCandidate = num;
+      const ratioCandidate = num * 100;
+      const pointsInRange = pointsCandidate >= min && pointsCandidate <= max;
+      const ratioInRange = ratioCandidate >= min && ratioCandidate <= max;
+
+      if (pointsInRange && !ratioInRange) return pointsCandidate;
+      if (!pointsInRange && ratioInRange) return ratioCandidate;
+      if (pointsInRange && ratioInRange) {
+        // Ambiguous case (both plausible): preserve value as percentage points.
+        return pointsCandidate;
+      }
+
+      // If neither is in range, fall back to existing number without scaling.
+      return pointsCandidate;
+    }
+
+    function formatPercent(value, metric, fallback = 'N/A') {
+      if (value === null || value === undefined || value === '') return fallback;
+      const num = normalizePercentValue(value, metric);
+      if (!Number.isFinite(num)) return fallback;
+
+      const decimals = Math.abs(num) > 0 && Math.abs(num) < 1 ? 2 : 1;
+      const formatted = num.toFixed(decimals).replace(/\.0+$/, '').replace(/(\.\d*[1-9])0+$/, '$1');
+      return `${formatted}%`;
+    }
+
+    function formatYield(value) {
+      if (value === null || value === undefined || value === '') return '-';
+      return formatPercent(value, 'gross_yield', '-');
+    }
+
+    function renderResult(rows, selectedStrategy) {
+      const resultArea = document.getElementById('resultArea');
+
+      if (!rows || !rows.length) {
+        resultArea.innerHTML = `
+          <div class="text-center py-12">
+            <p class="text-slate-500 text-lg">No recommendations found.</p>
+            <p class="text-slate-400 text-sm mt-2">Try adjusting your criteria and try again.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const recommendation = rows[0];
+      const suburbs = recommendation.top_suburbs || [];
+      const strategyIcon = selectedStrategy === 'growth' ? '📈' : '💵';
+      const strategyLabel = selectedStrategy === 'growth' ? 'Capital Growth' : 'Rental Yield';
+      const accentClass = selectedStrategy === 'growth' ? 'border-l-4 border-emerald-500' : 'border-l-4 border-blue-500';
+
+      let html = `
+        <div class="mb-8 p-4 rounded-lg ${accentClass} bg-slate-50 border border-slate-200">
+          <div class="flex items-start gap-3">
+            <span class="text-2xl">${strategyIcon}</span>
+            <div>
+              <h3 class="font-semibold text-slate-900">${strategyLabel} Strategy</h3>
+              <p class="text-sm text-slate-600 mt-1">${recommendation.ai_summary || 'Analyzing suburbs for your investment criteria...'}</p>
+            </div>
+          </div>
+        </div>
+      `;
+
+      if (!suburbs.length) {
+        html += `
+          <div class="text-center py-8">
+            <p class="text-slate-500">No matching suburbs found for these inputs.</p>
+          </div>
+        `;
+      } else {
+        html += '<div class="space-y-3">';
+        suburbs.forEach((item, index) => {
+          const s = transformSuburb(item, index, selectedStrategy);
+          const accentColor = s.strategy === 'growth' ? '#10b981' : '#2563eb';
+          const accentBg = s.strategy === 'growth' ? 'bg-emerald-50' : 'bg-blue-50';
+          const badgeClass = s.strategy === 'growth' ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700';
+
+          html += `
+            <div class="border-2 border-slate-300 rounded-lg p-5 hover:shadow-lg shadow-sm transition bg-white ${accentBg}">
+              <div class="flex items-start justify-between mb-4">
+                <div class="flex-1">
+                  <h4 class="text-lg font-bold text-slate-900">${s.name}</h4>
+                  <p class="text-xs text-slate-600 mt-1">Recommended for ${strategyLabel}</p>
+                </div>
+                <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold ${badgeClass}">Rank #${s.rank}</span>
+              </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4 py-4 border-t border-b border-slate-200">
+                <div>
+                  <p class="text-xs font-medium text-slate-600 uppercase tracking-wide">Median Price</p>
+                  <p class="text-lg font-bold text-slate-900 mt-1">${s.price}</p>
+                </div>
+                <div>
+                  <p class="text-xs font-medium text-slate-600 uppercase tracking-wide">Weekly Rent</p>
+                  <p class="text-lg font-bold text-slate-900 mt-1">${s.rent}</p>
+                </div>
+                <div>
+                  <p class="text-xs font-medium text-slate-600 uppercase tracking-wide">Weekly OOP</p>
+                  <p class="text-lg font-bold text-slate-900 mt-1">${s.estimatedOop}</p>
+                </div>
+                <div>
+                  <p class="text-xs font-medium text-slate-600 uppercase tracking-wide">Gross Yield</p>
+                  <p class="text-lg font-bold text-slate-900 mt-1">${s.yield}</p>
+                </div>
+              </div>
+
+              <div class="bg-white rounded p-3">
+                <p class="text-xs font-semibold text-slate-700 uppercase tracking-wide mb-2">Why This Suburb</p>
+                <p class="text-sm text-slate-700">${s.why}</p>
+              </div>
+
+              <button class="view-details-btn w-full mt-4 px-4 py-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 font-semibold rounded-lg transition" data-suburb='${JSON.stringify(item)}'>
+                View Full Details →
+              </button>
+            </div>
+          `;
+        });
+        html += '</div>';
+      }
+
+      resultArea.innerHTML = html;
+      
+      // Scroll to results section
+      setTimeout(() => {
+        document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+
+    function renderError(message) {
+      document.getElementById('resultArea').innerHTML = `
+        <div class="bg-red-50 border border-red-200 rounded-lg p-6">
+          <div class="flex gap-3">
+            <span class="text-2xl">⚠️</span>
+            <div>
+              <h3 class="font-semibold text-red-900">Something went wrong</h3>
+              <p class="text-sm text-red-700 mt-2 whitespace-pre-wrap font-mono">${message}</p>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Scroll to error section
+      setTimeout(() => {
+        document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+
+    function openDetailPanel(suburb) {
+      const suburbName = formatSuburbName(suburb.suburb);
+      document.getElementById('detailTitle').textContent = `${suburbName} Details`;
+      document.getElementById('detailContent').innerHTML = buildDetailContent(suburb, suburbName);
+      
+      document.getElementById('detailOverlay').classList.add('open');
+      document.getElementById('detailPanel').classList.add('open', 'slide-in');
+    }
+
+    function closeDetailPanel() {
+      const panel = document.getElementById('detailPanel');
+      panel.classList.remove('slide-in');
+      panel.classList.add('slide-out');
+      
+      setTimeout(() => {
+        document.getElementById('detailOverlay').classList.remove('open');
+        panel.classList.remove('open', 'slide-out');
+      }, 300);
+    }
+
+    function buildDetailContent(suburb, suburbName) {
+      const state = suburb.state || 'Unknown';
+      const postcode = suburb.postcode || 'N/A';
+      
+      // Build map URL
+      const mapUrl = `https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d12988.69899407627!2d-77.0827!3d38.8958!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z${encodeURIComponent(suburbName + ', ' + state)}!5e0!3m2!1sen!2sau!4v1234567890`;
+      
+      const metrics = [
+        { label: 'Location', value: `${suburbName}, ${state} ${postcode}` },
+        { label: 'Median Price', value: formatMoney(suburb.median_price), icon: '💰' },
+        { label: 'Weekly Rent', value: formatMoney(suburb.median_rent_weekly), icon: '🏠' },
+        { label: 'Gross Yield', value: formatYield(suburb.gross_yield), icon: '📊' },
+        { label: 'Vacancy Rate', value: formatPercent(suburb.vacancy_rate, 'vacancy_rate'), icon: '📍' },
+        { label: 'Renters %', value: formatPercent(suburb.renters_pct, 'renters_pct'), icon: '👥' },
+        { label: 'Stock on Market %', value: formatPercent(suburb.stock_on_market_pct, 'stock_on_market_pct'), icon: '📦' },
+        { label: 'Days on Market', value: suburb.days_on_market ? `${Math.round(suburb.days_on_market)} days` : 'N/A', icon: '⏱️' },
+        { label: 'Vendor Discount %', value: formatPercent(suburb.vendor_discount_pct, 'vendor_discount_pct'), icon: '💸' },
+        { label: 'Population Growth', value: formatPercent(suburb.population_growth_pct, 'population_growth_pct'), icon: '📈' },
+        { label: 'Infrastructure Score', value: suburb.infrastructure_score ? Math.round(suburb.infrastructure_score) : 'N/A', icon: '🏗️' },
+      ];
+
+      const scores = [
+        { label: 'Growth Score', value: suburb.base_growth_score ? Math.round(suburb.base_growth_score) : 'N/A', color: 'emerald' },
+        { label: 'Yield Score', value: suburb.base_yield_score ? Math.round(suburb.base_yield_score) : 'N/A', color: 'blue' },
+        { label: 'Demand Score', value: suburb.base_demand_score ? Math.round(suburb.base_demand_score) : 'N/A', color: 'purple' },
+        { label: 'Risk Score', value: suburb.base_risk_score ? Math.round(suburb.base_risk_score) : 'N/A', color: 'red' },
+        { label: 'Total Score', value: suburb.base_total_score ? Math.round(suburb.base_total_score) : 'N/A', color: 'indigo' }
+      ];
+
+      let html = `
+        <div class="space-y-6">
+          <!-- Map -->
+          <div class="rounded-lg overflow-hidden border border-slate-200">
+            <iframe 
+              width="100%" 
+              height="200" 
+              frameborder="0" 
+              style="border:0" 
+              src="https://www.google.com/maps/embed/v1/place?key=AIzaSyAi5lqKu7qqvHKgVF-Sd5l8KCT6-7EEd1o&q=${encodeURIComponent(suburbName + ', ' + state + ', Australia')}" 
+              allowfullscreen="" 
+              loading="lazy" 
+              referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+          </div>
+
+          <!-- Key Metrics -->
+          <div>
+            <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wide mb-4">Key Metrics</h3>
+            <div class="space-y-3">
+      `;
+
+      metrics.forEach(metric => {
+        html += `
+          <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200">
+            <div class="flex items-center gap-2">
+              <span class="text-lg">${metric.icon || '•'}</span>
+              <span class="text-sm font-medium text-slate-700">${metric.label}</span>
+            </div>
+            <span class="font-semibold text-slate-900">${metric.value}</span>
+          </div>
+        `;
+      });
+
+      html += `
+            </div>
+          </div>
+
+          <!-- Scoring Breakdown -->
+          <div>
+            <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wide mb-4">Scoring Breakdown</h3>
+            <div class="space-y-2">
+      `;
+
+      scores.forEach(score => {
+        const colorClasses = {
+          'emerald': 'bg-emerald-100 text-emerald-900',
+          'blue': 'bg-blue-100 text-blue-900',
+          'purple': 'bg-purple-100 text-purple-900',
+          'red': 'bg-red-100 text-red-900',
+          'indigo': 'bg-indigo-100 text-indigo-900'
+        };
+
+        html += `
+          <div class="flex items-center justify-between p-3 rounded-lg border border-slate-200 ${colorClasses[score.color]}">
+            <span class="text-sm font-medium">${score.label}</span>
+            <span class="font-bold text-lg">${score.value}</span>
+          </div>
+        `;
+      });
+
+      html += `
+            </div>
+          </div>
+
+          <!-- Metadata -->
+          <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs text-slate-600">
+            <p><strong>Suburb Key:</strong> ${suburb.suburb || 'N/A'}</p>
+            <p class="mt-2"><strong>Data refreshed:</strong> ${suburb.refreshed_at ? new Date(suburb.refreshed_at).toLocaleDateString() : 'N/A'}</p>
+          </div>
+        </div>
+      `;
+
+      return html;
+    }
+
+    async function createRun() {
+      const budget = Number(document.getElementById('budget').value);
+      const strategy = document.getElementById('strategy').value;
+
+      const response = await fetch(`${CONFIG.supabaseUrl}/rest/v1/recommendation_runs`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': CONFIG.supabaseKey,
+          'Authorization': `Bearer ${CONFIG.supabaseKey}`,
+          'Prefer': 'return=representation',
+          'Content-Profile': 'public',
+          'Accept-Profile': 'public'
+        },
+        body: JSON.stringify({
+          user_profile_id: CONFIG.userProfileId,
+          created_by: CONFIG.userProfileId,
+          input_budget: budget,
+          max_out_of_pocket: Number(document.getElementById('maxOop').value),
+          strategy_type: strategy
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(JSON.stringify(data, null, 2));
+      }
+
+      return data[0];
+    }
+
+    async function runEngine(runId) {
+      const response = await fetch(`${CONFIG.supabaseUrl}/rest/v1/rpc/run_recommendation_engine`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': CONFIG.supabaseKey,
+          'Authorization': `Bearer ${CONFIG.supabaseKey}`,
+          'Content-Profile': 'public',
+          'Accept-Profile': 'public'
+        },
+        body: JSON.stringify({ p_run_id: runId })
+      });
+
+      let data = null;
+      try {
+        data = await response.json();
+      } catch (_) {}
+
+      if (!response.ok) {
+        throw new Error(typeof data === 'string' ? data : JSON.stringify(data, null, 2));
+      }
+    }
+
+    async function fetchResult(runId) {
+      const response = await fetch(
+        `${CONFIG.supabaseUrl}/rest/v1/recommendations?recommendation_run_id=eq.${encodeURIComponent(runId)}&select=*`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': CONFIG.supabaseKey,
+            'Authorization': `Bearer ${CONFIG.supabaseKey}`,
+            'Accept-Profile': 'public'
+          }
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(JSON.stringify(data, null, 2));
+      }
+
+      return data;
+    }
+
+    function isNoMatchTopSuburbsError(error) {
+      const rawMessage = error?.message || String(error || '');
+
+      try {
+        const parsed = JSON.parse(rawMessage);
+        return parsed?.code === '23502' && String(parsed?.message || '').includes('top_suburbs');
+      } catch (_) {
+        return rawMessage.includes('"code": "23502"') && rawMessage.includes('top_suburbs');
+      }
+    }
+
+    async function generateRecommendation() {
+      const configError = getConfigError();
+      if (configError) {
+        setStatus('Failed');
+        renderError(configError);
+        return;
+      }
+
+      const selectedStrategy = document.getElementById('strategy').value;
+      const budget = Number(document.getElementById('budget').value);
+      const maxOop = Number(document.getElementById('maxOop').value);
+
+      if (!budget || !maxOop) {
+        alert('Please enter both budget and max weekly out of pocket');
+        return;
+      }
+
+      const button = document.getElementById('generateBtn');
+      const btnText = document.getElementById('btnText');
+      const btnSpinner = document.getElementById('btnSpinner');
+
+      button.disabled = true;
+      btnSpinner.classList.remove('hidden');
+
+      try {
+        setStatus('Creating run...');
+        const run = await createRun();
+        setRunInfo(run.id);
+
+        setStatus('Running engine...');
+        await runEngine(run.id);
+
+        setStatus('Fetching results...');
+        const result = await fetchResult(run.id);
+
+        renderResult(result, selectedStrategy);
+        setStatus('Done');
+      } catch (error) {
+        if (isNoMatchTopSuburbsError(error)) {
+          renderResult(
+            [
+              {
+                top_suburbs: [],
+                ai_summary: 'No suburbs met your budget and weekly out-of-pocket limits. Try increasing one of these limits.'
+              }
+            ],
+            selectedStrategy
+          );
+          setStatus('Done (No matches)');
+          return;
+        }
+
+        setStatus('Failed');
+        renderError(error.message || String(error));
+      } finally {
+        button.disabled = false;
+        btnSpinner.classList.add('hidden');
+      }
+    }
+
+    document.getElementById('generateBtn').addEventListener('click', generateRecommendation);
+
+    // Detail panel event listeners
+    document.getElementById('closeDetailBtn').addEventListener('click', closeDetailPanel);
+    document.getElementById('detailOverlay').addEventListener('click', closeDetailPanel);
+
+    // Event delegation for View Details buttons
+    document.getElementById('resultArea').addEventListener('click', (e) => {
+      if (e.target.closest('.view-details-btn')) {
+        const btn = e.target.closest('.view-details-btn');
+        const suburbData = JSON.parse(btn.dataset.suburb);
+        openDetailPanel(suburbData);
+      }
+    });
+  </script>
+</body>
+</html>

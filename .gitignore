@@ -1,0 +1,5 @@
+
+# Local data files
+.data/
+*.csv
+.DS_Store
