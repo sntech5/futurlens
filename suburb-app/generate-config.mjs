@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const envPath = resolve(process.cwd(), '.env');
@@ -18,13 +18,13 @@ function parseEnv(raw) {
   return map;
 }
 
-const envRaw = readFileSync(envPath, 'utf8');
-const env = parseEnv(envRaw);
+const envFromFile = existsSync(envPath) ? parseEnv(readFileSync(envPath, 'utf8')) : {};
+const env = { ...envFromFile, ...process.env };
 
 const required = ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'USER_PROFILE_ID'];
 const missing = required.filter((key) => !env[key]);
 if (missing.length) {
-  throw new Error(`Missing required .env keys: ${missing.join(', ')}`);
+  throw new Error(`Missing required environment keys: ${missing.join(', ')}`);
 }
 
 const configJs = `window.APP_CONFIG = {
