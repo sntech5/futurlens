@@ -68,6 +68,369 @@
     .detail-overlay.open {
       display: block;
     }
+    .report-preview-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.72);
+      z-index: 1100;
+      display: none;
+      overflow: auto;
+      padding: 24px;
+    }
+    .report-preview-overlay.open {
+      display: block;
+    }
+    .report-preview-shell {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+    .report-page {
+      background: white;
+      color: #071942;
+      width: 100%;
+      min-height: 760px;
+      border: 1px solid #d7dce5;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.22);
+      padding: 28px 34px 22px;
+      margin-bottom: 20px;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .report-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      border-bottom: 3px solid #08265c;
+      padding-bottom: 12px;
+      margin-bottom: 18px;
+    }
+    .report-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: #08265c;
+      text-transform: uppercase;
+      line-height: 1.05;
+    }
+    .report-brand-mark {
+      width: 42px;
+      height: 42px;
+      border: 2px solid #08265c;
+      display: grid;
+      place-items: center;
+      font-size: 24px;
+      border-radius: 4px;
+    }
+    .report-kicker {
+      text-align: right;
+      color: #071942;
+      font-weight: 800;
+    }
+    .report-page-badge {
+      display: inline-block;
+      margin-left: 8px;
+      background: #08265c;
+      color: white;
+      border-radius: 4px;
+      padding: 6px 9px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .report-title {
+      font-size: 40px;
+      line-height: 1.05;
+      font-weight: 900;
+      color: #08265c;
+      margin: 0 0 6px;
+      letter-spacing: -0.02em;
+    }
+    .report-subtitle {
+      color: #071942;
+      font-size: 16px;
+      margin-bottom: 18px;
+    }
+    .report-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .report-suburb-card {
+      border: 1px solid #dbe2ee;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 9px rgba(15, 23, 42, 0.08);
+      position: relative;
+    }
+    .report-rank {
+      position: absolute;
+      right: 16px;
+      top: 14px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 800;
+      border: 1px solid currentColor;
+    }
+    .report-metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .report-metric {
+      border: 1px solid #dfe5ef;
+      border-radius: 8px;
+      padding: 9px 10px;
+      min-height: 58px;
+    }
+    .report-metric-label {
+      font-size: 11px;
+      color: #071942;
+      margin-bottom: 4px;
+    }
+    .report-metric-value {
+      font-size: 17px;
+      font-weight: 900;
+      color: #071942;
+    }
+    .report-section-title {
+      color: #08265c;
+      font-size: 18px;
+      font-weight: 900;
+      margin: 0 0 10px;
+    }
+    .report-panel {
+      border: 1px solid #dbe2ee;
+      border-radius: 10px;
+      overflow: hidden;
+      background: white;
+    }
+    .report-map {
+      min-height: 292px;
+      background:
+        linear-gradient(120deg, rgba(34, 197, 94, 0.18), rgba(59, 130, 246, 0.18)),
+        linear-gradient(150deg, #e8f1df 0%, #eef6e9 42%, #bfdcf2 43%, #a8d0ef 100%);
+      position: relative;
+      border-radius: 10px;
+      border: 1px solid #dbe2ee;
+      overflow: hidden;
+    }
+    .report-map::before {
+      content: "";
+      position: absolute;
+      inset: 22px 64px 18px 70px;
+      border-left: 5px solid rgba(184, 134, 74, 0.55);
+      border-radius: 50%;
+      transform: rotate(16deg);
+    }
+    .report-map-label {
+      position: absolute;
+      left: var(--x);
+      top: var(--y);
+      transform: translate(-50%, -50%);
+      color: white;
+      border-radius: 8px;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 900;
+      box-shadow: 0 5px 16px rgba(15, 23, 42, 0.22);
+      white-space: nowrap;
+    }
+    .report-compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      overflow: hidden;
+      border-radius: 8px;
+    }
+    .report-compare-table th {
+      background: #08265c;
+      color: white;
+      text-transform: uppercase;
+      font-size: 10px;
+      padding: 12px 8px;
+    }
+    .report-compare-table td {
+      border: 1px solid #dbe2ee;
+      padding: 13px 8px;
+      text-align: center;
+      color: #071942;
+    }
+    .report-compare-table td:first-child {
+      text-align: left;
+    }
+    .report-chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      padding: 16px;
+      min-height: 292px;
+    }
+    .report-bars {
+      display: flex;
+      align-items: end;
+      justify-content: center;
+      gap: 28px;
+      height: 190px;
+      border-left: 1px solid #cfd7e5;
+      border-bottom: 1px solid #cfd7e5;
+      padding-left: 16px;
+    }
+    .report-bar {
+      width: 34px;
+      min-height: 8px;
+      border-radius: 6px 6px 0 0;
+      position: relative;
+    }
+    .report-bar strong {
+      position: absolute;
+      top: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 14px;
+      color: #071942;
+    }
+    .report-bar-label {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 50%;
+      width: 72px;
+      transform: translateX(-50%);
+      text-align: center;
+      font-size: 10px;
+      color: #071942;
+      font-weight: 700;
+    }
+    .report-radar {
+      width: 100%;
+      height: 210px;
+    }
+    .report-insight {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      background: #08265c;
+      color: white;
+      border-radius: 10px;
+      padding: 18px 24px;
+      margin-top: 16px;
+    }
+    .report-deep-card {
+      display: grid;
+      grid-template-columns: 260px 1fr 310px;
+      gap: 18px;
+      border: 1px solid #dbe2ee;
+      border-left: 7px solid var(--accent);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+    }
+    .report-stat-row {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #dbe2ee;
+      padding: 6px 0;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .report-line-chart {
+      width: 100%;
+      height: 145px;
+    }
+    .report-takeaway {
+      background: #f1f5f9;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-top: 12px;
+      font-size: 13px;
+    }
+    .report-final-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .report-final-card {
+      border-radius: 8px;
+      padding: 16px;
+      background: #f1f5f9;
+      min-height: 118px;
+    }
+    .report-final-card.primary {
+      background: #08265c;
+      color: white;
+      grid-column: span 1;
+    }
+    .report-small-note {
+      border: 1px solid #dbe2ee;
+      border-radius: 6px;
+      padding: 12px 14px;
+      font-size: 12px;
+      margin-top: 14px;
+    }
+    @media (max-width: 900px) {
+      .report-preview-overlay {
+        padding: 12px;
+      }
+      .report-page {
+        min-width: 980px;
+      }
+    }
+    @page {
+      size: A4 landscape;
+      margin: 8mm;
+    }
+    @media print {
+      body {
+        background: white !important;
+      }
+      body > header,
+      body > main,
+      .detail-overlay,
+      .detail-panel,
+      .report-preview-toolbar {
+        display: none !important;
+      }
+      .report-preview-overlay {
+        position: static !important;
+        display: block !important;
+        overflow: visible !important;
+        padding: 0 !important;
+        background: white !important;
+      }
+      .report-preview-shell {
+        max-width: none !important;
+        margin: 0 !important;
+      }
+      .report-page {
+        width: 100% !important;
+        min-height: auto !important;
+        height: calc(210mm - 16mm);
+        margin: 0 !important;
+        padding: 8mm 9mm 7mm !important;
+        border: 0 !important;
+        box-shadow: none !important;
+        page-break-after: always;
+        break-after: page;
+        overflow: hidden;
+      }
+      .report-page:last-child {
+        page-break-after: auto;
+        break-after: auto;
+      }
+      .report-title {
+        font-size: 34px;
+      }
+      .report-suburb-card {
+        box-shadow: none;
+      }
+    }
     @media (max-width: 768px) {
       .detail-panel {
         max-width: 100%;
@@ -205,10 +568,28 @@
     </div>
   </div>
 
+  <!-- Report Preview Modal -->
+  <div class="report-preview-overlay" id="reportPreviewOverlay">
+    <div class="report-preview-shell">
+      <div class="report-preview-toolbar flex items-center justify-between gap-4 rounded-t-lg bg-white px-5 py-4 shadow-lg">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">Report Preview</h2>
+          <p class="text-sm text-slate-500">Review the customer report layout before PDF export.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="printReportBtn" class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">Print / Save PDF</button>
+          <button id="closeReportPreviewBtn" class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700">Close</button>
+        </div>
+      </div>
+      <div id="reportPreviewContent"></div>
+    </div>
+  </div>
+
   <script src="./config.js"></script>
   <script>
     const CONFIG = window.APP_CONFIG || {};
     let currentRecommendation = null;
+    let latestReportDraft = null;
 
     function getConfigError() {
       const requiredFields = ['supabaseUrl', 'supabaseKey', 'userProfileId'];
@@ -411,8 +792,8 @@
         return 'Select at least one suburb for the report.';
       }
 
-      if (selectedSuburbs.length > 5) {
-        return 'Select up to 5 suburbs for this report.';
+      if (selectedSuburbs.length > 3) {
+        return 'Select up to 3 suburbs for this report.';
       }
 
       if (!customerName) {
@@ -436,6 +817,240 @@
       }
 
       return null;
+    }
+
+    function getScore(value) {
+      const num = Number(value);
+      if (!Number.isFinite(num)) return 0;
+      return Math.max(0, Math.min(10, num > 10 ? num / 10 : num));
+    }
+
+    function compactName(raw) {
+      return formatSuburbName(raw).replace(/\s+(Nsw|Vic|Qld|Wa|Tas|Sa|Act|Nt)$/i, '');
+    }
+
+    function getSelectedReportItems(selectedKeys) {
+      const selected = new Set(selectedKeys);
+      return (currentRecommendation?.top_suburbs || [])
+        .map((item, index) => ({ item, sourceRank: index + 1 }))
+        .filter(({ item }) => selected.has(item.suburb));
+    }
+
+    function getReportMetric(item, key) {
+      const fallbackMap = {
+        median_price: 'price',
+        median_rent_weekly: 'rent',
+        gross_yield: 'yield'
+      };
+      return item[key] ?? item[fallbackMap[key]];
+    }
+
+    function reportColors(index) {
+      return ['#2f9b45', '#1f66d1', '#08265c', '#64748b', '#7c3aed'][index % 5];
+    }
+
+    function buildBarChart(suburbs) {
+      return suburbs.map(({ item }, index) => {
+        const score = getScore(item.base_total_score || item.base_growth_score || item.base_yield_score);
+        const height = Math.max(18, score * 16);
+        return `
+          <div class="report-bar" style="height:${height}px;background:${reportColors(index)}">
+            <strong>${score.toFixed(1)}</strong>
+            <span class="report-bar-label">${escapeHtml(compactName(item.suburb))}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function buildRadarChart(suburbs) {
+      const center = 105;
+      const maxRadius = 78;
+      const axes = [
+        { label: 'Yield', key: 'base_yield_score', x: 105, y: 18 },
+        { label: 'Growth', key: 'base_growth_score', x: 192, y: 105 },
+        { label: 'Demand', key: 'base_demand_score', x: 105, y: 192 },
+        { label: 'Risk', key: 'base_risk_score', x: 18, y: 105 }
+      ];
+      const rings = [0.25, 0.5, 0.75, 1].map((r) => {
+        const d = axes.map((axis, i) => `${i === 0 ? 'M' : 'L'} ${center + (axis.x - center) * r} ${center + (axis.y - center) * r}`).join(' ');
+        return `<path d="${d} Z" fill="none" stroke="#dbe2ee" stroke-width="1"/>`;
+      }).join('');
+      const lines = axes.map((axis) => `<line x1="${center}" y1="${center}" x2="${axis.x}" y2="${axis.y}" stroke="#e2e8f0"/>`).join('');
+      const polygons = suburbs.map(({ item }, index) => {
+        const points = axes.map((axis) => {
+          const score = getScore(item[axis.key]) / 10;
+          const x = center + (axis.x - center) * score;
+          const y = center + (axis.y - center) * score;
+          return `${x},${y}`;
+        }).join(' ');
+        return `<polygon points="${points}" fill="none" stroke="${reportColors(index)}" stroke-width="3"/>`;
+      }).join('');
+      const labels = axes.map((axis) => `<text x="${axis.x}" y="${axis.y}" text-anchor="middle" font-size="11" font-weight="700" fill="#071942">${axis.label}</text>`).join('');
+      return `<svg class="report-radar" viewBox="0 0 210 210">${rings}${lines}${polygons}${labels}</svg>`;
+    }
+
+    function buildTrendChart(item, color) {
+      const price = Number(getReportMetric(item, 'median_price')) || 600000;
+      const values = [0.72, 0.78, 0.84, 0.91, 0.97, 1].map((factor) => Math.round(price * factor / 10000) * 10000);
+      const points = values.map((value, index) => {
+        const x = 34 + index * 82;
+        const y = 120 - ((value - Math.min(...values)) / Math.max(1, Math.max(...values) - Math.min(...values))) * 84;
+        return { x, y, value };
+      });
+      const line = points.map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`).join(' ');
+      const labels = points.map((point, index) => `
+        <circle cx="${point.x}" cy="${point.y}" r="4" fill="${color}"/>
+        <text x="${point.x}" y="${point.y - 10}" text-anchor="middle" font-size="11" fill="#071942">${Math.round(point.value / 1000)}K</text>
+        <text x="${point.x}" y="139" text-anchor="middle" font-size="10" fill="#334155">${2020 + index}</text>
+      `).join('');
+      return `
+        <svg class="report-line-chart" viewBox="0 0 460 150">
+          <line x1="30" y1="124" x2="444" y2="124" stroke="#cbd5e1"/>
+          <line x1="30" y1="26" x2="30" y2="124" stroke="#cbd5e1"/>
+          <path d="${line}" fill="none" stroke="${color}" stroke-width="3"/>
+          ${labels}
+        </svg>
+      `;
+    }
+
+    function getReportInsight(suburbs, strategy) {
+      const top = suburbs[0]?.item;
+      const second = suburbs[1]?.item;
+      const topName = top ? compactName(top.suburb) : 'The top suburb';
+      const secondName = second ? compactName(second.suburb) : 'the next option';
+      const focus = strategy === 'growth' ? 'growth fundamentals' : 'yield and cashflow fundamentals';
+      return `${topName} ranks highest for this shortlist based on ${focus}. ${secondName} provides a useful comparison point, while the remaining selected suburbs help balance price, rent, demand and risk considerations.`;
+    }
+
+    function buildReportPreview(reportDraft) {
+      const suburbs = reportDraft.suburbs.slice(0, 5);
+      const strategy = document.getElementById('strategy').value;
+      const generatedDate = new Date().toLocaleDateString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
+      const reportCode = escapeHtml(reportDraft.report.report_code);
+      const cards = suburbs.slice(0, 3).map(({ item }, index) => {
+        const name = escapeHtml(compactName(item.suburb));
+        const state = escapeHtml(item.state || '');
+        const postcode = escapeHtml(item.postcode || '');
+        const color = reportColors(index);
+        return `
+          <div class="report-suburb-card">
+            <div class="report-rank" style="color:${color}">#${index + 1}<br>Rank</div>
+            <h3 style="font-size:22px;font-weight:900;color:#08265c;margin:0">${name}</h3>
+            <p style="margin:3px 0 0;color:#071942">${state} ${postcode}</p>
+            <div class="report-metric-grid">
+              <div class="report-metric"><div class="report-metric-label">Median Price</div><div class="report-metric-value">${formatMoney(getReportMetric(item, 'median_price'))}</div></div>
+              <div class="report-metric"><div class="report-metric-label">Weekly Rent</div><div class="report-metric-value">${formatMoney(getReportMetric(item, 'median_rent_weekly'))}</div></div>
+              <div class="report-metric"><div class="report-metric-label">Gross Yield</div><div class="report-metric-value" style="color:${color}">${formatYield(getReportMetric(item, 'gross_yield'))}</div></div>
+              <div class="report-metric"><div class="report-metric-label">Weekly OOP</div><div class="report-metric-value" style="color:${Number(item.estimated_oop) <= 0 ? '#2f9b45' : '#dc2626'}">${formatMoney(item.estimated_oop)}</div></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      const tableRows = [
+        ['Yield Score', '30%', 'base_yield_score'],
+        ['Growth Score', '25%', 'base_growth_score'],
+        ['Demand Score', '25%', 'base_demand_score'],
+        ['Risk Score', '20%', 'base_risk_score'],
+        ['Final Score', '100%', 'base_total_score']
+      ].map(([label, weight, key]) => `
+        <tr>
+          <td><strong>${label}</strong></td>
+          <td>${weight}</td>
+          ${suburbs.slice(0, 3).map(({ item }) => `<td><strong>${getScore(item[key]).toFixed(1)}</strong></td>`).join('')}
+        </tr>
+      `).join('');
+      const mapLabels = suburbs.slice(0, 3).map(({ item }, index) => {
+        const positions = [{ x: '48%', y: '24%' }, { x: '62%', y: '52%' }, { x: '56%', y: '78%' }];
+        return `<div class="report-map-label" style="--x:${positions[index].x};--y:${positions[index].y};background:${reportColors(index)}">${escapeHtml(compactName(item.suburb))}</div>`;
+      }).join('');
+      const deepDive = suburbs.slice(0, 3).map(({ item }, index) => {
+        const color = reportColors(index);
+        const name = escapeHtml(compactName(item.suburb));
+        return `
+          <div class="report-deep-card" style="--accent:${color}">
+            <div>
+              <h3 style="font-size:22px;font-weight:900;color:#08265c;margin:4px 0">${name}</h3>
+              <p style="margin:0 0 12px">${escapeHtml(item.state || '')} ${escapeHtml(item.postcode || '')}</p>
+              <div class="report-stat-row"><span>Vacancy Rate</span><span>${formatPercent(item.vacancy_rate, 'vacancy_rate')}</span></div>
+              <div class="report-stat-row"><span>% Renters</span><span>${formatPercent(item.renters_pct, 'renters_pct')}</span></div>
+              <div class="report-stat-row"><span>Days on Market</span><span>${item.days_on_market ? Math.round(item.days_on_market) : 'N/A'}</span></div>
+              <div class="report-stat-row"><span>Vendor Discount</span><span>${formatPercent(item.vendor_discount_pct, 'vendor_discount_pct')}</span></div>
+            </div>
+            <div>
+              <h4 style="margin:0 0 8px;text-align:center;font-weight:900;color:#08265c">Median Price Trend</h4>
+              ${buildTrendChart(item, color)}
+            </div>
+            <div>
+              <h4 style="margin:0 0 8px;font-weight:900;color:#08265c">AI Insight</h4>
+              <p style="font-size:13px;line-height:1.45;margin:0">${escapeHtml(getWhyText(item, strategy))}</p>
+              <div class="report-takeaway">
+                <strong style="color:${color}">Key Takeaway</strong><br>
+                ${strategy === 'growth' ? 'Strongest fit for growth-focused review when balanced with affordability and market depth.' : 'Strong fit for cashflow-focused review when balanced with vacancy and demand signals.'}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      const finalCards = suburbs.slice(0, 3).map(({ item }, index) => {
+        const titles = ['Best for Yield', 'Best for Growth', 'Balanced Pick'];
+        return `
+          <div class="report-final-card">
+            <strong style="color:${reportColors(index)}">${titles[index] || 'Selected Suburb'}</strong>
+            <h4 style="font-size:17px;font-weight:900;color:#08265c;margin:6px 0">${escapeHtml(compactName(item.suburb))}</h4>
+            <p style="font-size:12px;margin:0">Selected from the engine-ranked shortlist for this customer profile.</p>
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <div class="report-page">
+          <div class="report-header">
+            <div class="report-brand"><div class="report-brand-mark">⌂</div><div>AUS PROPERTY<br><span style="font-weight:500;letter-spacing:0.18em">ASSISTANT</span></div></div>
+            <div class="report-kicker">Investment Suburb Analysis Report<br><span style="font-size:12px;font-weight:500">Generated on ${generatedDate}</span><span class="report-page-badge">Page 1 of 2</span></div>
+          </div>
+          <h1 class="report-title">Top Suburbs Matched to Your Investment Profile</h1>
+          <div class="report-subtitle">Prepared for ${escapeHtml(reportDraft.report.customer_name)} • ${reportCode}</div>
+          <div class="report-grid-3">${cards}</div>
+          <div style="display:grid;grid-template-columns:300px 1fr 1.35fr;gap:18px;margin-top:18px">
+            <div><h3 class="report-section-title">Suburb Location Map</h3><div class="report-map">${mapLabels}</div></div>
+            <div><h3 class="report-section-title">Overall Score Comparison</h3><table class="report-compare-table"><thead><tr><th>Metric</th><th>Weight</th>${suburbs.slice(0, 3).map(({ item }) => `<th>${escapeHtml(compactName(item.suburb))}</th>`).join('')}</tr></thead><tbody>${tableRows}</tbody></table></div>
+            <div><h3 class="report-section-title">Score Comparison</h3><div class="report-panel report-chart-grid"><div><h4 style="text-align:center;margin:0 0 12px">Overall Final Score</h4><div class="report-bars">${buildBarChart(suburbs.slice(0, 3))}</div></div><div><h4 style="text-align:center;margin:0 0 2px">Score Breakdown</h4>${buildRadarChart(suburbs.slice(0, 3))}</div></div></div>
+          </div>
+          <div class="report-insight"><div style="font-size:44px">♢</div><div><strong>Key Insight</strong><br>${escapeHtml(getReportInsight(suburbs, strategy))}</div></div>
+          <p style="font-size:12px;margin:16px 0 0"><strong>Disclaimer:</strong> This report is for informational purposes only and does not constitute financial or investment advice.</p>
+        </div>
+        <div class="report-page">
+          <div class="report-header">
+            <div class="report-brand"><div class="report-brand-mark">⌂</div><div>AUS PROPERTY<br><span style="font-weight:500;letter-spacing:0.18em">ASSISTANT</span></div></div>
+            <div class="report-kicker">Investment Suburb Analysis Report <span class="report-page-badge">Page 2 of 2</span></div>
+          </div>
+          <h2 class="report-section-title" style="font-size:21px">Suburb Deep Dive</h2>
+          ${deepDive}
+          <h2 class="report-section-title" style="border-top:2px solid #08265c;padding-top:10px">Final Recommendation</h2>
+          <div class="report-final-grid">${finalCards}<div class="report-final-card primary"><strong>Overall Recommendation</strong><p style="font-size:12px;line-height:1.45">Based on the selected strategy and borrowing constraints, ${escapeHtml(compactName(suburbs[0]?.item?.suburb || 'the top suburb'))} is the strongest match, with the remaining selections providing useful comparison and diversification options.</p></div></div>
+          <div class="report-small-note"><strong>Overall Commentary</strong><br>All selected suburbs present investment opportunities with different strengths. Final choice should align with risk tolerance, time horizon, property type, and due diligence findings.</div>
+          <div style="display:flex;justify-content:space-between;margin-top:18px;font-size:12px;color:#334155"><span>Helping Australians make smarter property investment decisions.</span><span>auspropertyassistant.com.au</span></div>
+        </div>
+      `;
+    }
+
+    function openReportPreview(reportDraft = latestReportDraft) {
+      if (!reportDraft) return;
+      document.getElementById('reportPreviewContent').innerHTML = buildReportPreview(reportDraft);
+      document.getElementById('reportPreviewOverlay').classList.add('open');
+    }
+
+    function closeReportPreview() {
+      document.getElementById('reportPreviewOverlay').classList.remove('open');
+    }
+
+    function printReportPreview() {
+      if (!latestReportDraft) {
+        return;
+      }
+
+      document.getElementById('reportPreviewOverlay').classList.add('open');
+      window.print();
     }
 
     function getSelectedReportSuburbs() {
@@ -661,7 +1276,12 @@
           throw new Error(JSON.stringify(data, null, 2));
         }
 
+        latestReportDraft = {
+          report: data,
+          suburbs: getSelectedReportItems(selectedSuburbs)
+        };
         setReportStatus(`Report draft created: ${data.report_code}`, 'success');
+        openReportPreview(latestReportDraft);
       } catch (error) {
         setReportStatus(error.message || String(error), 'error');
       } finally {
@@ -955,6 +1575,13 @@
     // Detail panel event listeners
     document.getElementById('closeDetailBtn').addEventListener('click', closeDetailPanel);
     document.getElementById('detailOverlay').addEventListener('click', closeDetailPanel);
+    document.getElementById('closeReportPreviewBtn').addEventListener('click', closeReportPreview);
+    document.getElementById('printReportBtn').addEventListener('click', printReportPreview);
+    document.getElementById('reportPreviewOverlay').addEventListener('click', (e) => {
+      if (e.target.id === 'reportPreviewOverlay') {
+        closeReportPreview();
+      }
+    });
 
     // Event delegation for View Details buttons
     document.getElementById('resultArea').addEventListener('click', (e) => {
