@@ -111,6 +111,58 @@ Notes:
 
 ---
 
+### `recommendation_reports`
+Purpose:
+- stores one customer-facing PDF report created from a recommendation result
+- allows multiple reports to be created from one recommendation run
+- stores customer details directly for MVP instead of using a customer master table
+
+Current important columns:
+- `id`
+- `report_code`
+- `recommendation_run_id`
+- `recommendation_id`
+- `customer_name`
+- `customer_email`
+- `generated_by_user_profile_id`
+- `report_date`
+- `daily_sequence`
+- `pdf_storage_path`
+- `pdf_file_name`
+- `report_status`
+- `generated_at`
+- `created_at`
+- `updated_at`
+
+Notes:
+- `report_code` is unique and follows `CUSTOMER-NAME-YYYYMMDD-###`
+- PDF files are stored and retrieved later instead of regenerated from live score data
+- detailed workflow reference: [recommendation_pdf_report_workflow.md](recommendation_pdf_report_workflow.md)
+
+---
+
+### `recommendation_report_suburbs`
+Purpose:
+- stores the suburbs selected for a PDF report
+- preserves the engine rank and the report order separately
+- stores a JSON snapshot of the suburb data used at report generation time
+
+Current important columns:
+- `id`
+- `report_id`
+- `suburb_key`
+- `source_rank`
+- `report_rank`
+- `suburb_snapshot`
+- `created_at`
+
+Notes:
+- `source_rank` is the original recommendation engine order
+- `report_rank` is the selected display order in the PDF report
+- users should select suburbs from the generated recommendation result, not arbitrary suburbs from the whole database
+
+---
+
 ### `suburbs`
 Purpose:
 - master suburb table
@@ -453,6 +505,8 @@ Min-max normalization to 0–100:
 - lower stock on market = better
 - lower vendor discount = better
 - lower vacancy = better
+- if a metric has no spread across the scored dataset, it receives a neutral component score of `50`
+- only rows with all required growth inputs present are included in the score refresh
 
 ### Current weights
 - DSR: `0.40`
@@ -460,6 +514,11 @@ Min-max normalization to 0–100:
 - Stock on market: `0.15`
 - Vendor discount: `0.15`
 - Vacancy: `0.10`
+
+### Exact Supabase implementation
+The current function body is captured in:
+
+[sql_reference_refresh_base_growth_scores.md](sql_reference_refresh_base_growth_scores.md)
 
 ### Important design rule
 If the growth model changes later, update only:

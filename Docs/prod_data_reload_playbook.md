@@ -31,6 +31,7 @@ Replace dummy domain data with production data while preserving key relationship
 
 4. Recompute:
 - `select public.refresh_base_growth_scores();`
+- Reference: [sql_reference_refresh_base_growth_scores.md](sql_reference_refresh_base_growth_scores.md)
 
 5. Validate:
 [postload_validate_prod.sql](../sql/postload_validate_prod.sql)
@@ -48,4 +49,3 @@ Replace dummy domain data with production data while preserving key relationship
 - No critical nulls in key base score fields.
 - Recommendation smoke passes with array output for `top_suburbs`.
 - Restrictive scenario returns empty array, not failure.
-
