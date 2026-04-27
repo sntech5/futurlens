@@ -1,7 +1,7 @@
 # SQL Reference: test_recommendation_engine.sql
 
 File:
-[test_recommendation_engine.sql](/Users/sujithnair/Documents/Passionproject/Suburb Recommender/sql/test_recommendation_engine.sql)
+[test_recommendation_engine.sql](../sql/test_recommendation_engine.sql)
 
 ## Context
 Assertion-style function tests for recommendation engine behavior.

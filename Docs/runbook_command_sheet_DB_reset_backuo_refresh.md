@@ -3,8 +3,8 @@
 Last updated: 2026-04-23 (Australia/Sydney)
 
 ## References
-- Main sequence: [prod_data_reload_playbook.md](/Users/sujithnair/Documents/Passionproject/Suburb Recommender/Docs/prod_data_reload_playbook.md)
-- Warnings: [prod_data_reload_warnings.md](/Users/sujithnair/Documents/Passionproject/Suburb Recommender/Docs/prod_data_reload_warnings.md)
+- Main sequence: [prod_data_reload_playbook.md](./prod_data_reload_playbook.md)
+- Warnings: [prod_data_reload_warnings.md](./prod_data_reload_warnings.md)
 
 ## Staging Window (Copy/Paste Order)
 
@@ -50,7 +50,7 @@ select public.refresh_base_growth_scores();
 ```
 
 9. UI smoke
-- Follow: [ui_smoke_checklist_2min.md](/Users/sujithnair/Documents/Passionproject/Suburb Recommender/Docs/ui_smoke_checklist_2min.md)
+- Follow: [ui_smoke_checklist_2min.md](./ui_smoke_checklist_2min.md)
 
 Staging go/no-go:
 - Go only if all SQL checks pass and UI smoke has no blocker.
@@ -106,7 +106,7 @@ select public.refresh_base_growth_scores();
 ```
 
 10. UI smoke
-- Follow: [ui_smoke_checklist_2min.md](/Users/sujithnair/Documents/Passionproject/Suburb Recommender/Docs/ui_smoke_checklist_2min.md)
+- Follow: [ui_smoke_checklist_2min.md](./ui_smoke_checklist_2min.md)
 
 11. Unfreeze writes
 - Reopen traffic only after validation + smoke pass.

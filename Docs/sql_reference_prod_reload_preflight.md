@@ -1,7 +1,7 @@
 # SQL Reference: preflight_prod_reload.sql
 
 File:
-[preflight_prod_reload.sql](/Users/sujithnair/Documents/Passionproject/Suburb Recommender/sql/preflight_prod_reload.sql)
+[preflight_prod_reload.sql](../sql/preflight_prod_reload.sql)
 
 ## Context
 First step before any destructive production data reset.

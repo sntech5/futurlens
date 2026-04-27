@@ -34,7 +34,7 @@
     .slide-out {
       animation: slide-out-right 0.3s ease-out forwards;
     }
-    .growth-accent { @apply text-emerald-600; }
+    .growth-accent { @apply text-indigo-600; }
     .yield-accent { @apply text-blue-600; }
     input:focus, select:focus {
       @apply ring-2 ring-indigo-500;
@@ -220,7 +220,7 @@
     document.querySelectorAll('.strategy-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.strategy-btn').forEach(b => {
-          b.classList.remove('border-emerald-500', 'bg-emerald-50', 'border-blue-500', 'bg-blue-50');
+          b.classList.remove('border-indigo-500', 'bg-indigo-50', 'border-blue-500', 'bg-blue-50');
           b.classList.add('border-slate-300');
         });
         
@@ -228,7 +228,7 @@
         document.getElementById('strategy').value = strategy;
         
         if (strategy === 'growth') {
-          btn.classList.add('border-emerald-500', 'bg-emerald-50');
+          btn.classList.add('border-indigo-500', 'bg-indigo-50');
         } else {
           btn.classList.add('border-blue-500', 'bg-blue-50');
         }
@@ -286,12 +286,12 @@
     function setStatus(message) {
       const statusEl = document.getElementById('status');
       statusEl.textContent = message;
-      statusEl.classList.remove('bg-slate-100', 'text-slate-600', 'bg-emerald-100', 'text-emerald-700', 'bg-red-100', 'text-red-700');
+      statusEl.classList.remove('bg-slate-100', 'text-slate-600', 'bg-indigo-100', 'text-indigo-700', 'bg-red-100', 'text-red-700');
       
       if (message.includes('Failed')) {
         statusEl.classList.add('bg-red-100', 'text-red-700');
       } else if (message.includes('Done')) {
-        statusEl.classList.add('bg-emerald-100', 'text-emerald-700');
+        statusEl.classList.add('bg-indigo-100', 'text-indigo-700');
       } else {
         statusEl.classList.add('bg-slate-100', 'text-slate-600');
       }
@@ -375,7 +375,7 @@
       const suburbs = recommendation.top_suburbs || [];
       const strategyIcon = selectedStrategy === 'growth' ? '📈' : '💵';
       const strategyLabel = selectedStrategy === 'growth' ? 'Capital Growth' : 'Rental Yield';
-      const accentClass = selectedStrategy === 'growth' ? 'border-l-4 border-emerald-500' : 'border-l-4 border-blue-500';
+      const accentClass = selectedStrategy === 'growth' ? 'border-l-4 border-indigo-500' : 'border-l-4 border-blue-500';
 
       let html = `
         <div class="mb-8 p-4 rounded-lg ${accentClass} bg-slate-50 border border-slate-200">
@@ -399,9 +399,8 @@
         html += '<div class="space-y-3">';
         suburbs.forEach((item, index) => {
           const s = transformSuburb(item, index, selectedStrategy);
-          const accentColor = s.strategy === 'growth' ? '#10b981' : '#2563eb';
-          const accentBg = s.strategy === 'growth' ? 'bg-emerald-50' : 'bg-blue-50';
-          const badgeClass = s.strategy === 'growth' ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700';
+          const accentBg = s.strategy === 'growth' ? 'bg-white' : 'bg-blue-50';
+          const badgeClass = s.strategy === 'growth' ? 'bg-indigo-100 text-indigo-700' : 'bg-blue-100 text-blue-700';
 
           html += `
             <div class="border-2 border-slate-300 rounded-lg p-5 hover:shadow-lg shadow-sm transition bg-white ${accentBg}">
@@ -515,7 +514,7 @@
       ];
 
       const scores = [
-        { label: 'Growth Score', value: suburb.base_growth_score ? Math.round(suburb.base_growth_score) : 'N/A', color: 'emerald' },
+        { label: 'Growth Score', value: suburb.base_growth_score ? Math.round(suburb.base_growth_score) : 'N/A', color: 'indigo' },
         { label: 'Yield Score', value: suburb.base_yield_score ? Math.round(suburb.base_yield_score) : 'N/A', color: 'blue' },
         { label: 'Demand Score', value: suburb.base_demand_score ? Math.round(suburb.base_demand_score) : 'N/A', color: 'purple' },
         { label: 'Risk Score', value: suburb.base_risk_score ? Math.round(suburb.base_risk_score) : 'N/A', color: 'red' },
@@ -568,7 +567,6 @@
 
       scores.forEach(score => {
         const colorClasses = {
-          'emerald': 'bg-emerald-100 text-emerald-900',
           'blue': 'bg-blue-100 text-blue-900',
           'purple': 'bg-purple-100 text-purple-900',
           'red': 'bg-red-100 text-red-900',

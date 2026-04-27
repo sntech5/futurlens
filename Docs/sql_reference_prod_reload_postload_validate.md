@@ -1,7 +1,7 @@
 # SQL Reference: postload_validate_prod.sql
 
 File:
-[postload_validate_prod.sql](/Users/sujithnair/Documents/Passionproject/Suburb Recommender/sql/postload_validate_prod.sql)
+[postload_validate_prod.sql](../sql/postload_validate_prod.sql)
 
 ## Context
 Validation checkpoint after production data load.

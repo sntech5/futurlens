@@ -1,7 +1,7 @@
 # SQL Reference: reset_domain_data_prod.sql
 
 File:
-[reset_domain_data_prod.sql](/Users/sujithnair/Documents/Passionproject/Suburb Recommender/sql/reset_domain_data_prod.sql)
+[reset_domain_data_prod.sql](../sql/reset_domain_data_prod.sql)
 
 ## Context
 Domain-data reset before loading real production data.

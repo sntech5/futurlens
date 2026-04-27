@@ -1,7 +1,7 @@
 # SQL Reference: smoke_recommendation_2min.sql
 
 File:
-[smoke_recommendation_2min.sql](/Users/sujithnair/Documents/Passionproject/Suburb Recommender/sql/smoke_recommendation_2min.sql)
+[smoke_recommendation_2min.sql](../sql/smoke_recommendation_2min.sql)
 
 ## Context
 Fast release-gate smoke for recommendation flow.

@@ -1,7 +1,7 @@
 # Audit Log and Housekeeping Guide
 
 File:
-[audit_log_and_housekeeping.sql](/Users/sujithnair/Documents/Passionproject/Suburb Recommender/sql/audit_log_and_housekeeping.sql)
+[audit_log_and_housekeeping.sql](../sql/audit_log_and_housekeeping.sql)
 
 ## Why this exists
 Your MVP can generate repeated runs/recommendations for the same criteria during testing and regular use.  
@@ -23,7 +23,7 @@ This package adds:
 
 ## How to apply
 1. Run:
-[audit_log_and_housekeeping.sql](/Users/sujithnair/Documents/Passionproject/Suburb Recommender/sql/audit_log_and_housekeeping.sql)
+[audit_log_and_housekeeping.sql](../sql/audit_log_and_housekeeping.sql)
 
 2. Dry-run duplicate recommendation cleanup:
 ```sql
@@ -91,4 +91,3 @@ order by run_count desc;
 - Cleanup logic excludes `pending` runs by default.
 - Run dry-run mode first in production.
 - Keep backups and follow your runbook sequence for destructive operations.
-

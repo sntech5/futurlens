@@ -18,10 +18,10 @@ Replace dummy domain data with production data while preserving key relationship
 
 ## Scripts and Order
 1. Preflight:
-[preflight_prod_reload.sql](/Users/sujithnair/Documents/Passionproject/Suburb Recommender/sql/preflight_prod_reload.sql)
+[preflight_prod_reload.sql](../sql/preflight_prod_reload.sql)
 
 2. Reset (destructive):
-[reset_domain_data_prod.sql](/Users/sujithnair/Documents/Passionproject/Suburb Recommender/sql/reset_domain_data_prod.sql)
+[reset_domain_data_prod.sql](../sql/reset_domain_data_prod.sql)
 
 3. Load data:
 - load `suburbs` first
@@ -33,10 +33,10 @@ Replace dummy domain data with production data while preserving key relationship
 - `select public.refresh_base_growth_scores();`
 
 5. Validate:
-[postload_validate_prod.sql](/Users/sujithnair/Documents/Passionproject/Suburb Recommender/sql/postload_validate_prod.sql)
+[postload_validate_prod.sql](../sql/postload_validate_prod.sql)
 
 6. Smoke test:
-[smoke_recommendation_2min.sql](/Users/sujithnair/Documents/Passionproject/Suburb Recommender/sql/smoke_recommendation_2min.sql)
+[smoke_recommendation_2min.sql](../sql/smoke_recommendation_2min.sql)
 
 ## Load Order Details
 - `suburbs` must exist before tables that reference `suburb_key`.
