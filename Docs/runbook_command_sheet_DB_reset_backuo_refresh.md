@@ -18,38 +18,44 @@ Last updated: 2026-04-23 (Australia/Sydney)
 -- sql/patch_run_recommendation_engine_no_null_top_suburbs.sql
 ```
 
-3. Reset domain data
+3. Apply/confirm report schema and functions
+```sql
+-- sql/create_recommendation_report_tables.sql
+-- sql/create_recommendation_report_functions.sql
+```
+
+4. Reset domain data
 ```sql
 -- sql/reset_domain_data_prod.sql
 ```
 
-4. Load staging data in this order
+5. Load staging data in this order
 1. `suburbs`
 2. `suburb_import_staging`
 3. transform to `suburb_base_scores`
 4. monthly/quarterly snapshot tables if applicable
 
-5. Recompute scores
+6. Recompute scores
 ```sql
 select public.refresh_base_growth_scores();
 ```
 
-6. Post-load validation
+7. Post-load validation
 ```sql
 -- sql/postload_validate_prod.sql
 ```
 
-7. Function assertions
+8. Function assertions
 ```sql
 -- sql/test_recommendation_engine.sql
 ```
 
-8. Fast smoke
+9. Fast smoke
 ```sql
 -- sql/smoke_recommendation_2min.sql
 ```
 
-9. UI smoke
+10. UI smoke
 - Follow: [ui_smoke_checklist_2min.md](./ui_smoke_checklist_2min.md)
 
 Staging go/no-go:
@@ -74,41 +80,47 @@ Staging go/no-go:
 -- sql/patch_run_recommendation_engine_no_null_top_suburbs.sql
 ```
 
-4. Reset domain data (destructive)
+4. Apply/confirm report schema and functions
+```sql
+-- sql/create_recommendation_report_tables.sql
+-- sql/create_recommendation_report_functions.sql
+```
+
+5. Reset domain data (destructive)
 ```sql
 -- sql/reset_domain_data_prod.sql
 ```
 
-5. Load production data in this order
+6. Load production data in this order
 1. `suburbs`
 2. `suburb_import_staging`
 3. transform to `suburb_base_scores`
 4. monthly/quarterly snapshot tables if applicable
 
-6. Recompute scores
+7. Recompute scores
 ```sql
 select public.refresh_base_growth_scores();
 ```
 
-7. Post-load validation
+8. Post-load validation
 ```sql
 -- sql/postload_validate_prod.sql
 ```
 
-8. Fast smoke
+9. Fast smoke
 ```sql
 -- sql/smoke_recommendation_2min.sql
 ```
 
-9. Optional deeper assertions (recommended during low traffic)
+10. Optional deeper assertions (recommended during low traffic)
 ```sql
 -- sql/test_recommendation_engine.sql
 ```
 
-10. UI smoke
+11. UI smoke
 - Follow: [ui_smoke_checklist_2min.md](./ui_smoke_checklist_2min.md)
 
-11. Unfreeze writes
+12. Unfreeze writes
 - Reopen traffic only after validation + smoke pass.
 
 ## Rollback Trigger Conditions
@@ -120,4 +132,3 @@ If triggered:
 1. Keep writes frozen.
 2. Restore backup.
 3. Re-run preflight and smoke checks.
-

@@ -208,12 +208,22 @@
   <script src="./config.js"></script>
   <script>
     const CONFIG = window.APP_CONFIG || {};
+    let currentRecommendation = null;
 
     function getConfigError() {
       const requiredFields = ['supabaseUrl', 'supabaseKey', 'userProfileId'];
       const missing = requiredFields.filter((field) => !CONFIG[field]);
       if (!missing.length) return null;
       return `Missing app config: ${missing.join(', ')}.\nGenerate config.js from .env by running: node generate-config.mjs`;
+    }
+
+    function getSupabaseHeaders(extra = {}) {
+      return {
+        'Content-Type': 'application/json',
+        'apikey': CONFIG.supabaseKey,
+        'Authorization': `Bearer ${CONFIG.supabaseKey}`,
+        ...extra
+      };
     }
 
     // Strategy button handling
@@ -358,10 +368,96 @@
       return formatPercent(value, 'gross_yield', '-');
     }
 
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function escapeAttr(value) {
+      return escapeHtml(value);
+    }
+
+    function isValidEmail(value) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    }
+
+    function getPositiveNumberInput(id) {
+      const input = document.getElementById(id);
+      const value = Number(input.value);
+      return Number.isFinite(value) && value > 0 ? value : null;
+    }
+
+    function validateRecommendationInputs() {
+      const budget = getPositiveNumberInput('budget');
+      const maxOop = getPositiveNumberInput('maxOop');
+
+      if (!budget) {
+        return 'Enter a budget greater than $0.';
+      }
+
+      if (!maxOop) {
+        return 'Enter a max weekly out-of-pocket amount greater than $0.';
+      }
+
+      return null;
+    }
+
+    function validateReportInputs(customerName, customerEmail, selectedSuburbs) {
+      if (!selectedSuburbs.length) {
+        return 'Select at least one suburb for the report.';
+      }
+
+      if (selectedSuburbs.length > 5) {
+        return 'Select up to 5 suburbs for this report.';
+      }
+
+      if (!customerName) {
+        return 'Enter the customer name.';
+      }
+
+      if (customerName.length < 2) {
+        return 'Customer name must be at least 2 characters.';
+      }
+
+      if (customerName.length > 120) {
+        return 'Customer name must be 120 characters or less.';
+      }
+
+      if (!customerEmail) {
+        return 'Enter the customer email.';
+      }
+
+      if (customerEmail.length > 254 || !isValidEmail(customerEmail)) {
+        return 'Enter a valid customer email address.';
+      }
+
+      return null;
+    }
+
+    function getSelectedReportSuburbs() {
+      return Array.from(document.querySelectorAll('.report-suburb-checkbox:checked'))
+        .map((checkbox) => checkbox.value);
+    }
+
+    function updateReportSelectionCount() {
+      const countEl = document.getElementById('selectedReportCount');
+      const createBtn = document.getElementById('createReportBtn');
+      if (!countEl || !createBtn) return;
+
+      const count = getSelectedReportSuburbs().length;
+      countEl.textContent = `${count} selected`;
+      createBtn.disabled = count === 0;
+    }
+
     function renderResult(rows, selectedStrategy) {
       const resultArea = document.getElementById('resultArea');
 
       if (!rows || !rows.length) {
+        currentRecommendation = null;
         resultArea.innerHTML = `
           <div class="text-center py-12">
             <p class="text-slate-500 text-lg">No recommendations found.</p>
@@ -372,6 +468,7 @@
       }
 
       const recommendation = rows[0];
+      currentRecommendation = recommendation;
       const suburbs = recommendation.top_suburbs || [];
       const strategyIcon = selectedStrategy === 'growth' ? '📈' : '💵';
       const strategyLabel = selectedStrategy === 'growth' ? 'Capital Growth' : 'Rental Yield';
@@ -396,18 +493,71 @@
           </div>
         `;
       } else {
-        html += '<div class="space-y-3">';
+        html += `
+          <div class="mb-6 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div class="grid flex-1 grid-cols-1 gap-4 sm:grid-cols-2">
+                <div class="space-y-2">
+                  <label for="reportCustomerName" class="block text-sm font-semibold text-slate-700">Customer Name</label>
+                  <input
+                    id="reportCustomerName"
+                    type="text"
+                    placeholder="e.g. Sarah Smith"
+                    maxlength="120"
+                    autocomplete="name"
+                    class="w-full rounded-lg border border-slate-300 px-4 py-3 text-slate-900 placeholder-slate-400 transition focus:border-indigo-500 focus:outline-none"
+                  />
+                </div>
+                <div class="space-y-2">
+                  <label for="reportCustomerEmail" class="block text-sm font-semibold text-slate-700">Customer Email</label>
+                  <input
+                    id="reportCustomerEmail"
+                    type="email"
+                    placeholder="e.g. sarah@example.com"
+                    maxlength="254"
+                    autocomplete="email"
+                    class="w-full rounded-lg border border-slate-300 px-4 py-3 text-slate-900 placeholder-slate-400 transition focus:border-indigo-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+              <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+                <span id="selectedReportCount" class="rounded-full bg-slate-100 px-3 py-2 text-center text-sm font-medium text-slate-600">0 selected</span>
+                <button
+                  id="createReportBtn"
+                  type="button"
+                  disabled
+                  class="rounded-lg bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Create Report Draft
+                </button>
+              </div>
+            </div>
+            <div id="reportStatus" class="mt-4 hidden rounded-lg border px-4 py-3 text-sm"></div>
+          </div>
+          <div class="space-y-3">
+        `;
         suburbs.forEach((item, index) => {
           const s = transformSuburb(item, index, selectedStrategy);
           const accentBg = s.strategy === 'growth' ? 'bg-white' : 'bg-blue-50';
           const badgeClass = s.strategy === 'growth' ? 'bg-indigo-100 text-indigo-700' : 'bg-blue-100 text-blue-700';
+          const suburbName = escapeHtml(s.name);
+          const suburbKey = escapeAttr(item.suburb);
+          const suburbJson = escapeAttr(JSON.stringify(item));
 
           html += `
             <div class="border-2 border-slate-300 rounded-lg p-5 hover:shadow-lg shadow-sm transition bg-white ${accentBg}">
               <div class="flex items-start justify-between mb-4">
-                <div class="flex-1">
-                  <h4 class="text-lg font-bold text-slate-900">${s.name}</h4>
-                  <p class="text-xs text-slate-600 mt-1">Recommended for ${strategyLabel}</p>
+                <div class="flex flex-1 items-start gap-3">
+                  <input
+                    type="checkbox"
+                    class="report-suburb-checkbox mt-1 h-5 w-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                    value="${suburbKey}"
+                    aria-label="Select ${suburbName} for report"
+                  />
+                  <div>
+                    <h4 class="text-lg font-bold text-slate-900">${suburbName}</h4>
+                    <p class="text-xs text-slate-600 mt-1">Recommended for ${strategyLabel}</p>
+                  </div>
                 </div>
                 <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold ${badgeClass}">Rank #${s.rank}</span>
               </div>
@@ -436,7 +586,7 @@
                 <p class="text-sm text-slate-700">${s.why}</p>
               </div>
 
-              <button class="view-details-btn w-full mt-4 px-4 py-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 font-semibold rounded-lg transition" data-suburb='${JSON.stringify(item)}'>
+              <button class="view-details-btn w-full mt-4 px-4 py-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 font-semibold rounded-lg transition" data-suburb="${suburbJson}">
                 View Full Details →
               </button>
             </div>
@@ -453,7 +603,74 @@
       }, 100);
     }
 
+    function setReportStatus(message, type = 'info') {
+      const statusEl = document.getElementById('reportStatus');
+      if (!statusEl) return;
+
+      const classes = {
+        info: 'border-slate-200 bg-slate-50 text-slate-700',
+        success: 'border-indigo-200 bg-indigo-50 text-indigo-800',
+        error: 'border-red-200 bg-red-50 text-red-700'
+      };
+
+      statusEl.className = `mt-4 rounded-lg border px-4 py-3 text-sm ${classes[type] || classes.info}`;
+      statusEl.textContent = message;
+      statusEl.classList.remove('hidden');
+    }
+
+    async function createReportDraft() {
+      if (!currentRecommendation) {
+        setReportStatus('Generate a recommendation before creating a report.', 'error');
+        return;
+      }
+
+      const selectedSuburbs = getSelectedReportSuburbs();
+      const customerName = document.getElementById('reportCustomerName')?.value.trim();
+      const customerEmail = document.getElementById('reportCustomerEmail')?.value.trim();
+      const createBtn = document.getElementById('createReportBtn');
+      const validationError = validateReportInputs(customerName, customerEmail, selectedSuburbs);
+
+      if (validationError) {
+        setReportStatus(validationError, 'error');
+        return;
+      }
+
+      createBtn.disabled = true;
+      setReportStatus('Creating report draft...', 'info');
+
+      try {
+        const response = await fetch(`${CONFIG.supabaseUrl}/rest/v1/rpc/create_recommendation_report_with_suburbs`, {
+          method: 'POST',
+          headers: getSupabaseHeaders({
+            'Content-Profile': 'public',
+            'Accept-Profile': 'public'
+          }),
+          body: JSON.stringify({
+            p_recommendation_run_id: currentRecommendation.recommendation_run_id,
+            p_recommendation_id: currentRecommendation.id,
+            p_customer_name: customerName,
+            p_customer_email: customerEmail,
+            p_generated_by_user_profile_id: CONFIG.userProfileId,
+            p_selected_suburb_keys: selectedSuburbs
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(JSON.stringify(data, null, 2));
+        }
+
+        setReportStatus(`Report draft created: ${data.report_code}`, 'success');
+      } catch (error) {
+        setReportStatus(error.message || String(error), 'error');
+      } finally {
+        updateReportSelectionCount();
+      }
+    }
+
     function renderError(message) {
+      currentRecommendation = null;
       document.getElementById('resultArea').innerHTML = `
         <div class="bg-red-50 border border-red-200 rounded-lg p-6">
           <div class="flex gap-3">
@@ -602,14 +819,11 @@
 
       const response = await fetch(`${CONFIG.supabaseUrl}/rest/v1/recommendation_runs`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': CONFIG.supabaseKey,
-          'Authorization': `Bearer ${CONFIG.supabaseKey}`,
+        headers: getSupabaseHeaders({
           'Prefer': 'return=representation',
           'Content-Profile': 'public',
           'Accept-Profile': 'public'
-        },
+        }),
         body: JSON.stringify({
           user_profile_id: CONFIG.userProfileId,
           created_by: CONFIG.userProfileId,
@@ -631,13 +845,10 @@
     async function runEngine(runId) {
       const response = await fetch(`${CONFIG.supabaseUrl}/rest/v1/rpc/run_recommendation_engine`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': CONFIG.supabaseKey,
-          'Authorization': `Bearer ${CONFIG.supabaseKey}`,
+        headers: getSupabaseHeaders({
           'Content-Profile': 'public',
           'Accept-Profile': 'public'
-        },
+        }),
         body: JSON.stringify({ p_run_id: runId })
       });
 
@@ -656,12 +867,9 @@
         `${CONFIG.supabaseUrl}/rest/v1/recommendations?recommendation_run_id=eq.${encodeURIComponent(runId)}&select=*`,
         {
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': CONFIG.supabaseKey,
-            'Authorization': `Bearer ${CONFIG.supabaseKey}`,
+          headers: getSupabaseHeaders({
             'Accept-Profile': 'public'
-          }
+          })
         }
       );
 
@@ -694,16 +902,13 @@
       }
 
       const selectedStrategy = document.getElementById('strategy').value;
-      const budget = Number(document.getElementById('budget').value);
-      const maxOop = Number(document.getElementById('maxOop').value);
-
-      if (!budget || !maxOop) {
-        alert('Please enter both budget and max weekly out of pocket');
+      const validationError = validateRecommendationInputs();
+      if (validationError) {
+        alert(validationError);
         return;
       }
 
       const button = document.getElementById('generateBtn');
-      const btnText = document.getElementById('btnText');
       const btnSpinner = document.getElementById('btnSpinner');
 
       button.disabled = true;
@@ -757,6 +962,18 @@
         const btn = e.target.closest('.view-details-btn');
         const suburbData = JSON.parse(btn.dataset.suburb);
         openDetailPanel(suburbData);
+      }
+
+      const createReportBtn = e.target.closest('#createReportBtn');
+      if (createReportBtn) {
+        if (createReportBtn.disabled) return;
+        createReportDraft();
+      }
+    });
+
+    document.getElementById('resultArea').addEventListener('change', (e) => {
+      if (e.target.classList.contains('report-suburb-checkbox')) {
+        updateReportSelectionCount();
       }
     });
   </script>

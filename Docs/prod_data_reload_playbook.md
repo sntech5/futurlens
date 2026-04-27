@@ -20,29 +20,36 @@ Replace dummy domain data with production data while preserving key relationship
 1. Preflight:
 [preflight_prod_reload.sql](../sql/preflight_prod_reload.sql)
 
-2. Reset (destructive):
+2. Apply/confirm app functions:
+- [patch_run_recommendation_engine_no_null_top_suburbs.sql](../sql/patch_run_recommendation_engine_no_null_top_suburbs.sql)
+- [create_recommendation_report_tables.sql](../sql/create_recommendation_report_tables.sql)
+- [create_recommendation_report_functions.sql](../sql/create_recommendation_report_functions.sql)
+- Reference: [sql_reference_recommendation_pdf_reports.md](sql_reference_recommendation_pdf_reports.md)
+
+3. Reset (destructive):
 [reset_domain_data_prod.sql](../sql/reset_domain_data_prod.sql)
 
-3. Load data:
+4. Load data:
 - load `suburbs` first
 - load `suburb_import_staging`
 - transform/load `suburb_base_scores`
 - load/update monthly and quarterly snapshot tables (if used)
 
-4. Recompute:
+5. Recompute:
 - `select public.refresh_base_growth_scores();`
 - Reference: [sql_reference_refresh_base_growth_scores.md](sql_reference_refresh_base_growth_scores.md)
 
-5. Validate:
+6. Validate:
 [postload_validate_prod.sql](../sql/postload_validate_prod.sql)
 
-6. Smoke test:
+7. Smoke test:
 [smoke_recommendation_2min.sql](../sql/smoke_recommendation_2min.sql)
 
 ## Load Order Details
 - `suburbs` must exist before tables that reference `suburb_key`.
 - `suburb_base_scores` load should happen after suburb master is ready.
 - `recommendation_runs` and `recommendations` are app-generated; do not bulk-fill unless intentional.
+- `recommendation_reports` and `recommendation_report_suburbs` are app-generated report records; preserve them unless intentionally resetting generated report history.
 
 ## Success Criteria
 - No FK-orphan rows in post-load validation.
