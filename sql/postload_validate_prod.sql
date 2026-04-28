@@ -9,9 +9,7 @@ select 'suburb_import_staging', count(*) from public.suburb_import_staging
 union all
 select 'suburb_base_scores', count(*) from public.suburb_base_scores
 union all
-select 'suburb_monthly_data', count(*) from public.suburb_monthly_data
-union all
-select 'suburb_quarterly_data', count(*) from public.suburb_quarterly_data
+select 'suburb_key_metrics_quarterly', count(*) from public.suburb_key_metrics_quarterly
 union all
 select 'recommendation_runs', count(*) from public.recommendation_runs
 union all
@@ -24,13 +22,8 @@ from public.suburb_base_scores s
 left join public.suburbs m on m.suburb_key = s.suburb_key
 where m.suburb_key is null;
 
-select count(*) as monthly_without_suburb
-from public.suburb_monthly_data s
-left join public.suburbs m on m.suburb_key = s.suburb_key
-where m.suburb_key is null;
-
 select count(*) as quarterly_without_suburb
-from public.suburb_quarterly_data s
+from public.suburb_key_metrics_quarterly s
 left join public.suburbs m on m.suburb_key = s.suburb_key
 where m.suburb_key is null;
 
@@ -47,13 +40,40 @@ select count(*) as null_rent_rows
 from public.suburb_base_scores
 where median_rent_weekly is null;
 
--- 4) Function readiness smoke query.
+select count(*) as quarterly_rows_missing_required_metrics
+from public.suburb_key_metrics_quarterly
+where median_price is null
+  or median_rent_weekly is null
+  or gross_yield is null
+  or vacancy_rate is null
+  or stock_on_market_pct is null
+  or days_on_market is null
+  or vendor_discount_pct is null;
+
+-- 4) No-made-up-data guardrails.
+select count(*) as empty_base_score_rows
+from public.suburb_base_scores
+where median_price is null
+  and median_rent_weekly is null
+  and gross_yield is null
+  and vacancy_rate is null
+  and stock_on_market_pct is null
+  and days_on_market is null;
+
+select count(*) as base_scores_without_quarterly_source
+from public.suburb_base_scores s
+where not exists (
+  select 1
+  from public.suburb_key_metrics_quarterly q
+  where q.suburb_key = s.suburb_key
+);
+
+-- 5) Function readiness smoke query.
 select
   p.proname as function_name,
   pg_get_function_identity_arguments(p.oid) as args
 from pg_proc p
 join pg_namespace n on n.oid = p.pronamespace
 where n.nspname = 'public'
-  and p.proname in ('run_recommendation_engine', 'refresh_base_growth_scores')
+  and p.proname in ('run_recommendation_engine', 'refresh_suburb_base_scores', 'refresh_base_growth_scores')
 order by p.proname;
-

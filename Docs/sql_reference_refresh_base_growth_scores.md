@@ -130,3 +130,19 @@ The final value is rounded to 3 decimal places.
 - `refreshed_at` is updated only for rows included in the scored result set.
 - The recommendation engine consumes `base_growth_score`; it does not calculate it.
 - Future changes to growth scoring should be made in `public.refresh_base_growth_scores()` without changing the frontend or `public.run_recommendation_engine()` unless output fields change.
+
+## Related Base Score Refresh Guardrail
+
+The base score load/refresh process must not create score rows from `public.suburbs` alone. Raw metric values must come from verified source rows in `public.suburb_key_metrics_quarterly`.
+
+The patch reference for the current no-made-up-data refresh pattern is:
+
+[patch_refresh_suburb_base_scores_no_made_up_data.sql](../sql/patch_refresh_suburb_base_scores_no_made_up_data.sql)
+
+Key rule:
+- `public.refresh_suburb_base_scores()` loads raw metrics and simple derived scores from verified source rows only.
+- `public.refresh_base_growth_scores()` remains the owner of `base_growth_score`.
+- Missing source data should produce no new score row, not a row that looks processed.
+- `base_growth_score` is stored on a `0-100` scale, so total-score formulas must divide it by `10` before combining it with `0-10` component scores.
+- `gross_yield` is stored as a decimal, for example `0.045` for `4.5%`, so yield-score formulas must account for that scale.
+- `public.suburb_key_metrics_quarterly` is the only active source table for current market metrics. `public.suburb_monthly_data` is not part of the active recommendation/report data path.

@@ -11,9 +11,7 @@ select 'suburb_import_staging', count(*) from public.suburb_import_staging
 union all
 select 'suburb_base_scores', count(*) from public.suburb_base_scores
 union all
-select 'suburb_monthly_data', count(*) from public.suburb_monthly_data
-union all
-select 'suburb_quarterly_data', count(*) from public.suburb_quarterly_data
+select 'suburb_key_metrics_quarterly', count(*) from public.suburb_key_metrics_quarterly
 union all
 select 'recommendation_runs', count(*) from public.recommendation_runs
 union all
@@ -39,4 +37,3 @@ from pg_proc p
 join pg_namespace n on n.oid = p.pronamespace
 where n.nspname = 'public'
   and p.proname = 'run_recommendation_engine';
-

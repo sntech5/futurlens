@@ -33,12 +33,12 @@ Last updated: 2026-04-23 (Australia/Sydney)
 5. Load staging data in this order
 1. `suburbs`
 2. `suburb_import_staging`
-3. transform to `suburb_base_scores`
-4. monthly/quarterly snapshot tables if applicable
+3. transform to `suburb_key_metrics_quarterly`
+4. refresh `suburb_base_scores`
 
 6. Recompute scores
 ```sql
-select public.refresh_base_growth_scores();
+select public.refresh_suburb_base_scores();
 ```
 
 7. Post-load validation
@@ -96,12 +96,12 @@ Staging go/no-go:
 6. Load production data in this order
 1. `suburbs`
 2. `suburb_import_staging`
-3. transform to `suburb_base_scores`
-4. monthly/quarterly snapshot tables if applicable
+3. transform to `suburb_key_metrics_quarterly`
+4. refresh `suburb_base_scores`
 
 7. Recompute scores
 ```sql
-select public.refresh_base_growth_scores();
+select public.refresh_suburb_base_scores();
 ```
 
 8. Post-load validation

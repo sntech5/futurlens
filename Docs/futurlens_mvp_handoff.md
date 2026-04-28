@@ -1,4 +1,4 @@
-# Aus Property Assistant MVP Handoff
+# FuturLens MVP Handoff
 
 _Last updated: 2026-04-22 (Australia/Sydney)_
 
@@ -211,29 +211,21 @@ Current important behavior:
 
 ---
 
-### `suburb_monthly_data`
+### `suburb_key_metrics_quarterly`
 Purpose:
-- current monthly snapshot table
-
-Important design clarification:
-- **one row per suburb only**
-- monthly refresh updates the row
-- not one row per suburb per month
-
-This table is not currently needed by the frontend MVP flow, but it exists in the broader design.
-
----
-
-### `suburb_quarterly_data`
-Purpose:
-- current quarterly snapshot table
+- current quarterly market metric source table
+- active source for refreshing `suburb_base_scores`
 
 Important design clarification:
 - **one row per suburb only**
 - quarterly refresh updates the row
 - not one row per suburb per quarter
 
-This table is also not currently needed by the frontend MVP flow.
+Current active design:
+- all current market metrics are refreshed quarterly
+- `suburb_monthly_data` is not part of the active recommendation/report path
+- price, rent, yield, vacancy, stock, days on market, vendor discount, and related factors should be loaded into `suburb_key_metrics_quarterly`
+- `suburb_base_scores` is refreshed from `suburb_key_metrics_quarterly`, not from suburb master records
 
 ---
 
@@ -259,7 +251,8 @@ Current imported columns:
 
 Notes:
 - text-heavy by design to tolerate messy CSV values
-- cleaned and transformed into `suburb_base_scores`
+- cleaned and transformed into `suburb_key_metrics_quarterly`
+- `suburb_base_scores` is then refreshed from `suburb_key_metrics_quarterly`
 
 ---
 
@@ -455,7 +448,8 @@ Excel/CSV with columns:
 2. Rename CSV headers to match `suburb_import_staging` snake_case column names exactly.
 3. Import into `suburb_import_staging`.
 4. Insert distinct suburb keys into `suburbs` first.
-5. Run cleaned transform query into `suburb_base_scores`.
+5. Run cleaned transform query into `suburb_key_metrics_quarterly`.
+6. Refresh `suburb_base_scores`.
 
 ### Important cleaning lesson
 Transform initially failed because raw values were not clean numerics, for example:
@@ -540,7 +534,8 @@ Working and in use.
 Working and created as the modular place for growth scoring logic.
 
 ### Mentioned/older function
-- `refresh_suburb_base_scores` exists in broader design, but the current discussion isolated modular growth scoring into `refresh_base_growth_scores()`.
+- `refresh_suburb_base_scores` refreshes current base score rows from `suburb_key_metrics_quarterly`.
+- `refresh_base_growth_scores` remains the modular owner of the growth score calculation.
 - There was also an abandoned 3-parameter version of `run_recommendation_engine`; do not continue with that path.
 
 ---
@@ -677,11 +672,16 @@ until the current recommendation experience is clearly useful.
 2. rename CSV headers to staging snake_case names
 3. import into `suburb_import_staging`
 4. insert missing suburbs into `suburbs`
-5. run cleaned transform into `suburb_base_scores`
-6. run:
+5. run cleaned transform into `suburb_key_metrics_quarterly`:
 
 ```sql
-select public.refresh_base_growth_scores();
+-- sql/load_suburb_key_metrics_quarterly_from_staging.sql
+```
+
+6. refresh base scores:
+
+```sql
+select public.refresh_suburb_base_scores();
 ```
 
 ### To test the app

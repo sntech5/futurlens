@@ -232,6 +232,8 @@ The frontend:
 - calls `public.update_recommendation_report_pdf_status(...)`
 - downloads a local copy for the user
 - disables the export button after a PDF is stored for that report
+- does not draw synthetic maps or historical price trends; those sections show data-scope messaging until verified location/history data is ingested
+- relies on recommendation snapshots ultimately sourced from verified quarterly suburb metric data
 
 Current storage path convention:
 
@@ -240,6 +242,11 @@ recommendation-reports/reports/YYYY/MM/DD/REPORT-CODE.pdf
 ```
 
 Reports should be retrieved from stored PDF files, not regenerated from live suburb score data, because suburb data and scores may change later.
+
+Data integrity rule:
+- report values must come from the stored recommendation snapshot or another verified source table
+- do not use invented suburb facts, synthetic price histories, or placeholder location graphics in generated PDFs
+- see [no_made_up_data_guardrail.md](no_made_up_data_guardrail.md)
 
 ## Report Retrieval
 

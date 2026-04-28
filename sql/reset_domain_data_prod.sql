@@ -10,8 +10,7 @@ truncate table public.recommendation_runs restart identity;
 
 -- Score/snapshot tables that depend on suburbs.
 truncate table public.suburb_base_scores restart identity;
-truncate table public.suburb_monthly_data restart identity;
-truncate table public.suburb_quarterly_data restart identity;
+truncate table public.suburb_key_metrics_quarterly restart identity;
 
 -- Import staging.
 truncate table public.suburb_import_staging restart identity;
@@ -23,4 +22,3 @@ truncate table public.suburbs restart identity;
 -- If you intentionally need profile reset, do it in a separate controlled step.
 
 commit;
-
