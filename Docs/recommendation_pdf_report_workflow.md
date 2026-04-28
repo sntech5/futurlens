@@ -193,19 +193,77 @@ Output:
 
 The MVP stores the generated PDF file.
 
+Storage bucket:
+
+```text
+recommendation-reports
+```
+
+Setup script:
+
+[create_recommendation_report_storage.sql](../sql/create_recommendation_report_storage.sql)
+
 Recommended flow:
 
 ```text
 1. User selects suburbs.
 2. User enters customer details.
 3. App calls create_recommendation_report_with_suburbs.
-4. App generates the PDF from report data.
-5. App uploads the PDF to storage.
-6. App calls update_recommendation_report_pdf_status with the storage path.
-7. Later retrieval uses report_code and pdf_storage_path.
+4. App renders a professional HTML report preview.
+5. App generates the PDF in-browser from the report pages using html2canvas + jsPDF.
+6. App uploads the PDF to storage.
+7. App calls update_recommendation_report_pdf_status with the storage path.
+8. App disables repeat export once the report is marked generated.
+9. Later retrieval uses report_code and pdf_storage_path.
+```
+
+Current frontend implementation:
+
+```text
+suburb-app/index.html
+```
+
+The frontend:
+- creates the draft report from selected suburb snapshots
+- opens a report preview modal
+- exports each `.report-page` to canvas with `html2canvas`
+- adds each canvas image to an A4 landscape PDF with `jsPDF`
+- uploads the PDF to the `recommendation-reports` bucket
+- calls `public.update_recommendation_report_pdf_status(...)`
+- downloads a local copy for the user
+- disables the export button after a PDF is stored for that report
+
+Current storage path convention:
+
+```text
+recommendation-reports/reports/YYYY/MM/DD/REPORT-CODE.pdf
 ```
 
 Reports should be retrieved from stored PDF files, not regenerated from live suburb score data, because suburb data and scores may change later.
+
+## Report Retrieval
+
+The app includes a "Find Generated Report" section.
+
+Lookup flow:
+
+```text
+1. User enters report_code.
+2. App queries public.recommendation_reports by report_code.
+3. App checks report_status = generated.
+4. App opens the stored PDF from Supabase Storage.
+```
+
+The frontend handles both storage path formats:
+
+```text
+reports/YYYY/MM/DD/REPORT-CODE.pdf
+recommendation-reports/reports/YYYY/MM/DD/REPORT-CODE.pdf
+```
+
+Security note:
+- the MVP storage policy is permissive because the current static app does not yet use a full authenticated user session
+- tighten report storage policies before storing real customer-sensitive reports
 
 ## Future Considerations
 

@@ -22,6 +22,7 @@ Last updated: 2026-04-23 (Australia/Sydney)
 ```sql
 -- sql/create_recommendation_report_tables.sql
 -- sql/create_recommendation_report_functions.sql
+-- sql/create_recommendation_report_storage.sql
 ```
 
 4. Reset domain data
@@ -84,6 +85,7 @@ Staging go/no-go:
 ```sql
 -- sql/create_recommendation_report_tables.sql
 -- sql/create_recommendation_report_functions.sql
+-- sql/create_recommendation_report_storage.sql
 ```
 
 5. Reset domain data (destructive)

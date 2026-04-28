@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Suburb Recommendation - Property Investment Assistant</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     @keyframes spin-slow {
       from { transform: rotate(0deg); }
@@ -91,9 +93,10 @@
       min-height: 760px;
       border: 1px solid #d7dce5;
       box-shadow: 0 18px 45px rgba(15, 23, 42, 0.22);
-      padding: 28px 34px 22px;
+      padding: 26px 32px 22px;
       margin-bottom: 20px;
       font-family: Arial, Helvetica, sans-serif;
+      font-size: 16px;
     }
     .report-header {
       display: flex;
@@ -102,7 +105,7 @@
       gap: 20px;
       border-bottom: 3px solid #08265c;
       padding-bottom: 12px;
-      margin-bottom: 18px;
+      margin-bottom: 14px;
     }
     .report-brand {
       display: flex;
@@ -127,6 +130,7 @@
       text-align: right;
       color: #071942;
       font-weight: 800;
+      font-size: 16px;
     }
     .report-page-badge {
       display: inline-block;
@@ -135,11 +139,11 @@
       color: white;
       border-radius: 4px;
       padding: 6px 9px;
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 800;
     }
     .report-title {
-      font-size: 40px;
+      font-size: 44px;
       line-height: 1.05;
       font-weight: 900;
       color: #08265c;
@@ -148,8 +152,19 @@
     }
     .report-subtitle {
       color: #071942;
+      font-size: 19px;
+      margin-bottom: 12px;
+    }
+    .report-personal-note {
+      border: 1px solid #dbe2ee;
+      border-left: 5px solid #1f66d1;
+      border-radius: 10px;
+      padding: 10px 16px;
+      margin-bottom: 16px;
+      background: #f8fafc;
+      color: #071942;
       font-size: 16px;
-      margin-bottom: 18px;
+      line-height: 1.45;
     }
     .report-grid-3 {
       display: grid;
@@ -159,7 +174,7 @@
     .report-suburb-card {
       border: 1px solid #dbe2ee;
       border-radius: 12px;
-      padding: 16px;
+      padding: 15px;
       box-shadow: 0 2px 9px rgba(15, 23, 42, 0.08);
       position: relative;
     }
@@ -173,35 +188,35 @@
       display: grid;
       place-items: center;
       text-align: center;
-      font-size: 11px;
+      font-size: 13px;
       font-weight: 800;
       border: 1px solid currentColor;
     }
     .report-metric-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 16px;
+      gap: 9px;
+      margin-top: 14px;
     }
     .report-metric {
       border: 1px solid #dfe5ef;
       border-radius: 8px;
-      padding: 9px 10px;
-      min-height: 58px;
+      padding: 8px 10px;
+      min-height: 56px;
     }
     .report-metric-label {
-      font-size: 11px;
+      font-size: 13px;
       color: #071942;
       margin-bottom: 4px;
     }
     .report-metric-value {
-      font-size: 17px;
+      font-size: 20px;
       font-weight: 900;
       color: #071942;
     }
     .report-section-title {
       color: #08265c;
-      font-size: 18px;
+      font-size: 20px;
       font-weight: 900;
       margin: 0 0 10px;
     }
@@ -237,7 +252,7 @@
       color: white;
       border-radius: 8px;
       padding: 7px 12px;
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 900;
       box-shadow: 0 5px 16px rgba(15, 23, 42, 0.22);
       white-space: nowrap;
@@ -245,7 +260,7 @@
     .report-compare-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 12px;
+      font-size: 14px;
       overflow: hidden;
       border-radius: 8px;
     }
@@ -253,7 +268,7 @@
       background: #08265c;
       color: white;
       text-transform: uppercase;
-      font-size: 10px;
+      font-size: 12px;
       padding: 12px 8px;
     }
     .report-compare-table td {
@@ -293,7 +308,7 @@
       top: -24px;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 14px;
+      font-size: 16px;
       color: #071942;
     }
     .report-bar-label {
@@ -303,7 +318,7 @@
       width: 72px;
       transform: translateX(-50%);
       text-align: center;
-      font-size: 10px;
+      font-size: 12px;
       color: #071942;
       font-weight: 700;
     }
@@ -323,20 +338,20 @@
     }
     .report-deep-card {
       display: grid;
-      grid-template-columns: 260px 1fr 310px;
-      gap: 18px;
+      grid-template-columns: 248px 1fr 300px;
+      gap: 16px;
       border: 1px solid #dbe2ee;
       border-left: 7px solid var(--accent);
       border-radius: 10px;
-      padding: 14px 16px;
-      margin-bottom: 10px;
+      padding: 12px 15px;
+      margin-bottom: 9px;
     }
     .report-stat-row {
       display: flex;
       justify-content: space-between;
       border-bottom: 1px solid #dbe2ee;
       padding: 6px 0;
-      font-size: 13px;
+      font-size: 15px;
       font-weight: 700;
     }
     .report-line-chart {
@@ -348,7 +363,7 @@
       border-radius: 8px;
       padding: 12px 14px;
       margin-top: 12px;
-      font-size: 13px;
+      font-size: 15px;
     }
     .report-final-grid {
       display: grid;
@@ -358,9 +373,9 @@
     }
     .report-final-card {
       border-radius: 8px;
-      padding: 16px;
+      padding: 14px;
       background: #f1f5f9;
-      min-height: 118px;
+      min-height: 110px;
     }
     .report-final-card.primary {
       background: #08265c;
@@ -371,7 +386,7 @@
       border: 1px solid #dbe2ee;
       border-radius: 6px;
       padding: 12px 14px;
-      font-size: 12px;
+      font-size: 14px;
       margin-top: 14px;
     }
     @media (max-width: 900px) {
@@ -539,6 +554,32 @@
       </div>
     </div>
 
+    <!-- Report Retrieval Section -->
+    <div class="bg-white rounded-lg shadow-md border border-slate-200 overflow-hidden mb-8">
+      <div class="bg-gradient-to-r from-slate-700 to-slate-800 px-6 py-4">
+        <h2 class="text-xl font-semibold text-white">Find Generated Report</h2>
+      </div>
+
+      <div class="p-6 sm:p-8">
+        <div class="flex flex-col gap-3 sm:flex-row">
+          <input
+            id="reportCodeInput"
+            type="text"
+            placeholder="e.g. SHIKHA-NARAYANAN-20260427-003"
+            class="flex-1 rounded-lg border border-slate-300 px-4 py-3 uppercase text-slate-900 placeholder-slate-400 transition focus:border-indigo-500 focus:outline-none"
+          />
+          <button
+            id="findReportBtn"
+            type="button"
+            class="rounded-lg bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            Open Report
+          </button>
+        </div>
+        <div id="findReportStatus" class="mt-4 hidden rounded-lg border px-4 py-3 text-sm"></div>
+      </div>
+    </div>
+
     <!-- Results Section -->
     <div class="bg-white rounded-lg shadow-md border border-slate-200 overflow-hidden">
       <div class="bg-gradient-to-r from-slate-600 to-slate-700 px-6 py-4">
@@ -577,7 +618,8 @@
           <p class="text-sm text-slate-500">Review the customer report layout before PDF export.</p>
         </div>
         <div class="flex items-center gap-2">
-          <button id="printReportBtn" class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">Print / Save PDF</button>
+          <span id="reportExportStatus" class="hidden text-sm font-medium text-slate-600"></span>
+          <button id="exportReportPdfBtn" class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60">Export PDF</button>
           <button id="closeReportPreviewBtn" class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700">Close</button>
         </div>
       </div>
@@ -588,6 +630,7 @@
   <script src="./config.js"></script>
   <script>
     const CONFIG = window.APP_CONFIG || {};
+    const REPORTS_BUCKET = 'recommendation-reports';
     let currentRecommendation = null;
     let latestReportDraft = null;
 
@@ -885,7 +928,7 @@
         }).join(' ');
         return `<polygon points="${points}" fill="none" stroke="${reportColors(index)}" stroke-width="3"/>`;
       }).join('');
-      const labels = axes.map((axis) => `<text x="${axis.x}" y="${axis.y}" text-anchor="middle" font-size="11" font-weight="700" fill="#071942">${axis.label}</text>`).join('');
+      const labels = axes.map((axis) => `<text x="${axis.x}" y="${axis.y}" text-anchor="middle" font-size="13" font-weight="700" fill="#071942">${axis.label}</text>`).join('');
       return `<svg class="report-radar" viewBox="0 0 210 210">${rings}${lines}${polygons}${labels}</svg>`;
     }
 
@@ -900,8 +943,8 @@
       const line = points.map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`).join(' ');
       const labels = points.map((point, index) => `
         <circle cx="${point.x}" cy="${point.y}" r="4" fill="${color}"/>
-        <text x="${point.x}" y="${point.y - 10}" text-anchor="middle" font-size="11" fill="#071942">${Math.round(point.value / 1000)}K</text>
-        <text x="${point.x}" y="139" text-anchor="middle" font-size="10" fill="#334155">${2020 + index}</text>
+        <text x="${point.x}" y="${point.y - 10}" text-anchor="middle" font-size="13" fill="#071942">${Math.round(point.value / 1000)}K</text>
+        <text x="${point.x}" y="139" text-anchor="middle" font-size="12" fill="#334155">${2020 + index}</text>
       `).join('');
       return `
         <svg class="report-line-chart" viewBox="0 0 460 150">
@@ -918,8 +961,11 @@
       const second = suburbs[1]?.item;
       const topName = top ? compactName(top.suburb) : 'The top suburb';
       const secondName = second ? compactName(second.suburb) : 'the next option';
-      const focus = strategy === 'growth' ? 'growth fundamentals' : 'yield and cashflow fundamentals';
-      return `${topName} ranks highest for this shortlist based on ${focus}. ${secondName} provides a useful comparison point, while the remaining selected suburbs help balance price, rent, demand and risk considerations.`;
+      const focus = strategy === 'growth' ? 'growth-focused fundamentals' : 'yield and cashflow fundamentals';
+      if (suburbs.length === 1) {
+        return `${topName} is the strongest match in this shortlist based on ${focus}, while still requiring normal due diligence on property type, condition, and local market depth.`;
+      }
+      return `${topName} is the strongest match in this shortlist based on ${focus}. ${secondName} provides a useful comparison point, while the full shortlist balances price, rent, demand and risk considerations.`;
     }
 
     function buildReportPreview(reportDraft) {
@@ -927,6 +973,7 @@
       const strategy = document.getElementById('strategy').value;
       const generatedDate = new Date().toLocaleDateString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
       const reportCode = escapeHtml(reportDraft.report.report_code);
+      const customerName = escapeHtml(reportDraft.report.customer_name || 'Customer');
       const cards = suburbs.slice(0, 3).map(({ item }, index) => {
         const name = escapeHtml(compactName(item.suburb));
         const state = escapeHtml(item.state || '');
@@ -935,8 +982,8 @@
         return `
           <div class="report-suburb-card">
             <div class="report-rank" style="color:${color}">#${index + 1}<br>Rank</div>
-            <h3 style="font-size:22px;font-weight:900;color:#08265c;margin:0">${name}</h3>
-            <p style="margin:3px 0 0;color:#071942">${state} ${postcode}</p>
+            <h3 style="font-size:26px;font-weight:900;color:#08265c;margin:0">${name}</h3>
+            <p style="font-size:16px;margin:3px 0 0;color:#071942">${state} ${postcode}</p>
             <div class="report-metric-grid">
               <div class="report-metric"><div class="report-metric-label">Median Price</div><div class="report-metric-value">${formatMoney(getReportMetric(item, 'median_price'))}</div></div>
               <div class="report-metric"><div class="report-metric-label">Weekly Rent</div><div class="report-metric-value">${formatMoney(getReportMetric(item, 'median_rent_weekly'))}</div></div>
@@ -969,8 +1016,8 @@
         return `
           <div class="report-deep-card" style="--accent:${color}">
             <div>
-              <h3 style="font-size:22px;font-weight:900;color:#08265c;margin:4px 0">${name}</h3>
-              <p style="margin:0 0 12px">${escapeHtml(item.state || '')} ${escapeHtml(item.postcode || '')}</p>
+              <h3 style="font-size:26px;font-weight:900;color:#08265c;margin:4px 0">${name}</h3>
+              <p style="font-size:16px;margin:0 0 12px">${escapeHtml(item.state || '')} ${escapeHtml(item.postcode || '')}</p>
               <div class="report-stat-row"><span>Vacancy Rate</span><span>${formatPercent(item.vacancy_rate, 'vacancy_rate')}</span></div>
               <div class="report-stat-row"><span>% Renters</span><span>${formatPercent(item.renters_pct, 'renters_pct')}</span></div>
               <div class="report-stat-row"><span>Days on Market</span><span>${item.days_on_market ? Math.round(item.days_on_market) : 'N/A'}</span></div>
@@ -981,11 +1028,11 @@
               ${buildTrendChart(item, color)}
             </div>
             <div>
-              <h4 style="margin:0 0 8px;font-weight:900;color:#08265c">AI Insight</h4>
-              <p style="font-size:13px;line-height:1.45;margin:0">${escapeHtml(getWhyText(item, strategy))}</p>
+              <h4 style="margin:0 0 8px;font-weight:900;color:#08265c">Investment Insight</h4>
+              <p style="font-size:15px;line-height:1.5;margin:0">${escapeHtml(getWhyText(item, strategy))}</p>
               <div class="report-takeaway">
                 <strong style="color:${color}">Key Takeaway</strong><br>
-                ${strategy === 'growth' ? 'Strongest fit for growth-focused review when balanced with affordability and market depth.' : 'Strong fit for cashflow-focused review when balanced with vacancy and demand signals.'}
+                ${strategy === 'growth' ? 'Strong candidate for a growth-focused review when balanced with affordability and market depth.' : 'Strong candidate for a cashflow-focused review when balanced with vacancy and demand signals.'}
               </div>
             </div>
           </div>
@@ -995,9 +1042,9 @@
         const titles = ['Best for Yield', 'Best for Growth', 'Balanced Pick'];
         return `
           <div class="report-final-card">
-            <strong style="color:${reportColors(index)}">${titles[index] || 'Selected Suburb'}</strong>
-            <h4 style="font-size:17px;font-weight:900;color:#08265c;margin:6px 0">${escapeHtml(compactName(item.suburb))}</h4>
-            <p style="font-size:12px;margin:0">Selected from the engine-ranked shortlist for this customer profile.</p>
+            <strong style="font-size:15px;color:${reportColors(index)}">${titles[index] || 'Selected Suburb'}</strong>
+            <h4 style="font-size:20px;font-weight:900;color:#08265c;margin:6px 0">${escapeHtml(compactName(item.suburb))}</h4>
+            <p style="font-size:14px;margin:0">Selected from the engine-ranked shortlist for ${customerName}'s profile.</p>
           </div>
         `;
       }).join('');
@@ -1006,10 +1053,14 @@
         <div class="report-page">
           <div class="report-header">
             <div class="report-brand"><div class="report-brand-mark">⌂</div><div>AUS PROPERTY<br><span style="font-weight:500;letter-spacing:0.18em">ASSISTANT</span></div></div>
-            <div class="report-kicker">Investment Suburb Analysis Report<br><span style="font-size:12px;font-weight:500">Generated on ${generatedDate}</span><span class="report-page-badge">Page 1 of 2</span></div>
+            <div class="report-kicker">Investment Suburb Analysis Report<br><span style="font-size:14px;font-weight:500">Generated on ${generatedDate}</span><span class="report-page-badge">Page 1 of 2</span></div>
           </div>
           <h1 class="report-title">Top Suburbs Matched to Your Investment Profile</h1>
-          <div class="report-subtitle">Prepared for ${escapeHtml(reportDraft.report.customer_name)} • ${reportCode}</div>
+          <div class="report-subtitle">Personalised investment suburb report prepared for <strong>${customerName}</strong> • ${reportCode}</div>
+          <div class="report-personal-note">
+            <strong>Dear ${customerName},</strong><br>
+            Based on your investment brief, borrowing comfort, and selected strategy, this report compares the suburbs that best matched your profile and highlights the shortlist prepared for your review.
+          </div>
           <div class="report-grid-3">${cards}</div>
           <div style="display:grid;grid-template-columns:300px 1fr 1.35fr;gap:18px;margin-top:18px">
             <div><h3 class="report-section-title">Suburb Location Map</h3><div class="report-map">${mapLabels}</div></div>
@@ -1017,19 +1068,19 @@
             <div><h3 class="report-section-title">Score Comparison</h3><div class="report-panel report-chart-grid"><div><h4 style="text-align:center;margin:0 0 12px">Overall Final Score</h4><div class="report-bars">${buildBarChart(suburbs.slice(0, 3))}</div></div><div><h4 style="text-align:center;margin:0 0 2px">Score Breakdown</h4>${buildRadarChart(suburbs.slice(0, 3))}</div></div></div>
           </div>
           <div class="report-insight"><div style="font-size:44px">♢</div><div><strong>Key Insight</strong><br>${escapeHtml(getReportInsight(suburbs, strategy))}</div></div>
-          <p style="font-size:12px;margin:16px 0 0"><strong>Disclaimer:</strong> This report is for informational purposes only and does not constitute financial or investment advice.</p>
+          <p style="font-size:14px;margin:16px 0 0"><strong>Disclaimer:</strong> This report is for informational purposes only and does not constitute financial or investment advice.</p>
         </div>
         <div class="report-page">
           <div class="report-header">
             <div class="report-brand"><div class="report-brand-mark">⌂</div><div>AUS PROPERTY<br><span style="font-weight:500;letter-spacing:0.18em">ASSISTANT</span></div></div>
             <div class="report-kicker">Investment Suburb Analysis Report <span class="report-page-badge">Page 2 of 2</span></div>
           </div>
-          <h2 class="report-section-title" style="font-size:21px">Suburb Deep Dive</h2>
+          <h2 class="report-section-title" style="font-size:24px">Suburb Deep Dive</h2>
           ${deepDive}
           <h2 class="report-section-title" style="border-top:2px solid #08265c;padding-top:10px">Final Recommendation</h2>
-          <div class="report-final-grid">${finalCards}<div class="report-final-card primary"><strong>Overall Recommendation</strong><p style="font-size:12px;line-height:1.45">Based on the selected strategy and borrowing constraints, ${escapeHtml(compactName(suburbs[0]?.item?.suburb || 'the top suburb'))} is the strongest match, with the remaining selections providing useful comparison and diversification options.</p></div></div>
-          <div class="report-small-note"><strong>Overall Commentary</strong><br>All selected suburbs present investment opportunities with different strengths. Final choice should align with risk tolerance, time horizon, property type, and due diligence findings.</div>
-          <div style="display:flex;justify-content:space-between;margin-top:18px;font-size:12px;color:#334155"><span>Helping Australians make smarter property investment decisions.</span><span>auspropertyassistant.com.au</span></div>
+          <div class="report-final-grid">${finalCards}<div class="report-final-card primary"><strong style="font-size:17px">Overall Recommendation for ${customerName}</strong><p style="font-size:14px;line-height:1.5">Based on your selected strategy and borrowing constraints, ${escapeHtml(compactName(suburbs[0]?.item?.suburb || 'the top suburb'))} is the strongest match in this shortlist, with the remaining selections providing useful comparison and diversification options.</p></div></div>
+          <div class="report-small-note"><strong>Overall Commentary for ${customerName}</strong><br>All selected suburbs present investment opportunities with different strengths. Your final choice should align with risk tolerance, time horizon, property type, and due diligence findings.</div>
+          <div style="display:flex;justify-content:space-between;margin-top:18px;font-size:14px;color:#334155"><span>Helping Australians make smarter property investment decisions.</span><span>auspropertyassistant.com.au</span></div>
         </div>
       `;
     }
@@ -1038,19 +1089,269 @@
       if (!reportDraft) return;
       document.getElementById('reportPreviewContent').innerHTML = buildReportPreview(reportDraft);
       document.getElementById('reportPreviewOverlay').classList.add('open');
+      updateReportExportButton();
     }
 
     function closeReportPreview() {
       document.getElementById('reportPreviewOverlay').classList.remove('open');
     }
 
-    function printReportPreview() {
-      if (!latestReportDraft) {
+    function getReportPdfFileName() {
+      const code = latestReportDraft?.report?.report_code || 'investment-suburb-report';
+      return `${code}.pdf`;
+    }
+
+    function getReportStoragePath(fileName = getReportPdfFileName()) {
+      const generatedAt = latestReportDraft?.report?.created_at
+        ? new Date(latestReportDraft.report.created_at)
+        : new Date();
+      const year = generatedAt.getFullYear();
+      const month = String(generatedAt.getMonth() + 1).padStart(2, '0');
+      const day = String(generatedAt.getDate()).padStart(2, '0');
+      return `reports/${year}/${month}/${day}/${fileName}`;
+    }
+
+    function setReportExportStatus(message, visible = true) {
+      const statusEl = document.getElementById('reportExportStatus');
+      if (!statusEl) return;
+
+      statusEl.textContent = message;
+      statusEl.classList.toggle('hidden', !visible);
+    }
+
+    function setFindReportStatus(message, type = 'info') {
+      const statusEl = document.getElementById('findReportStatus');
+      if (!statusEl) return;
+
+      const classes = {
+        info: 'border-slate-200 bg-slate-50 text-slate-700',
+        success: 'border-indigo-200 bg-indigo-50 text-indigo-800',
+        error: 'border-red-200 bg-red-50 text-red-700'
+      };
+
+      statusEl.className = `mt-4 rounded-lg border px-4 py-3 text-sm ${classes[type] || classes.info}`;
+      statusEl.textContent = message;
+      statusEl.classList.remove('hidden');
+    }
+
+    function normalizeReportObjectPath(pdfStoragePath) {
+      const path = String(pdfStoragePath || '').trim();
+      const prefix = `${REPORTS_BUCKET}/`;
+      return path.startsWith(prefix) ? path.slice(prefix.length) : path;
+    }
+
+    function getReportPublicUrl(pdfStoragePath) {
+      const objectPath = normalizeReportObjectPath(pdfStoragePath);
+      return `${CONFIG.supabaseUrl}/storage/v1/object/public/${REPORTS_BUCKET}/${objectPath.split('/').map(encodeURIComponent).join('/')}`;
+    }
+
+    function isReportPdfStored() {
+      return latestReportDraft?.report?.report_status === 'generated'
+        && Boolean(latestReportDraft?.report?.pdf_storage_path);
+    }
+
+    function updateReportExportButton() {
+      const exportBtn = document.getElementById('exportReportPdfBtn');
+      if (!exportBtn) return;
+
+      const isStored = isReportPdfStored();
+      exportBtn.disabled = isStored;
+      exportBtn.textContent = isStored ? 'PDF Stored' : 'Export PDF';
+
+      if (isStored) {
+        setReportExportStatus('PDF already stored for this report.');
+      }
+    }
+
+    async function buildReportPdf() {
+      const reportPages = Array.from(document.querySelectorAll('#reportPreviewContent .report-page'));
+
+      if (!reportPages.length) {
+        throw new Error('Open the report preview before exporting.');
+      }
+
+      if (!window.html2canvas || !window.jspdf?.jsPDF) {
+        throw new Error('PDF export libraries did not load.');
+      }
+
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4',
+        compress: true
+      });
+
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      for (let index = 0; index < reportPages.length; index += 1) {
+        const page = reportPages[index];
+        setReportExportStatus(`Rendering page ${index + 1} of ${reportPages.length}...`);
+
+        const canvas = await html2canvas(page, {
+          scale: 2,
+          backgroundColor: '#ffffff',
+          useCORS: true,
+          logging: false,
+          windowWidth: page.scrollWidth,
+          windowHeight: page.scrollHeight
+        });
+
+        const imageData = canvas.toDataURL('image/jpeg', 0.96);
+        const imageRatio = canvas.width / canvas.height;
+        const pageRatio = pageWidth / pageHeight;
+
+        let imageWidth = pageWidth;
+        let imageHeight = pageHeight;
+        let offsetX = 0;
+        let offsetY = 0;
+
+        if (imageRatio > pageRatio) {
+          imageHeight = pageWidth / imageRatio;
+          offsetY = (pageHeight - imageHeight) / 2;
+        } else {
+          imageWidth = pageHeight * imageRatio;
+          offsetX = (pageWidth - imageWidth) / 2;
+        }
+
+        if (index > 0) {
+          pdf.addPage();
+        }
+
+        pdf.addImage(imageData, 'JPEG', offsetX, offsetY, imageWidth, imageHeight);
+      }
+
+      return pdf;
+    }
+
+    async function uploadReportPdf(pdfBlob, storagePath) {
+      const response = await fetch(`${CONFIG.supabaseUrl}/storage/v1/object/${REPORTS_BUCKET}/${storagePath}`, {
+        method: 'POST',
+        headers: {
+          'apikey': CONFIG.supabaseKey,
+          'Authorization': `Bearer ${CONFIG.supabaseKey}`,
+          'Content-Type': 'application/pdf'
+        },
+        body: pdfBlob
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'PDF upload failed.');
+      }
+    }
+
+    async function markReportGenerated(storagePath, fileName) {
+      const response = await fetch(`${CONFIG.supabaseUrl}/rest/v1/rpc/update_recommendation_report_pdf_status`, {
+        method: 'POST',
+        headers: getSupabaseHeaders({
+          'Content-Profile': 'public',
+          'Accept-Profile': 'public'
+        }),
+        body: JSON.stringify({
+          p_report_id: latestReportDraft.report.id,
+          p_report_status: 'generated',
+          p_pdf_storage_path: `${REPORTS_BUCKET}/${storagePath}`,
+          p_pdf_file_name: fileName
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(JSON.stringify(data, null, 2));
+      }
+
+      latestReportDraft.report = data;
+    }
+
+    async function findGeneratedReport() {
+      const input = document.getElementById('reportCodeInput');
+      const button = document.getElementById('findReportBtn');
+      const reportCode = input.value.trim().toUpperCase();
+
+      if (!reportCode) {
+        setFindReportStatus('Enter a report code.', 'error');
         return;
       }
 
-      document.getElementById('reportPreviewOverlay').classList.add('open');
-      window.print();
+      button.disabled = true;
+      setFindReportStatus('Looking up report...', 'info');
+
+      try {
+        const response = await fetch(
+          `${CONFIG.supabaseUrl}/rest/v1/recommendation_reports?report_code=eq.${encodeURIComponent(reportCode)}&select=id,report_code,customer_name,customer_email,report_status,pdf_storage_path,pdf_file_name,generated_at&limit=1`,
+          {
+            method: 'GET',
+            headers: getSupabaseHeaders({
+              'Accept-Profile': 'public'
+            })
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(JSON.stringify(data, null, 2));
+        }
+
+        const report = data[0];
+        if (!report) {
+          setFindReportStatus('No report found for that code.', 'error');
+          return;
+        }
+
+        if (report.report_status !== 'generated' || !report.pdf_storage_path) {
+          setFindReportStatus('Report found, but the PDF has not been generated yet.', 'error');
+          return;
+        }
+
+        window.open(getReportPublicUrl(report.pdf_storage_path), '_blank', 'noopener');
+        setFindReportStatus(`Opened ${report.report_code} for ${report.customer_name}.`, 'success');
+      } catch (error) {
+        setFindReportStatus(error.message || 'Report lookup failed.', 'error');
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    async function exportReportPdf() {
+      if (!latestReportDraft) return;
+
+      const exportBtn = document.getElementById('exportReportPdfBtn');
+      const fileName = getReportPdfFileName();
+      const storagePath = getReportStoragePath(fileName);
+
+      if (isReportPdfStored()) {
+        updateReportExportButton();
+        return;
+      }
+
+      exportBtn.disabled = true;
+      setReportExportStatus('Preparing PDF...');
+
+      try {
+        const pdf = await buildReportPdf();
+        const pdfBlob = pdf.output('blob');
+
+        setReportExportStatus('Uploading PDF...');
+        await uploadReportPdf(pdfBlob, storagePath);
+
+        setReportExportStatus('Saving report record...');
+        await markReportGenerated(storagePath, fileName);
+
+        pdf.save(fileName);
+        setReportExportStatus('PDF exported and stored.');
+        updateReportExportButton();
+      } catch (error) {
+        setReportExportStatus(error.message || 'PDF export failed.');
+        exportBtn.disabled = false;
+      } finally {
+        if (!isReportPdfStored()) {
+          exportBtn.disabled = false;
+        }
+      }
     }
 
     function getSelectedReportSuburbs() {
@@ -1571,12 +1872,18 @@
     }
 
     document.getElementById('generateBtn').addEventListener('click', generateRecommendation);
+    document.getElementById('findReportBtn').addEventListener('click', findGeneratedReport);
+    document.getElementById('reportCodeInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        findGeneratedReport();
+      }
+    });
 
     // Detail panel event listeners
     document.getElementById('closeDetailBtn').addEventListener('click', closeDetailPanel);
     document.getElementById('detailOverlay').addEventListener('click', closeDetailPanel);
     document.getElementById('closeReportPreviewBtn').addEventListener('click', closeReportPreview);
-    document.getElementById('printReportBtn').addEventListener('click', printReportPreview);
+    document.getElementById('exportReportPdfBtn').addEventListener('click', exportReportPdf);
     document.getElementById('reportPreviewOverlay').addEventListener('click', (e) => {
       if (e.target.id === 'reportPreviewOverlay') {
         closeReportPreview();

@@ -24,6 +24,7 @@ Replace dummy domain data with production data while preserving key relationship
 - [patch_run_recommendation_engine_no_null_top_suburbs.sql](../sql/patch_run_recommendation_engine_no_null_top_suburbs.sql)
 - [create_recommendation_report_tables.sql](../sql/create_recommendation_report_tables.sql)
 - [create_recommendation_report_functions.sql](../sql/create_recommendation_report_functions.sql)
+- [create_recommendation_report_storage.sql](../sql/create_recommendation_report_storage.sql)
 - Reference: [sql_reference_recommendation_pdf_reports.md](sql_reference_recommendation_pdf_reports.md)
 
 3. Reset (destructive):
