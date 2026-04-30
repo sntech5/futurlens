@@ -77,7 +77,7 @@ begin
       and stock_on_market_pct is not null
       and days_on_market is not null
       and vendor_discount_pct is not null
-    order by suburb_key, quarter_period desc
+    order by suburb_key, quarter_period desc nulls last
   ),
   source_rows as (
     select

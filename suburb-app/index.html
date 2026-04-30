@@ -41,12 +41,83 @@
     input:focus, select:focus {
       @apply ring-2 ring-indigo-500;
     }
-    .app-logo {
-      width: 190px;
+    .brand-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      color: #06183f;
+      line-height: 1;
+    }
+    .brand-mark {
+      width: 54px;
       height: 54px;
-      object-fit: cover;
-      object-position: center;
-      display: block;
+      border: 5px solid currentColor;
+      border-left-color: transparent;
+      border-right-color: transparent;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+    .brand-mark::before,
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 11px;
+      height: 5px;
+      border-radius: 999px;
+      background: currentColor;
+      transform: translateY(-50%);
+    }
+    .brand-mark::before {
+      left: -10px;
+    }
+    .brand-mark::after {
+      right: -10px;
+    }
+    .brand-mark span {
+      width: 27px;
+      height: 27px;
+      border: 4px solid currentColor;
+      border-radius: 50%;
+      background: radial-gradient(circle at 32% 28%, #ffffff 0 10%, #5e7cff 12% 28%, #2448f2 58%, #10206c 100%);
+    }
+    .brand-word {
+      font-size: 50px;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+    }
+    .report-powered-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #06183f;
+    }
+    .report-powered-logo .brand-mark {
+      width: 30px;
+      height: 30px;
+      border-width: 3px;
+    }
+    .report-powered-logo .brand-mark::before,
+    .report-powered-logo .brand-mark::after {
+      width: 6px;
+      height: 3px;
+    }
+    .report-powered-logo .brand-mark::before {
+      left: -6px;
+    }
+    .report-powered-logo .brand-mark::after {
+      right: -6px;
+    }
+    .report-powered-logo .brand-mark span {
+      width: 15px;
+      height: 15px;
+      border-width: 2px;
+    }
+    .report-powered-logo .brand-word {
+      font-size: 24px;
+      letter-spacing: 0.16em;
     }
     .detail-panel {
       position: fixed;
@@ -76,6 +147,24 @@
     }
     .detail-overlay.open {
       display: block;
+    }
+    .report-action-panel {
+      position: fixed;
+      left: 50%;
+      right: auto;
+      bottom: 18px;
+      width: calc(100% - 32px);
+      max-width: 1120px;
+      transform: translateX(-50%);
+      z-index: 60;
+      max-height: calc(100vh - 36px);
+      overflow: auto;
+      background: #eef4ff;
+      border: 1px solid #bfdbfe;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.22);
+    }
+    .report-results-list {
+      padding-bottom: 210px;
     }
     .report-preview-overlay {
       position: fixed;
@@ -141,13 +230,6 @@
       color: #64748b;
       font-size: 13px;
       font-weight: 700;
-    }
-    .report-powered-by img {
-      width: 140px;
-      height: 38px;
-      object-fit: cover;
-      object-position: center;
-      display: block;
     }
     .report-kicker {
       text-align: right;
@@ -489,6 +571,30 @@
       .detail-panel {
         max-width: 100%;
       }
+      .brand-logo {
+        gap: 10px;
+      }
+      .brand-logo .brand-mark {
+        width: 42px;
+        height: 42px;
+        border-width: 4px;
+      }
+      .brand-logo .brand-mark span {
+        width: 21px;
+        height: 21px;
+        border-width: 3px;
+      }
+      .brand-logo .brand-word {
+        font-size: 32px;
+        letter-spacing: 0.14em;
+      }
+      .report-action-panel {
+        bottom: 12px;
+        width: calc(100% - 24px);
+      }
+      .report-results-list {
+        padding-bottom: 330px;
+      }
     }
   </style>
 </head>
@@ -498,7 +604,10 @@
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <div class="flex items-center justify-between">
         <div>
-          <img src="images/futurlens_logo.png" alt="FuturLens" class="app-logo" />
+          <div class="brand-logo" aria-label="FuturLens">
+            <span class="brand-mark" aria-hidden="true"><span></span></span>
+            <span class="brand-word">futurlens</span>
+          </div>
           <p class="text-sm text-slate-600 mt-1">Find the perfect Australian suburb for your investment strategy</p>
         </div>
       </div>
@@ -555,7 +664,7 @@
             🎯 Investment Strategy
           </label>
           <div class="grid grid-cols-2 gap-3">
-            <button type="button" class="strategy-btn strategy-btn-growth p-4 rounded-lg border-2 border-slate-300 hover:border-slate-400 hover:bg-slate-50 transition text-left font-medium text-slate-700" data-strategy="growth">
+            <button type="button" class="strategy-btn strategy-btn-growth p-4 rounded-lg border-2 border-indigo-500 bg-indigo-50 hover:border-slate-400 hover:bg-slate-50 transition text-left font-medium text-slate-700" data-strategy="growth">
               <div class="text-lg">📈</div>
               <div class="font-semibold text-slate-900">Capital Growth</div>
               <div class="text-xs text-slate-600">Focus on appreciation</div>
@@ -620,7 +729,7 @@
     </div>
 
     <!-- Results Section -->
-    <div class="bg-white rounded-lg shadow-md border border-slate-200 overflow-hidden">
+    <div id="resultsSection" class="hidden bg-white rounded-lg shadow-md border border-slate-200 overflow-hidden">
       <div class="bg-gradient-to-r from-slate-600 to-slate-700 px-6 py-4">
         <h2 class="text-xl font-semibold text-white">Recommended Suburbs</h2>
       </div>
@@ -670,6 +779,7 @@
   <script>
     const CONFIG = window.APP_CONFIG || {};
     const REPORTS_BUCKET = 'recommendation-reports';
+    const REPORT_MAX_SUBURBS = 3;
     let currentRecommendation = null;
     let latestReportDraft = null;
 
@@ -708,7 +818,7 @@
       });
     });
 
-    // Set default strategy value without visual selection
+    // Set default strategy value.
     document.getElementById('strategy').value = 'growth';
 
     function transformSuburb(item, index, strategy) {
@@ -874,8 +984,8 @@
         return 'Select at least one suburb for the report.';
       }
 
-      if (selectedSuburbs.length > 3) {
-        return 'Select up to 3 suburbs for this report.';
+      if (selectedSuburbs.length > REPORT_MAX_SUBURBS) {
+        return `Select up to ${REPORT_MAX_SUBURBS} suburbs for this report.`;
       }
 
       if (!customerName) {
@@ -1118,7 +1228,7 @@
           <div class="report-small-note"><strong>Overall Commentary for ${customerName}</strong><br>All selected suburbs present investment opportunities with different strengths. Your final choice should align with risk tolerance, time horizon, property type, and due diligence findings.</div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-top:18px;font-size:14px;color:#334155">
             <span>FuturLens helps investors make smarter property decisions.</span>
-            <div class="report-powered-by"><span>Powered by</span><img src="images/futurlens_logo.png" alt="FuturLens"></div>
+            <div class="report-powered-by"><span>Powered by</span><span class="report-powered-logo" aria-label="FuturLens"><span class="brand-mark" aria-hidden="true"><span></span></span><span class="brand-word">futurlens</span></span></div>
           </div>
         </div>
       `;
@@ -1404,11 +1514,12 @@
       if (!countEl || !createBtn) return;
 
       const count = getSelectedReportSuburbs().length;
-      countEl.textContent = `${count} selected`;
+      countEl.textContent = `${count} / ${REPORT_MAX_SUBURBS} selected`;
       createBtn.disabled = count === 0;
     }
 
     function renderResult(rows, selectedStrategy) {
+      document.getElementById('resultsSection')?.classList.remove('hidden');
       const resultArea = document.getElementById('resultArea');
 
       if (!rows || !rows.length) {
@@ -1449,7 +1560,7 @@
         `;
       } else {
         html += `
-          <div class="mb-6 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+          <div class="report-action-panel mb-6 rounded-lg p-5">
             <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
               <div class="grid flex-1 grid-cols-1 gap-4 sm:grid-cols-2">
                 <div class="space-y-2">
@@ -1476,7 +1587,7 @@
                 </div>
               </div>
               <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-                <span id="selectedReportCount" class="rounded-full bg-slate-100 px-3 py-2 text-center text-sm font-medium text-slate-600">0 selected</span>
+                <span id="selectedReportCount" class="rounded-full bg-slate-100 px-3 py-2 text-center text-sm font-medium text-slate-600">0 / ${REPORT_MAX_SUBURBS} selected</span>
                 <button
                   id="createReportBtn"
                   type="button"
@@ -1489,7 +1600,7 @@
             </div>
             <div id="reportStatus" class="mt-4 hidden rounded-lg border px-4 py-3 text-sm"></div>
           </div>
-          <div class="space-y-3">
+          <div class="report-results-list space-y-3">
         `;
         suburbs.forEach((item, index) => {
           const s = transformSuburb(item, index, selectedStrategy);
@@ -1631,6 +1742,7 @@
 
     function renderError(message) {
       currentRecommendation = null;
+      document.getElementById('resultsSection')?.classList.remove('hidden');
       document.getElementById('resultArea').innerHTML = `
         <div class="bg-red-50 border border-red-200 rounded-lg p-6">
           <div class="flex gap-3">
@@ -1943,6 +2055,11 @@
 
     document.getElementById('resultArea').addEventListener('change', (e) => {
       if (e.target.classList.contains('report-suburb-checkbox')) {
+        if (e.target.checked && getSelectedReportSuburbs().length > REPORT_MAX_SUBURBS) {
+          e.target.checked = false;
+          setReportStatus(`Select up to ${REPORT_MAX_SUBURBS} suburbs for this report.`, 'error');
+          document.getElementById('reportStatus')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
         updateReportSelectionCount();
       }
     });

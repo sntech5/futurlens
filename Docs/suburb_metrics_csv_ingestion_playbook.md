@@ -119,7 +119,19 @@ Legacy compatibility note:
 
 ## Required Load Order
 
-### 1. Import CSV Into Staging
+### 1. Clear Staging
+
+Before importing a fresh CSV, empty the staging table:
+
+```sql
+truncate table public.suburb_import_staging restart identity;
+```
+
+`public.suburb_import_staging` is temporary import workspace, not history.
+Clearing it before every refresh prevents old CSV rows from mixing with the
+new file and being transformed into the current quarter load.
+
+### 2. Import CSV Into Staging
 
 Import the cleaned CSV into:
 
@@ -129,7 +141,7 @@ public.suburb_import_staging
 
 Do not import directly into `suburb_key_metrics_quarterly` or `suburb_base_scores`.
 
-### 2. Insert Missing Suburbs Into Master
+### 3. Insert Missing Suburbs Into Master
 
 Run this before loading quarterly metrics:
 
@@ -157,7 +169,7 @@ on conflict (suburb_key) do update set
 
 If latitude/longitude columns exist in `public.suburbs` and are present in staging, update them in this step too.
 
-### 3. Load Quarterly Metrics From Staging
+### 4. Load Quarterly Metrics From Staging
 
 Run:
 
@@ -167,7 +179,7 @@ Run:
 
 This script joins staging rows to `public.suburbs`. Rows without matching master suburbs are not loaded.
 
-### 4. Refresh Base Scores
+### 5. Refresh Base Scores
 
 Run:
 
@@ -187,7 +199,7 @@ from:
 public.suburb_key_metrics_quarterly
 ```
 
-### 5. Validate
+### 6. Validate
 
 Run:
 
