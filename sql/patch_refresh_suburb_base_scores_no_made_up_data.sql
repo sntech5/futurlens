@@ -24,9 +24,13 @@ end;
 $$;
 
 alter table public.suburb_key_metrics_quarterly
+  add column if not exists quarter_period text,
   add column if not exists median_price numeric,
   add column if not exists median_rent_weekly numeric,
   add column if not exists gross_yield numeric;
+
+create unique index if not exists suburb_key_metrics_quarterly_suburb_key_period_uidx
+on public.suburb_key_metrics_quarterly (suburb_key, quarter_period);
 
 create or replace function public.refresh_suburb_base_scores()
 returns void
@@ -73,7 +77,7 @@ begin
       and stock_on_market_pct is not null
       and days_on_market is not null
       and vendor_discount_pct is not null
-    order by suburb_key, quarter_date desc
+    order by suburb_key, quarter_period desc
   ),
   source_rows as (
     select

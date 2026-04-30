@@ -19,6 +19,27 @@ CSV/XLS source file
 
 `public.suburb_monthly_data` is retired from the active app flow. Current market metrics are refreshed quarterly through `public.suburb_key_metrics_quarterly`.
 
+Historical quarter key:
+
+```text
+suburb_key + quarter_period
+```
+
+`quarter_period` uses the quarter-end month format:
+
+```text
+YYYY-MM
+```
+
+Examples:
+
+```text
+2026-03
+2026-06
+2026-09
+2026-12
+```
+
 ## CSV Header Schema
 
 The CSV should use these exact snake_case headers before importing into `public.suburb_import_staging`.
@@ -73,6 +94,28 @@ MAITLAND_NSW_2320
 ```
 
 This key must exist in `public.suburbs` before a row is loaded into `public.suburb_key_metrics_quarterly`.
+
+## Quarterly Uniqueness Rule
+
+The quarterly metric table is historical, not just a latest snapshot table.
+
+Business key:
+
+```text
+suburb_key + quarter_period
+```
+
+Example:
+
+```text
+MAITLAND_NSW_2320 + 2026-09
+```
+
+This avoids storing unnecessary exact dates while still preserving quarter-over-quarter history.
+
+Legacy compatibility note:
+- if `public.suburb_key_metrics_quarterly` still has a `quarter_date` column from an older schema, the loader will populate it with the quarter-end date
+- business uniqueness still uses `suburb_key + quarter_period`
 
 ## Required Load Order
 

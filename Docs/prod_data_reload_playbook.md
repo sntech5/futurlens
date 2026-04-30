@@ -54,6 +54,7 @@ Quarterly staging transform:
 - [load_suburb_key_metrics_quarterly_from_staging.sql](../sql/load_suburb_key_metrics_quarterly_from_staging.sql)
 - This transform derives `median_rent_weekly` only from real `typical_value` and `gross_rental_yield` source fields.
 - If a required source metric is missing, the suburb is not loaded into `suburb_key_metrics_quarterly`.
+- Historical uniqueness in `suburb_key_metrics_quarterly` is `suburb_key + quarter_period`, where `quarter_period` is stored as `YYYY-MM` using the quarter-end month.
 
 Retired table:
 - `public.suburb_monthly_data` is no longer part of active logic.

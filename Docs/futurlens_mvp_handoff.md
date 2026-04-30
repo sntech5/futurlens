@@ -226,6 +226,7 @@ Current active design:
 - `suburb_monthly_data` is not part of the active recommendation/report path
 - price, rent, yield, vacancy, stock, days on market, vendor discount, and related factors should be loaded into `suburb_key_metrics_quarterly`
 - `suburb_base_scores` is refreshed from `suburb_key_metrics_quarterly`, not from suburb master records
+- quarterly history is tracked by `suburb_key + quarter_period` where `quarter_period` uses `YYYY-MM` such as `2026-09`
 
 ---
 

@@ -7,6 +7,10 @@
 -- - median_rent_weekly is derived only when typical_value and gross_rental_yield
 --   are both present: weekly rent = median price * gross yield / 52.
 -- - Rows without matching public.suburbs records are not loaded.
+-- - Historical uniqueness is suburb_key + quarter_period, where quarter_period
+--   uses the quarter-end month format YYYY-MM, for example 2026-09.
+-- - quarter_date may still exist as a legacy compatibility column; when present,
+--   this loader populates it with the quarter-end date.
 --
 -- Expected staging columns:
 -- state, post_code, suburb, avg_vendor_discount, days_on_market,
@@ -14,14 +18,19 @@
 -- statistical_reliability, typical_value, vacancy_rate, gross_rental_yield.
 
 alter table public.suburb_key_metrics_quarterly
+  add column if not exists quarter_period text,
   add column if not exists median_price numeric,
   add column if not exists median_rent_weekly numeric,
   add column if not exists gross_yield numeric;
 
+create unique index if not exists suburb_key_metrics_quarterly_suburb_key_period_uidx
+on public.suburb_key_metrics_quarterly (suburb_key, quarter_period);
+
 with cleaned as (
   select
     upper(trim(suburb)) || '_' || upper(trim(state)) || '_' || trim(post_code) as suburb_key,
-    date_trunc('quarter', current_date)::date as quarter_date,
+    to_char(date_trunc('quarter', current_date) + interval '2 month', 'YYYY-MM') as quarter_period,
+    (date_trunc('quarter', current_date) + interval '3 month - 1 day')::date as quarter_date,
     nullif(regexp_replace(coalesce(typical_value, ''), '[^0-9.]', '', 'g'), '')::numeric as median_price,
     case
       when nullif(regexp_replace(coalesce(gross_rental_yield, ''), '[^0-9.]', '', 'g'), '')::numeric > 1
@@ -40,6 +49,7 @@ with cleaned as (
 ready as (
   select
     c.suburb_key,
+    c.quarter_period,
     c.quarter_date,
     c.median_price,
     round((c.median_price * c.gross_yield / 52)::numeric, 2) as median_rent_weekly,
@@ -65,6 +75,7 @@ ready as (
 )
 insert into public.suburb_key_metrics_quarterly (
   suburb_key,
+  quarter_period,
   quarter_date,
   median_price,
   median_rent_weekly,
@@ -79,6 +90,7 @@ insert into public.suburb_key_metrics_quarterly (
 )
 select
   suburb_key,
+  quarter_period,
   quarter_date,
   median_price,
   median_rent_weekly,
@@ -91,8 +103,9 @@ select
   population_growth_pct,
   infrastructure_score
 from ready
-on conflict (suburb_key)
+on conflict (suburb_key, quarter_period)
 do update set
+  quarter_period = excluded.quarter_period,
   quarter_date = excluded.quarter_date,
   median_price = excluded.median_price,
   median_rent_weekly = excluded.median_rent_weekly,
