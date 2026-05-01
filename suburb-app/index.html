@@ -836,6 +836,27 @@
     let currentRecommendation = null;
     let latestReportDraft = null;
 
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+
+    function resetInitialScrollPosition() {
+      if (window.location.hash) return;
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
+
+    resetInitialScrollPosition();
+    window.addEventListener('load', () => {
+      requestAnimationFrame(resetInitialScrollPosition);
+    });
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) {
+        resetInitialScrollPosition();
+      }
+    });
+
     function getConfigError() {
       const requiredFields = ['supabaseUrl', 'supabaseKey', 'userProfileId'];
       const missing = requiredFields.filter((field) => !CONFIG[field]);
