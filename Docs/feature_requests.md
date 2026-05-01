@@ -94,3 +94,119 @@ Why it matters:
 
 Suggested milestone fit:
 - Milestone 4 operational improvement before repeat refresh cycles
+
+### 3. Affordability Score For Suburb Ranking
+
+Status:
+- requested
+
+Problem:
+- `max_out_of_pocket` entered by the user is currently used as an eligibility filter only
+- once a suburb passes the weekly out-of-pocket threshold, lower OOP does not improve its rank
+- this can make recommendations feel misaligned with user intent because a suburb near the
+  user's maximum weekly OOP can outrank a much more affordable suburb solely because its
+  growth or yield score is higher
+- the current OOP calculation is embedded directly in `public.run_recommendation_engine`,
+  which makes future finance-model changes harder to isolate
+
+Requested feature:
+- add an affordability score that converts estimated weekly out-of-pocket cost into a
+  ranking factor
+- keep OOP calculation in modular database logic so the finance formula can be enhanced
+  without rewriting the recommendation engine, frontend, or report-generation flow
+
+Desired behavior:
+- keep `max_out_of_pocket` as a hard filter so unaffordable suburbs are excluded
+- calculate `estimated_oop` using a dedicated database function or equivalent isolated
+  SQL module
+- calculate `affordability_score` from the estimated OOP and the user's maximum OOP
+- include `affordability_score` in suburb ranking so lower weekly OOP improves rank
+- include `affordability_score` in `top_suburbs` payloads for transparency and report use
+- preserve strategy intent: growth recommendations should still prioritize growth, yield
+  recommendations should still prioritize yield, but affordability should influence ordering
+  among eligible suburbs
+
+Proposed modular design:
+
+```text
+public.calculate_estimated_weekly_oop(
+  median_price,
+  median_rent_weekly
+)
+-> numeric
+
+public.calculate_affordability_score(
+  estimated_weekly_oop,
+  max_out_of_pocket
+)
+-> numeric
+
+public.run_recommendation_engine(p_run_id)
+-> calls the modular functions
+-> filters on estimated_weekly_oop <= max_out_of_pocket
+-> ranks using strategy score plus affordability_score
+```
+
+Initial OOP formula:
+
+```text
+estimated_weekly_oop = ((median_price * 0.8 * 0.06) / 52) - median_rent_weekly
+```
+
+Important modularity requirement:
+- the current 80% loan / 6% interest / simple weekly interest assumption must live in the
+  dedicated OOP calculation function, not inline in ranking SQL
+- future enhancements such as user deposit, interest rate, repayment type, management fees,
+  insurance, strata, council rates, vacancy allowance, or tax assumptions should be made in
+  the OOP module without changing ranking orchestration
+
+Possible first-pass affordability score:
+
+```text
+affordability_score =
+  100 when estimated_weekly_oop <= 0
+  otherwise 100 * (1 - estimated_weekly_oop / max_out_of_pocket), clamped to 0..100
+```
+
+Ranking direction:
+- higher `affordability_score` is better
+- negative or zero OOP should score best because the suburb is cash-flow neutral or positive
+- suburbs above `max_out_of_pocket` remain excluded rather than merely down-ranked
+
+Open scoring decision:
+- decide whether affordability is:
+  - a secondary tie-breaker after strategy score
+  - a weighted factor blended into a new recommendation score
+  - strategy-dependent, for example higher weight for yield users than growth users
+
+Suggested first implementation:
+- add affordability as a secondary weighted factor while preserving existing strategy-first
+  behavior
+- example concept:
+
+```text
+growth ranking = growth_score weighted heavily + affordability_score weighted lightly
+yield ranking = yield_score weighted heavily + affordability_score weighted moderately
+```
+
+Acceptance criteria:
+- changing the OOP formula requires updating only the modular OOP calculation function
+- changing the affordability scoring curve requires updating only the affordability score
+  function
+- `estimated_oop` remains present in each returned suburb object
+- `affordability_score` is present in each returned suburb object
+- no returned suburb has `estimated_oop > max_out_of_pocket`
+- with all else equal, a suburb with lower estimated OOP ranks above a suburb with higher
+  estimated OOP
+- restrictive no-match runs still insert a recommendation row with `top_suburbs = []`
+- tests cover positive OOP, zero OOP, negative OOP, and boundary cases at exactly
+  `max_out_of_pocket`
+
+Why it matters:
+- better matches user expectations when they provide a weekly affordability limit
+- makes recommendations feel more personalized and financially practical
+- prevents affordability from being treated as a hidden pass/fail gate only
+- creates a clean foundation for a more realistic finance model later
+
+Suggested milestone fit:
+- Milestone 5 scoring model review and ranking improvement

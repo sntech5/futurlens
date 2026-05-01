@@ -30,7 +30,8 @@ if (missing.length) {
 const configJs = `window.APP_CONFIG = {
   supabaseUrl: ${JSON.stringify(env.SUPABASE_URL)},
   supabaseKey: ${JSON.stringify(env.SUPABASE_ANON_KEY)},
-  userProfileId: ${JSON.stringify(env.USER_PROFILE_ID)}
+  userProfileId: ${JSON.stringify(env.USER_PROFILE_ID)},
+  googleMapsEmbedApiKey: ${JSON.stringify(env.GOOGLE_MAPS_EMBED_API_KEY || '')}
 };
 `;
 

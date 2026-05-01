@@ -780,6 +780,21 @@
     </div>
   </main>
 
+  <footer class="border-t border-slate-200 bg-white/80">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center">
+      <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-slate-500">
+        <span class="font-medium text-slate-600">FuturLens</span>
+        <span class="h-1 w-1 rounded-full bg-slate-300"></span>
+        <span>Australian property intelligence</span>
+        <span class="h-1 w-1 rounded-full bg-slate-300"></span>
+        <span>Model outputs, not financial advice</span>
+      </div>
+      <div class="mt-2 text-xs text-slate-400">
+        &copy; 2026 FuturLens. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
   <!-- Detail Panel Overlay -->
   <div class="detail-overlay" id="detailOverlay"></div>
 
@@ -835,6 +850,51 @@
         'Authorization': `Bearer ${CONFIG.supabaseKey}`,
         ...extra
       };
+    }
+
+    function getGoogleMapsQuery(suburbName, state) {
+      return `${suburbName}, ${state}, Australia`;
+    }
+
+    function getGoogleMapsSearchUrl(query) {
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+    }
+
+    function renderMapPanel(suburbName, state) {
+      const query = getGoogleMapsQuery(suburbName, state);
+      const searchUrl = getGoogleMapsSearchUrl(query);
+
+      if (!CONFIG.googleMapsEmbedApiKey) {
+        return `
+          <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
+            <p class="text-sm font-semibold text-slate-900">Map unavailable</p>
+            <p class="mt-1 text-sm text-slate-600">Add a Google Maps Embed API key to show maps in-app.</p>
+            <a
+              href="${searchUrl}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="mt-3 inline-flex rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700"
+            >
+              Open in Google Maps
+            </a>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="rounded-lg overflow-hidden border border-slate-200">
+          <iframe
+            width="100%"
+            height="200"
+            frameborder="0"
+            style="border:0"
+            src="https://www.google.com/maps/embed/v1/place?key=${encodeURIComponent(CONFIG.googleMapsEmbedApiKey)}&q=${encodeURIComponent(query)}"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade">
+          </iframe>
+        </div>
+      `;
     }
 
     // Strategy button handling
@@ -1889,18 +1949,7 @@
       let html = `
         <div class="space-y-6">
           <!-- Map -->
-          <div class="rounded-lg overflow-hidden border border-slate-200">
-            <iframe 
-              width="100%" 
-              height="200" 
-              frameborder="0" 
-              style="border:0" 
-              src="https://www.google.com/maps/embed/v1/place?key=AIzaSyAi5lqKu7qqvHKgVF-Sd5l8KCT6-7EEd1o&q=${encodeURIComponent(suburbName + ', ' + state + ', Australia')}" 
-              allowfullscreen="" 
-              loading="lazy" 
-              referrerpolicy="no-referrer-when-downgrade">
-            </iframe>
-          </div>
+          ${renderMapPanel(suburbName, state)}
 
           <!-- Key Metrics -->
           <div>
