@@ -166,6 +166,44 @@
     .report-results-list {
       padding-bottom: 210px;
     }
+    .info-tooltip {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      border: 1px solid currentColor;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: help;
+    }
+    .info-tooltip::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 8px);
+      width: min(260px, 70vw);
+      transform: translateX(-50%);
+      border-radius: 6px;
+      background: #0f172a;
+      color: white;
+      padding: 8px 10px;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.4;
+      opacity: 0;
+      pointer-events: none;
+      text-align: left;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      z-index: 80;
+    }
+    .info-tooltip:hover::after,
+    .info-tooltip:focus-visible::after {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-2px);
+    }
     .report-preview-overlay {
       position: fixed;
       inset: 0;
@@ -1017,6 +1055,25 @@
       return Math.max(0, Math.min(10, num > 10 ? num / 10 : num));
     }
 
+    function hasNumericScore(value) {
+      return value !== null && value !== undefined && value !== '' && Number.isFinite(Number(value));
+    }
+
+    function formatScoreValue(value) {
+      if (!hasNumericScore(value)) return 'N/A';
+      return getScore(value).toFixed(1).replace(/\.0$/, '');
+    }
+
+    function getScoreTone(value, { inverse = false } = {}) {
+      if (!hasNumericScore(value)) return 'bg-slate-100 text-slate-700 border-slate-200';
+      const score = getScore(value);
+      const good = inverse ? score <= 3 : score >= 7;
+      const caution = inverse ? score <= 6 : score >= 4;
+      if (good) return 'bg-green-100 text-green-900 border-green-200';
+      if (caution) return 'bg-amber-100 text-amber-900 border-amber-200';
+      return 'bg-red-100 text-red-900 border-red-200';
+    }
+
     function compactName(raw) {
       return formatSuburbName(raw).replace(/\s+(Nsw|Vic|Qld|Wa|Tas|Sa|Act|Nt)$/i, '');
     }
@@ -1800,12 +1857,34 @@
       ];
 
       const scores = [
-        { label: 'Growth Score', value: suburb.base_growth_score ? Math.round(suburb.base_growth_score) : 'N/A', color: 'indigo' },
-        { label: 'Yield Score', value: suburb.base_yield_score ? Math.round(suburb.base_yield_score) : 'N/A', color: 'blue' },
-        { label: 'Demand Score', value: suburb.base_demand_score ? Math.round(suburb.base_demand_score) : 'N/A', color: 'purple' },
-        { label: 'Risk Score', value: suburb.base_risk_score ? Math.round(suburb.base_risk_score) : 'N/A', color: 'red' },
-        { label: 'Total Score', value: suburb.base_total_score ? Math.round(suburb.base_total_score) : 'N/A', color: 'indigo' }
+        {
+          label: 'Growth Score',
+          value: suburb.base_growth_score,
+          insight: 'Relative growth signal from demand pressure, stock, discounting, vacancy and days on market.'
+        },
+        {
+          label: 'Yield Score',
+          value: suburb.base_yield_score,
+          insight: 'Higher means stronger gross rental yield compared with the scoring cap.'
+        },
+        {
+          label: 'Demand Score',
+          value: suburb.base_demand_score,
+          insight: 'Higher means tighter vacancy and faster selling conditions.'
+        },
+        {
+          label: 'Risk Penalty',
+          value: suburb.base_risk_score,
+          inverse: true,
+          insight: 'Lower is better. This currently reflects stock-on-market pressure.'
+        }
       ];
+
+      const totalScore = {
+        label: 'Total Score',
+        value: suburb.base_total_score,
+        insight: 'Weighted result from growth, yield and demand, reduced by the risk penalty.'
+      };
 
       let html = `
         <div class="space-y-6">
@@ -1848,21 +1927,38 @@
           <!-- Scoring Breakdown -->
           <div>
             <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wide mb-4">Scoring Breakdown</h3>
+            <div class="mb-3 rounded-lg border ${getScoreTone(totalScore.value)} p-4">
+              <div class="flex items-start justify-between gap-4">
+                <div>
+                  <div class="flex items-center gap-2 text-sm font-bold uppercase tracking-wide">
+                    <span>${totalScore.label}</span>
+                    <span class="info-tooltip" tabindex="0" aria-label="${escapeAttr(totalScore.insight)}" data-tooltip="${escapeAttr(totalScore.insight)}">i</span>
+                  </div>
+                </div>
+                <div class="shrink-0 text-right">
+                  <div class="text-4xl font-black leading-none">${formatScoreValue(totalScore.value)}</div>
+                  <div class="mt-1 text-xs font-semibold opacity-80">out of 10</div>
+                </div>
+              </div>
+            </div>
             <div class="space-y-2">
       `;
 
       scores.forEach(score => {
-        const colorClasses = {
-          'blue': 'bg-blue-100 text-blue-900',
-          'purple': 'bg-purple-100 text-purple-900',
-          'red': 'bg-red-100 text-red-900',
-          'indigo': 'bg-indigo-100 text-indigo-900'
-        };
-
         html += `
-          <div class="flex items-center justify-between p-3 rounded-lg border border-slate-200 ${colorClasses[score.color]}">
-            <span class="text-sm font-medium">${score.label}</span>
-            <span class="font-bold text-lg">${score.value}</span>
+          <div class="rounded-lg border p-3 ${getScoreTone(score.value, { inverse: score.inverse })}">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-bold">${score.label}</span>
+                  <span class="info-tooltip" tabindex="0" aria-label="${escapeAttr(score.insight)}" data-tooltip="${escapeAttr(score.insight)}">i</span>
+                </div>
+              </div>
+              <div class="shrink-0 text-right">
+                <span class="font-black text-xl">${formatScoreValue(score.value)}</span>
+                <div class="text-xs font-semibold opacity-80">/ 10</div>
+              </div>
+            </div>
           </div>
         `;
       });

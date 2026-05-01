@@ -19,7 +19,8 @@ Working rule:
 | 2 | Report Generation Final | IN PROGRESS | Professional report preview, PDF export, storage upload, duplicate-export guard, and report-code retrieval are implemented; final end-to-end verification is still in progress. |
 | 3 | Suburb Factors Data Ingestion | PENDING | Add ingestion path for report enrichment factors such as developable land supply, amenities, household growth, professional occupation growth, affordability, and employment diversity. |
 | 4 | Real Data Ingestion for Suburb Metrics One Time | PENDING | Load verified real suburb metric data into the existing suburb scoring tables, remove/replace demo data, and validate recommendation quality. |
-| 5 | DEMO to at least 3 prospective clients | PENDING | Use the testable product to gather feedback from at least three prospective clients. Must replace MVP anon report-storage policies with authenticated user policies before demo. |
+| 5 | Critical Algorithm Function Review | PENDING | After data refresh, critically analyse every database function that contains scoring, ranking, recommendation, or report-selection logic. Store/review those function bodies in `sql/functions-logic/`. |
+| 6 | DEMO to at least 3 prospective clients | PENDING | Use the testable product to gather feedback from at least three prospective clients. Must replace MVP anon report-storage policies with authenticated user policies before demo. |
 
 ## Current Focus
 
@@ -54,7 +55,7 @@ Allowed during Milestone 2:
 - fix bugs that block report generation
 - document any temporary MVP security shortcuts clearly
 
-Required before Milestone 5 demo:
+Required before Milestone 6 demo:
 - replace anonymous report storage upload/update policies with authenticated user policies
 - confirm report PDFs cannot be uploaded, overwritten, or read by unintended users
 - confirm suburb metrics used in recommendations and reports come from verified source data
@@ -80,6 +81,13 @@ Milestone 4:
 - validate that `suburb_base_scores` has no empty rows created from suburb master data alone
 - remove or clearly quarantine old demo/stale metric rows
 - rerun recommendation smoke tests after real metric load
+
+Milestone 5:
+- collect every algorithm-bearing database function into `sql/functions-logic/`
+- review scoring formulas, weights, normalisation, null handling, and ranking order critically
+- verify each function uses source-backed metrics only and does not introduce hidden placeholder logic
+- document the intended business meaning of each score or recommendation output
+- update SQL patch files only after the reviewed function logic is accepted
 
 Defer until later:
 - new scoring model changes
