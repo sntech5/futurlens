@@ -59,6 +59,7 @@ begin
         'days_on_market', s.days_on_market,
         'vendor_discount_pct', s.vendor_discount_pct,
         'population_growth_pct', s.population_growth_pct,
+        'population_growth_vs_state_pct', s.population_growth_vs_state_pct,
         'infrastructure_score', s.infrastructure_score,
         'base_growth_score', s.base_growth_score,
         'base_population_growth_score', s.base_population_growth_score,

@@ -49,6 +49,10 @@ select count(*) as null_rent_rows
 from public.suburb_base_scores
 where median_rent_weekly is null;
 
+select count(*) as population_score_rows_missing_score
+from public.suburb_base_scores
+where base_population_growth_score is null;
+
 select count(*) as quarterly_rows_missing_required_metrics
 from public.suburb_key_metrics_quarterly
 where median_price is null

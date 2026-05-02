@@ -196,6 +196,7 @@ Current columns:
 - `days_on_market`
 - `vendor_discount_pct`
 - `population_growth_pct`
+- `population_growth_vs_state_pct`
 - `infrastructure_score`
 - `base_growth_score`
 - `base_population_growth_score`
@@ -550,6 +551,7 @@ Market momentum inputs:
 Population momentum inputs:
 - `suburb_population_metrics.growth_2023_2024_pct`
 - `suburb_population_metrics.growth_2024_2025_pct`
+- `suburb_population_metrics.population_2025` for population-weighted state benchmarks
 
 ### Fields explicitly not used in `base_growth_score`
 - `gross_yield`
@@ -564,10 +566,10 @@ Min-max normalization to 0–100:
 - lower stock on market = better
 - lower vendor discount = better
 - lower vacancy = better
-- higher weighted two-year population growth = better
+- higher weighted two-year population growth versus state benchmark = better
 - if a metric has no spread across the scored dataset, it receives a neutral component score of `50`
 - only rows with all required growth inputs present are included in the score refresh
-- missing population metrics receive neutral `base_population_growth_score = 50`; `population_growth_pct` remains null
+- missing population metrics receive neutral `base_population_growth_score = 50`; `population_growth_pct` and `population_growth_vs_state_pct` remain null
 
 ### Current weights
 Market momentum score:
@@ -580,6 +582,7 @@ Market momentum score:
 Population momentum:
 - latest year: `0.70`
 - previous year: `0.30`
+- scoring signal: weighted suburb momentum minus population-weighted state benchmark
 
 Final growth score:
 - market momentum score: `0.65`

@@ -7,7 +7,11 @@
 -- Model:
 -- - population_growth_pct stores a weighted 2-year population momentum value:
 --     70% growth_2024_2025_pct + 30% growth_2023_2024_pct
--- - base_population_growth_score stores the normalized 0-100 score.
+-- - population_growth_vs_state_pct stores suburb momentum minus state benchmark.
+-- - state benchmark is population-weighted across loaded source-backed rows
+--   for each state.
+-- - base_population_growth_score stores the normalized 0-100 score from
+--   population_growth_vs_state_pct.
 -- - base_growth_score blends:
 --     65% market momentum score + 35% population growth score
 --
@@ -16,6 +20,7 @@
 -- - missing values are not invented; population_growth_pct remains null
 
 alter table public.suburb_base_scores
+  add column if not exists population_growth_vs_state_pct numeric,
   add column if not exists base_population_growth_score numeric;
 
 create or replace function public.refresh_population_growth_scores()
@@ -23,34 +28,64 @@ returns void
 language plpgsql
 as $$
 begin
-  with source_rows as (
+  with population_source as (
     select
-      s.suburb_key,
+      pm.suburb_key,
+      upper(pm.state) as state,
+      pm.population_2025,
       (
         pm.growth_2024_2025_pct * 0.70
         + pm.growth_2023_2024_pct * 0.30
       )::numeric as population_momentum_pct
+    from public.suburb_population_metrics pm
+    where pm.growth_2024_2025_pct is not null
+      and pm.growth_2023_2024_pct is not null
+  ),
+  state_benchmarks as (
+    select
+      state,
+      coalesce(
+        sum(population_momentum_pct * population_2025) / nullif(sum(population_2025), 0),
+        avg(population_momentum_pct)
+      ) as state_population_momentum_pct
+    from population_source
+    group by state
+  ),
+  source_rows as (
+    select
+      s.suburb_key,
+      population_source.population_momentum_pct,
+      state_benchmarks.state_population_momentum_pct,
+      (
+        population_source.population_momentum_pct
+        - state_benchmarks.state_population_momentum_pct
+      )::numeric as population_growth_vs_state_pct
     from public.suburb_base_scores s
-    left join public.suburb_population_metrics pm
-      on pm.suburb_key = s.suburb_key
+    left join population_source
+      on population_source.suburb_key = s.suburb_key
+    left join public.suburbs sub
+      on sub.suburb_key = s.suburb_key
+    left join state_benchmarks
+      on state_benchmarks.state = coalesce(population_source.state, upper(sub.state))
   ),
   stats as (
     select
-      min(population_momentum_pct) as min_population_momentum_pct,
-      max(population_momentum_pct) as max_population_momentum_pct
+      min(population_growth_vs_state_pct) as min_population_growth_vs_state_pct,
+      max(population_growth_vs_state_pct) as max_population_growth_vs_state_pct
     from source_rows
-    where population_momentum_pct is not null
+    where population_growth_vs_state_pct is not null
   ),
   scored as (
     select
       source_rows.suburb_key,
       source_rows.population_momentum_pct,
+      source_rows.population_growth_vs_state_pct,
       case
-        when source_rows.population_momentum_pct is null then 50
-        when stats.max_population_momentum_pct = stats.min_population_momentum_pct then 50
+        when source_rows.population_growth_vs_state_pct is null then 50
+        when stats.max_population_growth_vs_state_pct = stats.min_population_growth_vs_state_pct then 50
         else 100
-          * (source_rows.population_momentum_pct - stats.min_population_momentum_pct)
-          / nullif(stats.max_population_momentum_pct - stats.min_population_momentum_pct, 0)
+          * (source_rows.population_growth_vs_state_pct - stats.min_population_growth_vs_state_pct)
+          / nullif(stats.max_population_growth_vs_state_pct - stats.min_population_growth_vs_state_pct, 0)
       end as population_growth_score
     from source_rows
     cross join stats
@@ -58,6 +93,7 @@ begin
   update public.suburb_base_scores t
   set
     population_growth_pct = scored.population_momentum_pct,
+    population_growth_vs_state_pct = scored.population_growth_vs_state_pct,
     base_population_growth_score = round(scored.population_growth_score::numeric, 3),
     refreshed_at = now()
   from scored

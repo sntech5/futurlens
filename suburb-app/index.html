@@ -1934,6 +1934,7 @@
         { label: 'Days on Market', value: suburb.days_on_market ? `${Math.round(suburb.days_on_market)} days` : 'N/A', icon: '⏱️' },
         { label: 'Vendor Discount %', value: formatPercent(suburb.vendor_discount_pct, 'vendor_discount_pct'), icon: '💸' },
         { label: 'Population Growth', value: formatPercent(suburb.population_growth_pct, 'population_growth_pct'), icon: '📈' },
+        { label: 'Population Growth vs State', value: formatPercent(suburb.population_growth_vs_state_pct, 'population_growth_pct'), icon: '📈' },
         { label: 'Infrastructure Score', value: suburb.infrastructure_score ? Math.round(suburb.infrastructure_score) : 'N/A', icon: '🏗️' },
       ];
 
@@ -1946,7 +1947,7 @@
         {
           label: 'Population Growth Score',
           value: suburb.base_population_growth_score,
-          insight: 'Normalized score from weighted 2023-2025 population growth. Missing source data receives a neutral score.'
+          insight: 'Normalized score from weighted 2023-2025 population growth compared with the state benchmark. Missing source data receives a neutral score.'
         },
         {
           label: 'Yield Score',

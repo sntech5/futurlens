@@ -52,9 +52,17 @@ That value is normalized to:
 base_population_growth_score
 ```
 
-on a `0-100` scale.
+on a `0-100` scale from:
 
-Missing population source rows receive neutral `base_population_growth_score = 50`, while `population_growth_pct` remains null. This keeps missing source data from being invented or unfairly punished.
+```text
+population_growth_vs_state_pct =
+  population_momentum_pct
+- state_population_momentum_pct
+```
+
+The state benchmark is calculated as a population-weighted average from loaded source-backed `suburb_population_metrics` rows for each state. This avoids letting small-base suburbs dominate ranking just because their raw percentage growth is high.
+
+Missing population source rows receive neutral `base_population_growth_score = 50`, while `population_growth_pct` and `population_growth_vs_state_pct` remain null. This keeps missing source data from being invented or unfairly punished.
 
 ### Market Momentum Score
 
