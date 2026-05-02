@@ -73,7 +73,8 @@ begin
       (v_rec_normal -> 0) ? 'price' and
       (v_rec_normal -> 0) ? 'rent' and
       (v_rec_normal -> 0) ? 'yield' and
-      (v_rec_normal -> 0) ? 'estimated_oop'
+      (v_rec_normal -> 0) ? 'estimated_oop' and
+      (v_rec_normal -> 0) ? 'base_population_growth_score'
     ) then
       raise exception 'Smoke FAIL S3: expected keys missing in first suburb object';
     end if;

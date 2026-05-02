@@ -11,9 +11,11 @@ truncate table public.recommendation_runs restart identity;
 -- Score/snapshot tables that depend on suburbs.
 truncate table public.suburb_base_scores restart identity;
 truncate table public.suburb_key_metrics_quarterly restart identity;
+truncate table public.suburb_population_metrics restart identity;
 
 -- Import staging.
 truncate table public.suburb_import_staging restart identity;
+truncate table public.suburb_population_metrics_staging restart identity;
 
 -- Master data table.
 truncate table public.suburbs restart identity;

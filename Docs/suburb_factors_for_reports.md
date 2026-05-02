@@ -7,6 +7,84 @@ Purpose:
 
 These factors are not yet assumed to be part of the current recommendation score unless explicitly added to the scoring SQL. They are intended to enrich suburb reports with context beyond the existing base scores.
 
+## Implemented Factor Tables
+
+### `public.suburb_population_metrics`
+
+Status:
+- table created in Supabase and captured in source control
+
+Source:
+- ABS Regional Population 2024-25, Population estimates by SA2 and above
+
+Allocation:
+- SA2 source data allocated to suburb level
+- source level: `SA2_ALLOCATED_TO_SUBURB`
+- allocation method: `RESIDENTIAL_MB_PROPORTIONAL`
+
+Current fields:
+- `suburb_key`
+- `suburb_name`
+- `state`
+- `postcode`
+- `population_2025`
+- `growth_2023_2024_pct`
+- `growth_2024_2025_pct`
+- `source_level`
+- `allocation_method`
+- `source_year`
+- `source_name`
+
+Intended use:
+- add source-backed population and recent population-growth context to generated suburb reports
+- support future scoring-model review if population growth is intentionally added to recommendation ranking
+
+Guardrail:
+- do not treat these metrics as part of the current recommendation score until the scoring SQL explicitly uses them
+- report wording should identify the population data as SA2-allocated suburb-level data, not direct suburb-level enumeration
+
+SQL reference:
+- [create_suburb_population_metrics.sql](../sql/create_suburb_population_metrics.sql)
+- [create_suburb_population_metrics_staging.sql](../sql/create_suburb_population_metrics_staging.sql)
+- [load_suburb_population_metrics_from_staging.sql](../sql/load_suburb_population_metrics_from_staging.sql)
+- [audit_population_metrics_coverage.sql](../sql/audit_population_metrics_coverage.sql)
+
+Import workflow:
+1. Create the final table and staging table if needed.
+2. Truncate `public.suburb_population_metrics_staging`.
+3. Import the CSV into `public.suburb_population_metrics_staging`, not directly into `public.suburb_population_metrics`.
+4. Run [load_suburb_population_metrics_from_staging.sql](../sql/load_suburb_population_metrics_from_staging.sql).
+5. Run post-load validation.
+
+Import note:
+- `population_2025` is an integer in the final table, but some CSV tools export values like `2808.0`.
+- The staging loader accepts that text and converts it safely to `2808`.
+
+Known coverage gap:
+- latest audit showed 149 of 164 recommendation suburbs had population metrics, about 90.9% coverage
+- the missing 15 suburbs are all WA suburbs that were absent from the population staging CSV, even by suburb name
+- reports must display population data as unavailable for these suburbs rather than inventing values
+
+Known missing recommendation suburbs:
+
+```text
+ALKIMOS_WA_6038
+ASHBY_WA_6065
+BALLAJURA_WA_6066
+BEECHBORO_WA_6063
+BUTLER_WA_6036
+GIRRAWHEEN_WA_6064
+KOONDOOLA_WA_6064
+LOCKRIDGE_WA_6054
+MERRIWA_WA_6030
+MIDDLE SWAN_WA_6056
+PEARSALL_WA_6065
+RIDGEWOOD_WA_6030
+STRATTON_WA_6056
+WANNEROO_WA_6065
+WAROONA_WA_6215
+```
+
 ## Report Factor List
 
 ### 1. Developable Land Supply

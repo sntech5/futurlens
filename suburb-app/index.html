@@ -1941,7 +1941,12 @@
         {
           label: 'Growth Score',
           value: suburb.base_growth_score,
-          insight: 'Relative growth signal from demand pressure, stock, discounting, vacancy and days on market.'
+          insight: 'Blends market momentum with source-backed population growth where available.'
+        },
+        {
+          label: 'Population Growth Score',
+          value: suburb.base_population_growth_score,
+          insight: 'Normalized score from weighted 2023-2025 population growth. Missing source data receives a neutral score.'
         },
         {
           label: 'Yield Score',

@@ -1,0 +1,41 @@
+begin
+  with source_rows as (
+    select
+      s.suburb_key,
+      (
+        pm.growth_2024_2025_pct * 0.70
+        + pm.growth_2023_2024_pct * 0.30
+      )::numeric as population_momentum_pct
+    from public.suburb_base_scores s
+    left join public.suburb_population_metrics pm
+      on pm.suburb_key = s.suburb_key
+  ),
+  stats as (
+    select
+      min(population_momentum_pct) as min_population_momentum_pct,
+      max(population_momentum_pct) as max_population_momentum_pct
+    from source_rows
+    where population_momentum_pct is not null
+  ),
+  scored as (
+    select
+      source_rows.suburb_key,
+      source_rows.population_momentum_pct,
+      case
+        when source_rows.population_momentum_pct is null then 50
+        when stats.max_population_momentum_pct = stats.min_population_momentum_pct then 50
+        else 100
+          * (source_rows.population_momentum_pct - stats.min_population_momentum_pct)
+          / nullif(stats.max_population_momentum_pct - stats.min_population_momentum_pct, 0)
+      end as population_growth_score
+    from source_rows
+    cross join stats
+  )
+  update public.suburb_base_scores t
+  set
+    population_growth_pct = scored.population_momentum_pct,
+    base_population_growth_score = round(scored.population_growth_score::numeric, 3),
+    refreshed_at = now()
+  from scored
+  where t.suburb_key = scored.suburb_key;
+end;

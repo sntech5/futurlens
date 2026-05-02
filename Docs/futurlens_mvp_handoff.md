@@ -198,6 +198,7 @@ Current columns:
 - `population_growth_pct`
 - `infrastructure_score`
 - `base_growth_score`
+- `base_population_growth_score`
 - `base_yield_score`
 - `base_demand_score`
 - `base_risk_score`
@@ -227,6 +228,63 @@ Current active design:
 - price, rent, yield, vacancy, stock, days on market, vendor discount, and related factors should be loaded into `suburb_key_metrics_quarterly`
 - `suburb_base_scores` is refreshed from `suburb_key_metrics_quarterly`, not from suburb master records
 - quarterly history is tracked by `suburb_key + quarter_period` where `quarter_period` uses `YYYY-MM` such as `2026-09`
+
+---
+
+### `suburb_population_metrics`
+Purpose:
+- source-backed suburb population context for reports and future scoring work
+- stores current population and recent annual population-growth metrics allocated to suburb level
+- not currently part of recommendation ranking unless explicitly joined into future scoring SQL
+
+Source and allocation:
+- source: ABS Regional Population 2024-25, Population estimates by SA2 and above
+- source level: `SA2_ALLOCATED_TO_SUBURB`
+- allocation method: `RESIDENTIAL_MB_PROPORTIONAL`
+- source year: `2025`
+
+Current columns:
+- `suburb_key`
+- `suburb_name`
+- `state`
+- `postcode`
+- `population_2025`
+- `growth_2023_2024_pct`
+- `growth_2024_2025_pct`
+- `source_level`
+- `allocation_method`
+- `source_year`
+- `source_name`
+- `created_at`
+- `updated_at`
+
+Constraints and indexes:
+- one row per `suburb_key`
+- `suburb_key` references `public.suburbs(suburb_key)` with cascade delete
+- indexed by `state`, `postcode`, `population_2025`, and `growth_2024_2025_pct`
+- `updated_at` is maintained by `public.set_updated_at()` via trigger
+
+Source-controlled SQL:
+- [create_suburb_population_metrics.sql](../sql/create_suburb_population_metrics.sql)
+- [create_suburb_population_metrics_staging.sql](../sql/create_suburb_population_metrics_staging.sql)
+- [load_suburb_population_metrics_from_staging.sql](../sql/load_suburb_population_metrics_from_staging.sql)
+- [audit_population_metrics_coverage.sql](../sql/audit_population_metrics_coverage.sql)
+
+Import note:
+- import population CSVs into `public.suburb_population_metrics_staging` first
+- do not import directly into `public.suburb_population_metrics` if the CSV contains values like `2808.0` for `population_2025`
+- the staging loader converts whole-number decimal text into integer population values
+
+Known coverage gap:
+- latest audit: 164 recommendation suburbs, 149 with population metrics, 15 missing
+- coverage is about 90.9%
+- missing rows were absent from `public.suburb_population_metrics_staging`, not rejected by the loader
+- all known missing rows are WA suburbs:
+  `ALKIMOS_WA_6038`, `ASHBY_WA_6065`, `BALLAJURA_WA_6066`, `BEECHBORO_WA_6063`,
+  `BUTLER_WA_6036`, `GIRRAWHEEN_WA_6064`, `KOONDOOLA_WA_6064`, `LOCKRIDGE_WA_6054`,
+  `MERRIWA_WA_6030`, `MIDDLE SWAN_WA_6056`, `PEARSALL_WA_6065`, `RIDGEWOOD_WA_6030`,
+  `STRATTON_WA_6056`, `WANNEROO_WA_6065`, `WAROONA_WA_6215`
+- app/report behavior should show population data unavailable for these suburbs until a verified source row is loaded
 
 ---
 
@@ -471,21 +529,27 @@ Fix used:
 Make growth ranking more realistic and modular without touching the frontend or engine each time.
 
 ### Design decision
-Keep growth-score logic isolated in a dedicated function:
+Keep growth-score logic isolated in dedicated functions:
 
 ```sql
+public.refresh_population_growth_scores()
 public.refresh_base_growth_scores()
 ```
 
-This is the correct modular location for future changes.
+`refresh_population_growth_scores()` owns the population momentum formula.
+`refresh_base_growth_scores()` owns the final growth-score blend.
 
 ### Inputs considered in the weighted growth score
-Only the following are currently relevant:
+Market momentum inputs:
 - `base_demand_score` (currently DSR-derived)
 - `days_on_market`
 - `stock_on_market_pct`
 - `vendor_discount_pct`
 - `vacancy_rate`
+
+Population momentum inputs:
+- `suburb_population_metrics.growth_2023_2024_pct`
+- `suburb_population_metrics.growth_2024_2025_pct`
 
 ### Fields explicitly not used in `base_growth_score`
 - `gross_yield`
@@ -500,15 +564,26 @@ Min-max normalization to 0–100:
 - lower stock on market = better
 - lower vendor discount = better
 - lower vacancy = better
+- higher weighted two-year population growth = better
 - if a metric has no spread across the scored dataset, it receives a neutral component score of `50`
 - only rows with all required growth inputs present are included in the score refresh
+- missing population metrics receive neutral `base_population_growth_score = 50`; `population_growth_pct` remains null
 
 ### Current weights
+Market momentum score:
 - DSR: `0.40`
 - DOM: `0.20`
 - Stock on market: `0.15`
 - Vendor discount: `0.15`
 - Vacancy: `0.10`
+
+Population momentum:
+- latest year: `0.70`
+- previous year: `0.30`
+
+Final growth score:
+- market momentum score: `0.65`
+- population growth score: `0.35`
 
 ### Exact Supabase implementation
 The current function body is captured in:
@@ -519,6 +594,7 @@ The current function body is captured in:
 If the growth model changes later, update only:
 
 ```sql
+public.refresh_population_growth_scores()
 public.refresh_base_growth_scores()
 ```
 
@@ -534,9 +610,13 @@ Working and in use.
 ### `public.refresh_base_growth_scores()`
 Working and created as the modular place for growth scoring logic.
 
+### `public.refresh_population_growth_scores()`
+Working and created as the modular owner of source-backed population momentum scoring.
+
 ### Mentioned/older function
 - `refresh_suburb_base_scores` refreshes current base score rows from `suburb_key_metrics_quarterly`.
 - `refresh_base_growth_scores` remains the modular owner of the growth score calculation.
+- `refresh_population_growth_scores` remains the modular owner of population momentum calculation.
 - There was also an abandoned 3-parameter version of `run_recommendation_engine`; do not continue with that path.
 
 ---

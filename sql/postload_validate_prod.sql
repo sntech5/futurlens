@@ -11,6 +11,10 @@ select 'suburb_base_scores', count(*) from public.suburb_base_scores
 union all
 select 'suburb_key_metrics_quarterly', count(*) from public.suburb_key_metrics_quarterly
 union all
+select 'suburb_population_metrics', count(*) from public.suburb_population_metrics
+union all
+select 'suburb_population_metrics_staging', count(*) from public.suburb_population_metrics_staging
+union all
 select 'recommendation_runs', count(*) from public.recommendation_runs
 union all
 select 'recommendations', count(*) from public.recommendations
@@ -24,6 +28,11 @@ where m.suburb_key is null;
 
 select count(*) as quarterly_without_suburb
 from public.suburb_key_metrics_quarterly s
+left join public.suburbs m on m.suburb_key = s.suburb_key
+where m.suburb_key is null;
+
+select count(*) as population_metrics_without_suburb
+from public.suburb_population_metrics s
 left join public.suburbs m on m.suburb_key = s.suburb_key
 where m.suburb_key is null;
 
@@ -75,5 +84,10 @@ select
 from pg_proc p
 join pg_namespace n on n.oid = p.pronamespace
 where n.nspname = 'public'
-  and p.proname in ('run_recommendation_engine', 'refresh_suburb_base_scores', 'refresh_base_growth_scores')
+  and p.proname in (
+    'run_recommendation_engine',
+    'refresh_suburb_base_scores',
+    'refresh_base_growth_scores',
+    'refresh_population_growth_scores'
+  )
 order by p.proname;

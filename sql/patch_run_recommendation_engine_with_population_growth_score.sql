@@ -1,9 +1,12 @@
--- Reference: Docs/sql_reference_patch_run_recommendation_engine.md
--- Patch: prevent NOT NULL failures on recommendations.top_suburbs
--- Context: public.run_recommendation_engine(p_run_id uuid)
+-- Purpose:
+-- Refresh recommendation payload shape after adding
+-- suburb_base_scores.base_population_growth_score.
 --
--- Apply this in Supabase SQL Editor. It preserves the 1-parameter signature
--- and ensures no-match runs write top_suburbs = '[]'::jsonb.
+-- Context:
+-- public.run_recommendation_engine(p_run_id uuid)
+--
+-- Apply after:
+-- - patch_growth_score_with_population_momentum.sql
 
 create or replace function public.run_recommendation_engine(p_run_id uuid)
 returns void
@@ -16,7 +19,6 @@ declare
   v_strategy_type text;
   v_top_suburbs jsonb;
 begin
-  -- Read run inputs from source-of-truth table.
   select
     rr.user_profile_id,
     rr.input_budget,
@@ -38,8 +40,6 @@ begin
     raise exception 'run_recommendation_engine: missing required run inputs for run_id %', p_run_id;
   end if;
 
-  -- Build recommendation payload.
-  -- IMPORTANT: jsonb_agg returns NULL when no rows match, so wrap with COALESCE.
   select coalesce(
     jsonb_agg(
       jsonb_build_object(
@@ -81,7 +81,6 @@ begin
   where s.median_price <= v_budget
     and (((s.median_price * 0.8 * 0.06) / 52) - s.median_rent_weekly) <= v_max_oop;
 
-  -- Double-guard before insert.
   v_top_suburbs := coalesce(v_top_suburbs, '[]'::jsonb);
 
   insert into public.recommendations (

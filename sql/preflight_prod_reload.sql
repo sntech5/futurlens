@@ -13,6 +13,10 @@ select 'suburb_base_scores', count(*) from public.suburb_base_scores
 union all
 select 'suburb_key_metrics_quarterly', count(*) from public.suburb_key_metrics_quarterly
 union all
+select 'suburb_population_metrics', count(*) from public.suburb_population_metrics
+union all
+select 'suburb_population_metrics_staging', count(*) from public.suburb_population_metrics_staging
+union all
 select 'recommendation_runs', count(*) from public.recommendation_runs
 union all
 select 'recommendations', count(*) from public.recommendations

@@ -1,4 +1,74 @@
+-- Purpose:
+-- Add source-backed population growth as a meaningful factor in suburb growth
+-- ranking while keeping population scoring modular.
+--
+-- Apply in Supabase SQL Editor after public.suburb_population_metrics exists.
+--
+-- Model:
+-- - population_growth_pct stores a weighted 2-year population momentum value:
+--     70% growth_2024_2025_pct + 30% growth_2023_2024_pct
+-- - base_population_growth_score stores the normalized 0-100 score.
+-- - base_growth_score blends:
+--     65% market momentum score + 35% population growth score
+--
+-- Missing population metrics:
+-- - missing population rows receive a neutral score of 50
+-- - missing values are not invented; population_growth_pct remains null
 
+alter table public.suburb_base_scores
+  add column if not exists base_population_growth_score numeric;
+
+create or replace function public.refresh_population_growth_scores()
+returns void
+language plpgsql
+as $$
+begin
+  with source_rows as (
+    select
+      s.suburb_key,
+      (
+        pm.growth_2024_2025_pct * 0.70
+        + pm.growth_2023_2024_pct * 0.30
+      )::numeric as population_momentum_pct
+    from public.suburb_base_scores s
+    left join public.suburb_population_metrics pm
+      on pm.suburb_key = s.suburb_key
+  ),
+  stats as (
+    select
+      min(population_momentum_pct) as min_population_momentum_pct,
+      max(population_momentum_pct) as max_population_momentum_pct
+    from source_rows
+    where population_momentum_pct is not null
+  ),
+  scored as (
+    select
+      source_rows.suburb_key,
+      source_rows.population_momentum_pct,
+      case
+        when source_rows.population_momentum_pct is null then 50
+        when stats.max_population_momentum_pct = stats.min_population_momentum_pct then 50
+        else 100
+          * (source_rows.population_momentum_pct - stats.min_population_momentum_pct)
+          / nullif(stats.max_population_momentum_pct - stats.min_population_momentum_pct, 0)
+      end as population_growth_score
+    from source_rows
+    cross join stats
+  )
+  update public.suburb_base_scores t
+  set
+    population_growth_pct = scored.population_momentum_pct,
+    base_population_growth_score = round(scored.population_growth_score::numeric, 3),
+    refreshed_at = now()
+  from scored
+  where t.suburb_key = scored.suburb_key;
+end;
+$$;
+
+create or replace function public.refresh_base_growth_scores()
+returns void
+language plpgsql
+as $$
 declare
   v_weight_dsr numeric := 0.40;
   v_weight_dom numeric := 0.20;
@@ -81,3 +151,4 @@ begin
   from scored
   where t.suburb_key = scored.suburb_key;
 end;
+$$;

@@ -210,3 +210,52 @@ Why it matters:
 
 Suggested milestone fit:
 - Milestone 5 scoring model review and ranking improvement
+
+### 4. Resolve WA Population Metrics Coverage Gap
+
+Status:
+- requested
+
+Problem:
+- `public.suburb_population_metrics` currently covers 149 of 164 suburbs in the recommendation universe
+- the 15 missing suburbs are all WA suburbs and were absent from the population staging CSV
+- population metrics are intended for source-backed report context and possible future scoring work
+- reports must not invent population data, so these suburbs currently need an unavailable-data fallback
+
+Known missing suburbs:
+
+```text
+ALKIMOS_WA_6038
+ASHBY_WA_6065
+BALLAJURA_WA_6066
+BEECHBORO_WA_6063
+BUTLER_WA_6036
+GIRRAWHEEN_WA_6064
+KOONDOOLA_WA_6064
+LOCKRIDGE_WA_6054
+MERRIWA_WA_6030
+MIDDLE SWAN_WA_6056
+PEARSALL_WA_6065
+RIDGEWOOD_WA_6030
+STRATTON_WA_6056
+WANNEROO_WA_6065
+WAROONA_WA_6215
+```
+
+Requested feature:
+- improve population-source coverage for recommendation suburbs by finding and loading verified source-backed population rows for the missing WA suburbs
+
+Desired behavior:
+- rerun [audit_population_metrics_coverage.sql](../sql/audit_population_metrics_coverage.sql) after each population import
+- identify whether missing suburbs require alternate SA2 mapping, suburb/postcode alias handling, or an additional verified source extract
+- load only verified source-backed population rows through `public.suburb_population_metrics_staging`
+- keep report fallback behavior for suburbs where population metrics remain unavailable
+
+Acceptance criteria:
+- population metric coverage reaches 100% for current `public.suburb_base_scores` rows, or remaining gaps are explicitly documented with reason
+- no synthetic or manually guessed population values are inserted
+- all loaded rows retain source/allocation metadata
+- post-load validation reports `population_metrics_without_suburb = 0`
+
+Suggested milestone fit:
+- Milestone 3 report-factor data quality follow-up, or Milestone 5 scoring-model review if population growth becomes a ranking factor

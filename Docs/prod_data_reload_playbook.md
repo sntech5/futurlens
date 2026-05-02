@@ -44,6 +44,8 @@ Data integrity guardrail:
 - load `suburbs` first
 - load `suburb_import_staging`
 - transform/load verified market metrics into `suburb_key_metrics_quarterly`
+- load `suburb_population_metrics_staging`
+- transform/load verified population metrics into `suburb_population_metrics`
 - refresh `suburb_base_scores` from `suburb_key_metrics_quarterly`
 
 5. Recompute:
@@ -55,6 +57,15 @@ Quarterly staging transform:
 - This transform derives `median_rent_weekly` only from real `typical_value` and `gross_rental_yield` source fields.
 - If a required source metric is missing, the suburb is not loaded into `suburb_key_metrics_quarterly`.
 - Historical uniqueness in `suburb_key_metrics_quarterly` is `suburb_key + quarter_period`, where `quarter_period` is stored as `YYYY-MM` using the quarter-end month.
+
+Population metric transform:
+- [create_suburb_population_metrics.sql](../sql/create_suburb_population_metrics.sql)
+- [create_suburb_population_metrics_staging.sql](../sql/create_suburb_population_metrics_staging.sql)
+- [load_suburb_population_metrics_from_staging.sql](../sql/load_suburb_population_metrics_from_staging.sql)
+- [patch_growth_score_with_population_momentum.sql](../sql/patch_growth_score_with_population_momentum.sql)
+- Population CSVs must be imported into `suburb_population_metrics_staging` first, not directly into `suburb_population_metrics`.
+- The population loader converts whole-number decimal text like `2808.0` into integer population values.
+- `refresh_base_growth_scores()` now blends market momentum with source-backed population growth.
 
 Retired table:
 - `public.suburb_monthly_data` is no longer part of active logic.
@@ -69,6 +80,7 @@ Retired table:
 ## Load Order Details
 - `suburbs` must exist before tables that reference `suburb_key`.
 - `suburb_key_metrics_quarterly` is the source table for current market metrics, including price, rent, yield, vacancy, stock, days on market, vendor discount, and supporting factors.
+- `suburb_population_metrics` is the source table for population and recent population-growth context.
 - `suburb_base_scores` is refreshed from `suburb_key_metrics_quarterly`; do not load it directly from suburb master records.
 - `recommendation_runs` and `recommendations` are app-generated; do not bulk-fill unless intentional.
 - `recommendation_reports` and `recommendation_report_suburbs` are app-generated report records; preserve them unless intentionally resetting generated report history.
