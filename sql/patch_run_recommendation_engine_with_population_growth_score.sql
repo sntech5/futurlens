@@ -58,6 +58,7 @@ begin
         'stock_on_market_pct', s.stock_on_market_pct,
         'days_on_market', s.days_on_market,
         'vendor_discount_pct', s.vendor_discount_pct,
+        'population_2025', pop.population_2025,
         'population_growth_pct', s.population_growth_pct,
         'population_growth_vs_state_pct', s.population_growth_vs_state_pct,
         'infrastructure_score', s.infrastructure_score,
@@ -70,15 +71,17 @@ begin
         'refreshed_at', s.refreshed_at
       )
       order by
+        s.base_total_score desc nulls last,
         case when v_strategy_type = 'growth' then s.base_growth_score end desc nulls last,
         case when v_strategy_type = 'yield' then s.base_yield_score end desc nulls last,
-        s.base_total_score desc nulls last
+        s.suburb_key asc
     ),
     '[]'::jsonb
   )
   into v_top_suburbs
   from public.suburb_base_scores s
   left join public.suburbs sub on sub.suburb_key = s.suburb_key
+  left join public.suburb_population_metrics pop on pop.suburb_key = s.suburb_key
   where s.median_price <= v_budget
     and (((s.median_price * 0.8 * 0.06) / 52) - s.median_rent_weekly) <= v_max_oop;
 
@@ -98,7 +101,7 @@ begin
     v_strategy_type,
     case
       when jsonb_array_length(v_top_suburbs) = 0 then 'No suburbs matched the selected budget and weekly out-of-pocket constraints.'
-      else 'AI summary placeholder'
+      else 'Suburbs are ranked primarily by overall investment score, with the selected strategy score used as a tiebreaker.'
     end
   );
 

@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FuturLens Report Page Template</title>
+  <style>
+    body {
+      margin: 0;
+      background: #eef2f7;
+      color: #08204a;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .report-document {
+      display: grid;
+      gap: 20px;
+      max-width: 980px;
+      margin: 24px auto;
+    }
+    .report-page {
+      min-height: 1280px;
+      background: #fff;
+      border: 1px solid #d7dce5;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
+      padding: 0 26px 76px;
+      position: relative;
+      overflow: hidden;
+    }
+    .report-hero {
+      margin: 0 -26px 22px;
+      min-height: 342px;
+      display: grid;
+      grid-template-columns: 48% 52%;
+      background: #06245b;
+      color: #fff;
+      position: relative;
+    }
+    .report-hero-copy {
+      z-index: 1;
+      padding: 38px 34px;
+    }
+    .report-hero-media {
+      background: linear-gradient(135deg, #b8d7ef 0%, #6aa1c6 45%, #0f766e 100%);
+    }
+    .report-hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(104deg, rgba(2, 19, 52, 0.98) 0%, rgba(5, 36, 91, 0.95) 47%, transparent 47.2%);
+    }
+    .report-title-badge,
+    .report-date-card,
+    .report-band,
+    .report-section,
+    .report-meta-footer {
+      border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(8, 32, 74, 0.06);
+    }
+    .report-band {
+      display: grid;
+      grid-template-columns: 225px 1fr;
+      margin-bottom: 18px;
+      background: #f4f9fd;
+      overflow: hidden;
+    }
+    .report-brief-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      padding: 16px 20px;
+    }
+    .report-rank-grid {
+      display: grid;
+      grid-template-columns: 110px 170px 1fr;
+      padding: 16px 20px;
+    }
+    .report-section {
+      background: linear-gradient(135deg, #f8fbff 0%, #eef6fc 100%);
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+    .report-metrics-layout {
+      display: grid;
+      grid-template-columns: 1fr 190px;
+      gap: 14px;
+    }
+    .report-metric-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .report-signal-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .report-lower-grid {
+      display: grid;
+      grid-template-columns: 0.9fr 1fr;
+      gap: 18px;
+    }
+    .report-meta-footer {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1.35fr;
+      background: #eef6fc;
+      overflow: hidden;
+    }
+    .report-ai-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    .report-ai-card {
+      background: linear-gradient(135deg, #f8fbff 0%, #eef6fc 100%);
+      border-radius: 10px;
+      padding: 18px;
+    }
+    .report-ai-card.full {
+      grid-column: 1 / -1;
+    }
+  </style>
+</head>
+<body>
+  <main class="report-document" data-report-document>
+    <!-- Repeat this article once per selected suburb. -->
+    <article class="report-page" data-report-page data-suburb="{{suburbKey}}">
+      <section class="report-hero" data-section="hero">
+        <div class="report-hero-copy">
+          <div class="report-title-badge" data-field="report-title">Suburb Investment Report</div>
+          <h1 data-field="suburb-name">{{suburbName}}</h1>
+          <div data-field="location">{{state}} {{postcode}}</div>
+          <div data-field="customer-name">Prepared for {{customerName}}</div>
+          <p data-field="brief-copy">Suburb investment report generated from your selected budget, out-of-pocket limit, and investment strategy.</p>
+        </div>
+        <div class="report-hero-media" data-field="suburb-image-url">{{suburbImageUrl | optional}}</div>
+        <div class="report-date-card" data-field="report-month">{{reportMonth}}</div>
+      </section>
+
+      <section class="report-band" data-section="investment-brief">
+        <div>Investment Brief</div>
+        <div class="report-brief-grid">
+          <div data-field="budget">{{budget}}</div>
+          <div data-field="max-oop">{{maxWeeklyOutOfPocket}}</div>
+          <div data-field="strategy">{{strategy}}</div>
+          <div data-field="run-date">{{runDate}}</div>
+        </div>
+      </section>
+
+      <section class="report-band" data-section="suburb-ranking">
+        <div>Suburb Ranking</div>
+        <div class="report-rank-grid">
+          <div data-field="overall-rank">{{overallRank}}</div>
+          <div data-field="selected-order">{{selectedReportOrder}}</div>
+          <div data-field="ranking-method">{{rankingMethod}}</div>
+        </div>
+      </section>
+
+      <section class="report-section" data-section="key-investment-metrics">
+        <h2>Key Investment Metrics</h2>
+        <div class="report-metrics-layout">
+          <div class="report-metric-grid">
+            <div data-report-field="median_price">{{medianPrice}}</div>
+            <div data-report-field="median_rent_weekly">{{medianWeeklyRent}}</div>
+            <div data-report-field="gross_yield">{{grossRentalYield}}</div>
+            <div data-report-field="vacancy_rate">{{vacancyRate}}</div>
+            <div data-report-field="population_2025">{{population2025}}</div>
+            <div data-report-field="estimated_oop">{{estimatedWeeklyOop}}</div>
+          </div>
+          <aside data-section="affordability-checks">
+            <div data-field="fits-budget">{{fitsBudget}}</div>
+            <div data-field="fits-max-oop">{{fitsMaxOop}}</div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="report-section" data-section="market-indicators">
+        <h2>Market Indicators</h2>
+        <div class="report-signal-grid">
+          <div data-report-field="days_on_market">{{daysOnMarket}}</div>
+          <div data-report-field="vendor_discount_pct">{{vendorDiscount}}</div>
+          <div data-report-field="stock_on_market_pct">{{stockOnMarket}}</div>
+          <div data-report-field="renters_pct">{{rentersPct}}</div>
+          <div data-report-field="population_growth_vs_state_pct">{{populationGrowthVsState}}</div>
+        </div>
+      </section>
+
+      <section class="report-lower-grid">
+        <section class="report-section" data-section="population-growth">
+          <h2>Population & Growth</h2>
+          <div data-report-field="population_2025">{{population2025}}</div>
+          <div data-report-field="population_growth_pct">{{populationGrowthPct}}</div>
+          <div data-report-field="population_growth_vs_state_pct">{{populationGrowthVsState}}</div>
+          <div data-report-field="base_population_growth_score">{{populationMomentumScore}}</div>
+          <div data-field="population-meaning">{{populationMeaning}}</div>
+        </section>
+
+        <section class="report-section" data-section="investment-scores">
+          <h2>Investment Scores</h2>
+          <div data-report-field="base_total_score">{{overallScore}}</div>
+          <div data-report-field="base_growth_score">{{capitalGrowthScore}}</div>
+          <div data-report-field="base_yield_score">{{rentalYieldScore}}</div>
+          <div data-report-field="base_demand_score">{{rentalDemandScore}}</div>
+          <div data-report-field="base_risk_score">{{riskProfileScore}}</div>
+          <div data-report-field="base_population_growth_score">{{populationMomentumScore}}</div>
+        </section>
+      </section>
+
+      <section class="report-ai-section" data-section="openai-context-commentary">
+        <div class="report-ai-card full" data-field="ai-summary">{{openAiSummary}}</div>
+        <div class="report-ai-card" data-field="ai-strengths">{{openAiStrengths}}</div>
+        <div class="report-ai-card" data-field="ai-local-drivers">{{openAiLocalDrivers}}</div>
+        <div class="report-ai-card" data-field="ai-risk-notes">{{openAiRiskNotes}}</div>
+        <div class="report-ai-card" data-field="ai-cited-context">{{openAiCitedContextFacts}}</div>
+      </section>
+
+      <section class="report-meta-footer" data-section="report-meta-footer">
+        <div data-field="report-code">{{reportCode}}</div>
+        <div data-field="report-month">{{reportMonth}}</div>
+        <div data-field="strategy">{{strategy}}</div>
+        <div data-field="disclaimer">{{disclaimer}}</div>
+      </section>
+
+      <footer data-section="page-footer">
+        <span data-field="page-count">{{pageNumber}} of {{totalPages}}</span>
+      </footer>
+    </article>
+  </main>
+</body>
+</html>

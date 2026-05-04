@@ -4,6 +4,7 @@ Files:
 - [create_recommendation_report_tables.sql](../sql/create_recommendation_report_tables.sql)
 - [create_recommendation_report_functions.sql](../sql/create_recommendation_report_functions.sql)
 - [create_recommendation_report_storage.sql](../sql/create_recommendation_report_storage.sql)
+- [create_openai_suburb_summary_cache_tables.sql](../sql/create_openai_suburb_summary_cache_tables.sql)
 
 ## Context
 
@@ -17,6 +18,7 @@ Adds MVP database support for stored customer-facing PDF reports generated from 
 - Add `public.create_recommendation_report_with_suburbs(...)`.
 - Add `public.update_recommendation_report_pdf_status(...)`.
 - Add the `recommendation-reports` Supabase Storage bucket and MVP upload/read policies.
+- Add optional OpenAI structured suburb summary cache tables for future report commentary.
 
 ## Expected Outcome
 
@@ -57,6 +59,12 @@ Then:
 
 ```sql
 -- sql/create_recommendation_report_storage.sql
+```
+
+Optional AI summary cache tables:
+
+```sql
+-- sql/create_openai_suburb_summary_cache_tables.sql
 ```
 
 ## Related Design Doc

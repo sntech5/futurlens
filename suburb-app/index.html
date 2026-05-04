@@ -88,37 +88,6 @@
       font-weight: 500;
       letter-spacing: 0.22em;
     }
-    .report-powered-logo {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: #06183f;
-    }
-    .report-powered-logo .brand-mark {
-      width: 30px;
-      height: 30px;
-      border-width: 3px;
-    }
-    .report-powered-logo .brand-mark::before,
-    .report-powered-logo .brand-mark::after {
-      width: 6px;
-      height: 3px;
-    }
-    .report-powered-logo .brand-mark::before {
-      left: -6px;
-    }
-    .report-powered-logo .brand-mark::after {
-      right: -6px;
-    }
-    .report-powered-logo .brand-mark span {
-      width: 15px;
-      height: 15px;
-      border-width: 2px;
-    }
-    .report-powered-logo .brand-word {
-      font-size: 24px;
-      letter-spacing: 0.16em;
-    }
     .detail-panel {
       position: fixed;
       top: 0;
@@ -213,340 +182,593 @@
       overflow: auto;
       padding: 24px;
     }
-    .report-preview-overlay.open {
-      display: block;
-    }
+    .report-preview-overlay.open { display: block; }
     .report-preview-shell {
-      max-width: 1120px;
+      max-width: 980px;
       margin: 0 auto;
     }
+    .report-document {
+      display: grid;
+      gap: 20px;
+    }
     .report-page {
-      background: white;
-      color: #071942;
+      background: #ffffff;
+      color: #0f172a;
       width: 100%;
-      min-height: 760px;
+      min-height: 1320px;
       border: 1px solid #d7dce5;
       box-shadow: 0 18px 45px rgba(15, 23, 42, 0.22);
-      padding: 26px 32px 22px;
+      padding: 28px 30px 104px;
       margin-bottom: 20px;
       font-family: Arial, Helvetica, sans-serif;
-      font-size: 16px;
+      font-size: 13px;
+      position: relative;
+      overflow: hidden;
     }
-    .report-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 20px;
-      border-bottom: 3px solid #08265c;
-      padding-bottom: 12px;
-      margin-bottom: 14px;
+    .report-page {
+      --report-navy: #06245b;
+      --report-blue: #0b4c9c;
+      --report-teal: #17a7a6;
+      --report-green: #35a853;
+      --report-orange: #f59e0b;
+      --report-purple: #8b5cf6;
+      --report-red: #ef4444;
+      color: #08204a;
+      min-height: 1300px;
+      padding: 0 28px 78px;
+      font-size: 12px;
     }
-    .report-brand {
-      display: flex;
-      align-items: center;
+    .report-hero {
+      margin: 0 -28px 20px;
+      min-height: 330px;
+      display: grid;
+      grid-template-columns: 48% 52%;
+      background: #06245b;
+      color: #fff;
+      position: relative;
+      gap: 0;
+      align-items: stretch;
+    }
+    .report-hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(104deg, rgba(2, 19, 52, 0.98) 0%, rgba(5, 36, 91, 0.95) 47%, transparent 47.2%);
+      pointer-events: none;
+    }
+    .report-hero-copy {
+      position: relative;
+      z-index: 1;
+      padding: 36px 34px;
+      display: grid;
+      align-content: start;
+    }
+    .report-title-badge {
+      display: inline-grid;
+      grid-template-columns: 42px auto;
       gap: 12px;
-      font-weight: 800;
-      letter-spacing: 0.04em;
-      color: #08265c;
+      align-items: center;
+      width: max-content;
+      max-width: 270px;
+      border-radius: 8px;
+      background: rgba(23, 167, 166, 0.24);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      padding: 12px 16px;
+      font-size: 15px;
+      line-height: 1.25;
+      font-weight: 900;
       text-transform: uppercase;
-      line-height: 1.05;
     }
-    .report-brand-mark {
-      width: 42px;
-      height: 42px;
-      border: 2px solid #08265c;
+    .report-title-icon {
+      width: 38px;
+      height: 38px;
+      border: 2px solid rgba(255, 255, 255, 0.85);
+      border-radius: 4px;
       display: grid;
       place-items: center;
-      font-size: 24px;
-      border-radius: 4px;
+      font-size: 21px;
     }
-    .report-powered-by {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 10px;
-      color: #64748b;
-      font-size: 13px;
-      font-weight: 700;
-    }
-    .report-kicker {
-      text-align: right;
-      color: #071942;
-      font-weight: 800;
-      font-size: 16px;
-    }
-    .report-page-badge {
-      display: inline-block;
-      margin-left: 8px;
-      background: #08265c;
-      color: white;
-      border-radius: 4px;
-      padding: 6px 9px;
-      font-size: 14px;
-      font-weight: 800;
-    }
-    .report-title {
-      font-size: 44px;
-      line-height: 1.05;
+    .report-hero-title {
+      margin: 30px 0 0;
+      color: #fff;
+      font-size: 52px;
+      line-height: 0.95;
       font-weight: 900;
-      color: #08265c;
-      margin: 0 0 6px;
-      letter-spacing: -0.02em;
+      letter-spacing: 0;
+      text-transform: none;
     }
-    .report-subtitle {
-      color: #071942;
-      font-size: 19px;
-      margin-bottom: 12px;
+    .report-hero-location {
+      margin-top: 8px;
+      color: #27c2c1;
+      font-size: 32px;
+      line-height: 1;
+      font-weight: 900;
+      text-transform: uppercase;
     }
-    .report-personal-note {
-      border: 1px solid #dbe2ee;
-      border-left: 5px solid #1f66d1;
-      border-radius: 10px;
-      padding: 10px 16px;
-      margin-bottom: 16px;
-      background: #f8fafc;
-      color: #071942;
+    .report-prepared {
+      border-top: 1px solid rgba(255,255,255,0.55);
+      margin-top: 22px;
+      padding-top: 16px;
+      max-width: 390px;
+      color: #f8fafc;
       font-size: 16px;
       line-height: 1.45;
     }
-    .report-grid-3 {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 18px;
+    .report-prepared p {
+      margin: 6px 0 0;
+      font-size: 14px;
     }
-    .report-suburb-card {
-      border: 1px solid #dbe2ee;
-      border-radius: 12px;
-      padding: 15px;
-      box-shadow: 0 2px 9px rgba(15, 23, 42, 0.08);
+    .report-hero-media {
       position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #b8d7ef 0%, #6aa1c6 45%, #0f766e 100%);
     }
-    .report-rank {
+    .report-hero-media.has-image {
+      background-size: cover;
+      background-position: center;
+    }
+    .report-hero-media:not(.has-image)::before {
+      content: "Suburb image not loaded";
       position: absolute;
-      right: 16px;
-      top: 14px;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
+      right: 34px;
+      top: 42px;
+      max-width: 190px;
+      color: rgba(255,255,255,0.8);
+      font-size: 13px;
+      line-height: 1.35;
+      text-align: right;
+    }
+    .report-date-card {
+      position: absolute;
+      right: 28px;
+      bottom: 24px;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 42px auto;
+      gap: 12px;
+      align-items: center;
+      color: #fff;
+      background: #10a7aa;
+      border-radius: 8px;
+      padding: 13px 18px;
+      box-shadow: 0 12px 24px rgba(2, 12, 34, 0.24);
+      font-weight: 900;
+    }
+    .report-date-card span {
+      display: block;
+      font-size: 12px;
+      opacity: 0.92;
+    }
+    .report-date-card strong {
+      display: block;
+      margin-top: 2px;
+      font-size: 18px;
+    }
+    .report-band {
+      display: grid;
+      grid-template-columns: 225px 1fr;
+      margin-bottom: 16px;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #f4f9fd;
+      box-shadow: 0 4px 16px rgba(8, 32, 74, 0.06);
+    }
+    .report-band-label {
+      display: grid;
+      grid-template-columns: 54px 1fr;
+      gap: 14px;
+      align-items: center;
+      padding: 20px 18px;
+      background: linear-gradient(90deg, rgba(216, 235, 250, 0.9), rgba(255,255,255,0.35));
+      color: var(--report-navy);
+      font-size: 17px;
+      line-height: 1.2;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+    .report-band.rank .report-band-label {
+      color: #064e3b;
+      background: linear-gradient(90deg, rgba(222, 245, 230, 0.95), rgba(255,255,255,0.4));
+    }
+    .report-band-icon {
+      width: 50px;
+      height: 50px;
       display: grid;
       place-items: center;
-      text-align: center;
-      font-size: 13px;
-      font-weight: 800;
-      border: 1px solid currentColor;
+      border-radius: 50%;
+      color: #fff;
+      background: var(--report-blue);
+      font-size: 24px;
+    }
+    .report-band.rank .report-band-icon {
+      background: var(--report-green);
+    }
+    .report-brief-grid,
+    .report-rank-grid {
+      display: grid;
+      align-items: center;
+      gap: 0;
+      padding: 15px 20px;
+    }
+    .report-brief-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .report-rank-grid {
+      grid-template-columns: 110px 170px 1fr;
+    }
+    .report-brief-item,
+    .report-rank-item {
+      border-left: 1px solid #cdd9e8;
+      padding: 0 18px;
+      min-height: 54px;
+      display: grid;
+      align-content: center;
+    }
+    .report-brief-item:first-child,
+    .report-rank-item:first-child {
+      border-left: 0;
+    }
+    .report-label {
+      color: var(--report-navy);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+    .report-value {
+      margin-top: 5px;
+      color: #071f49;
+      font-size: 16px;
+      line-height: 1.15;
+      font-weight: 700;
+    }
+    .report-rank-number {
+      color: #083d3f;
+      font-size: 28px;
+      font-weight: 900;
+    }
+    .report-section {
+      margin-bottom: 16px;
+      border: 0;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #f8fbff 0%, #eef6fc 100%);
+      box-shadow: 0 4px 16px rgba(8, 32, 74, 0.06);
+      padding: 18px;
+      overflow: visible;
+    }
+    .report-section-title {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      color: var(--report-navy);
+      font-size: 17px;
+      line-height: 1.15;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+    .report-metrics-layout {
+      display: grid;
+      grid-template-columns: 1fr 190px;
+      gap: 14px;
+      align-items: stretch;
+      margin-top: 16px;
     }
     .report-metric-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 9px;
-      margin-top: 14px;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+      padding: 0;
     }
     .report-metric {
-      border: 1px solid #dfe5ef;
+      min-height: 124px;
       border-radius: 8px;
-      padding: 8px 10px;
-      min-height: 56px;
-    }
-    .report-metric-label {
-      font-size: 13px;
-      color: #071942;
-      margin-bottom: 4px;
-    }
-    .report-metric-value {
-      font-size: 20px;
-      font-weight: 900;
-      color: #071942;
-    }
-    .report-section-title {
-      color: #08265c;
-      font-size: 20px;
-      font-weight: 900;
-      margin: 0 0 10px;
-    }
-    .report-panel {
-      border: 1px solid #dbe2ee;
-      border-radius: 10px;
-      overflow: hidden;
-      background: white;
-    }
-    .report-data-panel {
-      min-height: 292px;
-      border-radius: 10px;
-      border: 1px solid #dbe2ee;
-      background: #f8fafc;
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      justify-content: center;
-    }
-    .report-data-panel strong {
-      color: #08265c;
-      font-size: 18px;
-    }
-    .report-data-panel p {
-      color: #334155;
-      font-size: 14px;
-      line-height: 1.45;
-      margin: 0;
-    }
-    .report-data-list {
-      display: grid;
-      gap: 8px;
-      margin-top: 4px;
-    }
-    .report-data-list div {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      border-bottom: 1px solid #e2e8f0;
-      padding-bottom: 7px;
-      font-size: 14px;
-    }
-    .report-compare-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-      overflow: hidden;
-      border-radius: 8px;
-    }
-    .report-compare-table th {
-      background: #08265c;
-      color: white;
-      text-transform: uppercase;
-      font-size: 12px;
+      border: 1px solid var(--metric-border, #cfe2f6);
+      background: var(--metric-bg, #eef7ff);
       padding: 12px 8px;
-    }
-    .report-compare-table td {
-      border: 1px solid #dbe2ee;
-      padding: 13px 8px;
-      text-align: center;
-      color: #071942;
-    }
-    .report-compare-table td:first-child {
-      text-align: left;
-    }
-    .report-chart-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      padding: 16px;
-      min-height: 292px;
-    }
-    .report-bars {
-      display: flex;
-      align-items: end;
-      justify-content: center;
-      gap: 28px;
-      height: 190px;
-      border-left: 1px solid #cfd7e5;
-      border-bottom: 1px solid #cfd7e5;
-      padding-left: 16px;
-    }
-    .report-bar {
-      width: 34px;
-      min-height: 8px;
-      border-radius: 6px 6px 0 0;
-      position: relative;
-    }
-    .report-bar strong {
-      position: absolute;
-      top: -24px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 16px;
-      color: #071942;
-    }
-    .report-bar-label {
-      position: absolute;
-      top: calc(100% + 8px);
-      left: 50%;
-      width: 72px;
-      transform: translateX(-50%);
+      align-content: center;
+      justify-items: center;
       text-align: center;
-      font-size: 12px;
-      color: #071942;
-      font-weight: 700;
     }
-    .report-radar {
-      width: 100%;
-      height: 210px;
-    }
-    .report-insight {
-      display: flex;
-      gap: 18px;
-      align-items: center;
-      background: #08265c;
-      color: white;
-      border-radius: 10px;
-      padding: 18px 24px;
-      margin-top: 16px;
-    }
-    .report-deep-card {
-      display: grid;
-      grid-template-columns: 248px 1fr 300px;
-      gap: 16px;
-      border: 1px solid #dbe2ee;
-      border-left: 7px solid var(--accent);
-      border-radius: 10px;
-      padding: 12px 15px;
-      margin-bottom: 9px;
-    }
-    .report-stat-row {
-      display: flex;
-      justify-content: space-between;
-      border-bottom: 1px solid #dbe2ee;
-      padding: 6px 0;
-      font-size: 15px;
-      font-weight: 700;
-    }
-    .report-line-chart {
-      width: 100%;
-      height: 145px;
-    }
-    .report-unavailable-chart {
-      min-height: 145px;
-      border: 1px dashed #cbd5e1;
-      border-radius: 8px;
+    .report-metric-icon,
+    .report-signal-icon,
+    .report-score-icon,
+    .report-mini-icon {
+      width: 42px;
+      height: 42px;
       display: grid;
       place-items: center;
-      padding: 16px;
-      text-align: center;
-      color: #475569;
-      background: #f8fafc;
-      font-size: 14px;
-      line-height: 1.4;
+      border-radius: 50%;
+      color: #fff;
+      background: var(--metric-accent, var(--report-blue));
+      font-size: 21px;
+      margin-bottom: 9px;
     }
-    .report-takeaway {
-      background: #f1f5f9;
+    .report-metric span,
+    .report-signal span,
+    .report-score-row span {
+      color: #08204a;
+      font-size: 11px;
+      line-height: 1.25;
+      font-weight: 700;
+      text-transform: none;
+    }
+    .report-metric strong,
+    .report-signal strong {
+      color: var(--report-navy);
+      margin-top: 7px;
+      font-size: 17px;
+      line-height: 1.05;
+      font-weight: 900;
+    }
+    .report-affordability {
+      display: grid;
+      gap: 10px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, #e8f7ee, #f2fbf5);
+      color: #064e3b;
+      padding: 15px;
+    }
+    .report-affordability h3 {
+      margin: 0 0 4px;
+      font-size: 12px;
+      text-transform: uppercase;
+      font-weight: 900;
+    }
+    .report-check-row {
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      gap: 10px;
+      align-items: center;
+      border-bottom: 1px solid rgba(6, 78, 59, 0.12);
+      padding: 8px 0;
+    }
+    .report-check-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #0ea878;
+      color: #fff;
+      font-size: 20px;
+      font-weight: 900;
+    }
+    .report-help-text {
+      margin: 12px 0 0;
+      color: #64748b;
+      font-size: 10px;
+      line-height: 1.45;
+    }
+    .report-signal-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+      padding: 0;
+    }
+    .report-signal {
+      min-height: 78px;
+      border: 1px solid #dbe2ee;
       border-radius: 8px;
-      padding: 12px 14px;
-      margin-top: 12px;
+      background: #fffaf0;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 46px 1fr;
+      align-items: center;
+      gap: 10px;
+    }
+    .report-lower-grid {
+      display: grid;
+      grid-template-columns: 0.9fr 1fr;
+      gap: 16px;
+    }
+    .report-population-body {
+      display: grid;
+      grid-template-columns: 1fr 136px;
+      gap: 18px;
+      align-items: center;
+      margin-top: 16px;
+    }
+    .report-stat-list {
+      display: grid;
+      gap: 0;
+    }
+    .report-stat-row {
+      display: grid;
+      grid-template-columns: 34px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      border-bottom: 1px solid #d5e1eb;
+      padding: 10px 0;
+      font-size: 12px;
+    }
+    .report-stat-row strong {
+      color: var(--report-navy);
       font-size: 15px;
     }
-    .report-final-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 10px;
-    }
-    .report-final-card {
+    .report-meaning-card {
       border-radius: 8px;
-      padding: 14px;
-      background: #f1f5f9;
-      min-height: 110px;
+      border: 1px solid #cae8d2;
+      background: #edf9ef;
+      padding: 15px;
+      color: #064e3b;
+      font-size: 12px;
+      line-height: 1.45;
     }
-    .report-final-card.primary {
-      background: #08265c;
-      color: white;
-      grid-column: span 1;
+    .report-meaning-card strong {
+      display: block;
+      margin: 8px 0 6px;
+      color: #064e3b;
+      font-size: 13px;
     }
-    .report-small-note {
-      border: 1px solid #dbe2ee;
-      border-radius: 6px;
-      padding: 12px 14px;
-      font-size: 14px;
-      margin-top: 14px;
+    .report-score-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+      padding: 0;
+    }
+    .report-score-row {
+      display: grid;
+      grid-template-columns: 38px 145px 1fr 56px;
+      gap: 12px;
+      align-items: center;
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+    .report-score-row.primary {
+      grid-template-columns: 48px 145px 1fr 86px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(11, 76, 156, 0.10), rgba(23, 167, 166, 0.08));
+      border: 1px solid rgba(11, 76, 156, 0.16);
+      padding: 12px;
+      margin-bottom: 2px;
+    }
+    .report-score-row.primary .report-score-icon {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 0;
+      font-size: 22px;
+    }
+    .report-score-row.primary span {
+      color: var(--report-navy);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+    .report-score-row strong {
+      color: var(--report-navy);
+      font-size: 16px;
+      font-weight: 900;
+    }
+    .report-score-row.primary strong {
+      font-size: 28px;
+      line-height: 1;
+      text-align: right;
+    }
+    .report-score-track {
+      height: 6px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #dfe7ee;
+    }
+    .report-score-fill {
+      height: 100%;
+      width: var(--score-width, 0%);
+      border-radius: inherit;
+      background: var(--score-color, var(--report-blue));
+    }
+    .report-meta-footer {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1.35fr;
+      gap: 0;
+      margin-top: 22px;
+      border-radius: 10px;
+      background: #eef6fc;
+      overflow: hidden;
+    }
+    .report-meta-cell {
+      display: grid;
+      grid-template-columns: 38px 1fr;
+      gap: 12px;
+      align-items: start;
+      border-left: 1px solid #cdd9e8;
+      padding: 18px;
+      min-height: 72px;
+    }
+    .report-meta-cell:first-child {
+      border-left: 0;
+    }
+    .report-meta-cell.note {
+      display: block;
+      color: #475569;
+      font-size: 11px;
+      line-height: 1.45;
+    }
+    .report-ai-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 2px;
+    }
+    .report-ai-card {
+      border-radius: 10px;
+      background: linear-gradient(135deg, #f8fbff 0%, #eef6fc 100%);
+      box-shadow: 0 4px 16px rgba(8, 32, 74, 0.06);
+      padding: 16px;
+      color: #08204a;
+      min-height: 132px;
+    }
+    .report-ai-card.full {
+      grid-column: 1 / -1;
+    }
+    .report-ai-card h3 {
+      margin: 0 0 10px;
+      color: var(--report-navy);
+      font-size: 13px;
+      line-height: 1.2;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+    .report-ai-card p {
+      margin: 0;
+      color: #334155;
+      font-size: 11px;
+      line-height: 1.5;
+      font-weight: 650;
+    }
+    .report-ai-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .report-ai-list li {
+      display: grid;
+      grid-template-columns: 15px 1fr;
+      gap: 8px;
+      color: #334155;
+      font-size: 11px;
+      line-height: 1.4;
+      font-weight: 650;
+    }
+    .report-ai-list li::before {
+      content: "•";
+      color: var(--report-teal);
+      font-weight: 900;
+    }
+    .report-ai-source {
+      display: block;
+      margin-top: 2px;
+      color: #64748b;
+      font-size: 10px;
+      font-weight: 600;
+    }
+    .report-footer {
+      position: absolute;
+      left: 28px;
+      right: 28px;
+      bottom: 18px;
+      min-height: 0;
+      background: transparent;
+      color: #64748b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0;
+      font-size: 10px;
+    }
+    .report-footer strong {
+      color: var(--report-navy);
+    }
+    .report-pill {
+      display: inline-block;
+      border-radius: 999px;
+      background: #c8efd6;
+      color: #0f6b36;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 650;
     }
     @media (max-width: 900px) {
       .report-preview-overlay {
@@ -557,7 +779,7 @@
       }
     }
     @page {
-      size: A4 landscape;
+      size: A4 portrait;
       margin: 8mm;
     }
     @media print {
@@ -582,12 +804,15 @@
         max-width: none !important;
         margin: 0 !important;
       }
+      .report-document {
+        display: block !important;
+      }
       .report-page {
         width: 100% !important;
         min-height: auto !important;
-        height: calc(210mm - 16mm);
+        height: calc(297mm - 16mm);
         margin: 0 !important;
-        padding: 8mm 9mm 7mm !important;
+        padding: 8mm 9mm 0 !important;
         border: 0 !important;
         box-shadow: none !important;
         page-break-after: always;
@@ -597,12 +822,6 @@
       .report-page:last-child {
         page-break-after: auto;
         break-after: auto;
-      }
-      .report-title {
-        font-size: 34px;
-      }
-      .report-suburb-card {
-        box-shadow: none;
       }
     }
     @media (max-width: 768px) {
@@ -873,6 +1092,20 @@
       };
     }
 
+    function getSupabaseFunctionHeaders(extra = {}) {
+      const functionJwt = CONFIG.supabaseFunctionJwt || CONFIG.supabaseKey;
+      if (!String(functionJwt || '').startsWith('eyJ')) {
+        throw new Error('Supabase Edge Function JWT is missing or invalid. Add SUPABASE_FUNCTION_JWT with the legacy anonymous API key, regenerate config.js, and redeploy.');
+      }
+
+      return {
+        'Content-Type': 'application/json',
+        'apikey': CONFIG.supabaseKey,
+        'Authorization': `Bearer ${functionJwt}`,
+        ...extra
+      };
+    }
+
     function getGoogleMapsQuery(suburbName, state) {
       return `${suburbName}, ${state}, Australia`;
     }
@@ -956,6 +1189,8 @@
     function getWhyText(item, strategy) {
       const reasons = [];
 
+      reasons.push(`overall investment score is ${formatScoreValue(item.base_total_score)}/10`);
+
       if (item.estimated_oop !== undefined && item.estimated_oop !== null) {
         reasons.push(`estimated weekly out of pocket is ${formatMoney(item.estimated_oop)}`);
       }
@@ -965,16 +1200,15 @@
       }
 
       if (strategy === 'growth') {
-        reasons.push('it ranked higher on growth-oriented scoring');
-        reasons.push('the growth score emphasizes demand-supply strength, faster selling, tighter stock, lower discounting, and lower vacancy');
+        reasons.push(`growth score is ${formatScoreValue(item.base_growth_score)}/10`);
       } else {
         if (item.yield) {
           reasons.push(`it shows a gross rental yield of ${formatYield(item.yield)}`);
         }
-        reasons.push('it ranked higher on yield-oriented scoring');
+        reasons.push(`yield score is ${formatScoreValue(item.base_yield_score)}/10`);
       }
 
-      return reasons.join(', ') + '.';
+      return `Included in the shortlist because ${reasons.join(', ')}. Ranking is primarily by overall investment score, with the selected strategy score used as a tiebreaker.`;
     }
 
     function formatSuburbName(raw) {
@@ -1058,6 +1292,18 @@
     function formatYield(value) {
       if (value === null || value === undefined || value === '') return '-';
       return formatPercent(value, 'gross_yield', '-');
+    }
+
+    function formatNumber(value, fallback = 'N/A') {
+      const num = Number(value);
+      if (!Number.isFinite(num)) return fallback;
+      return new Intl.NumberFormat('en-AU', { maximumFractionDigits: 0 }).format(num);
+    }
+
+    function formatDays(value) {
+      const num = Number(value);
+      if (!Number.isFinite(num)) return 'N/A';
+      return `${Math.round(num)} days`;
     }
 
     function escapeHtml(value) {
@@ -1166,6 +1412,42 @@
         .filter(({ item }) => selected.has(item.suburb));
     }
 
+    async function enrichReportItemsWithPopulationMetrics(reportItems) {
+      const suburbKeys = reportItems
+        .map(({ item }) => item.suburb)
+        .filter(Boolean);
+
+      const missingPopulation = reportItems.some(({ item }) => item.population_2025 === null || item.population_2025 === undefined);
+      if (!suburbKeys.length || !missingPopulation) return reportItems;
+
+      const keyList = suburbKeys.map((key) => `"${String(key).replaceAll('"', '\\"')}"`).join(',');
+      const response = await fetch(
+        `${CONFIG.supabaseUrl}/rest/v1/suburb_population_metrics?suburb_key=in.(${encodeURIComponent(keyList)})&select=suburb_key,population_2025`,
+        {
+          method: 'GET',
+          headers: getSupabaseHeaders({ 'Accept-Profile': 'public' })
+        }
+      );
+
+      const rows = await response.json();
+      if (!response.ok) {
+        throw new Error(JSON.stringify(rows, null, 2));
+      }
+
+      const populationByKey = new Map(rows.map((row) => [row.suburb_key, row.population_2025]));
+      return reportItems.map(({ item, ...rest }) => ({
+        ...rest,
+        item: {
+          ...item,
+          population_2025: item.population_2025 ?? populationByKey.get(item.suburb) ?? null,
+          population_data_available: (
+            item.population_2025 !== null
+            && item.population_2025 !== undefined
+          ) || populationByKey.has(item.suburb)
+        }
+      }));
+    }
+
     function getReportMetric(item, key) {
       const fallbackMap = {
         median_price: 'price',
@@ -1175,201 +1457,542 @@
       return item[key] ?? item[fallbackMap[key]];
     }
 
-    function reportColors(index) {
-      return ['#2f9b45', '#1f66d1', '#08265c', '#64748b', '#7c3aed'][index % 5];
+    function getInvestmentScore(item) {
+      return Math.round(getScore(item.base_total_score || item.base_growth_score || item.base_yield_score) * 10);
     }
 
-    function buildBarChart(suburbs) {
-      return suburbs.map(({ item }, index) => {
-        const score = getScore(item.base_total_score || item.base_growth_score || item.base_yield_score);
-        const height = Math.max(18, score * 16);
+    function getInvestmentVerdict(score) {
+      if (score >= 82) return 'Strong Buy';
+      if (score >= 72) return 'Good Buy';
+      if (score >= 62) return 'Consider';
+      return 'Review';
+    }
+
+    function getReportScoreRows(item) {
+      const riskPenalty = Number(item.base_risk_score);
+      const riskColor = !Number.isFinite(riskPenalty)
+        ? '#94a3b8'
+        : riskPenalty <= 3
+          ? '#35a853'
+          : riskPenalty <= 6
+            ? '#f59e0b'
+            : '#ef4444';
+
+      return [
+        ['Total Score', item.base_total_score, '🏆', '#0b4c9c', true],
+        ['Capital Growth Score', item.base_growth_score, '↗', '#35a853', false],
+        ['Rental Yield Score', item.base_yield_score, '$', '#8b5cf6', false],
+        ['Rental Demand Score', item.base_demand_score, '●', '#f59e0b', false],
+        ['Risk Penalty', item.base_risk_score, '◈', riskColor, false],
+        ['Population Momentum Score', item.base_population_growth_score, '▥', '#17a7a6', false]
+      ];
+    }
+
+    function getReportAiSummary(item) {
+      const summary = item.report_summary || item.ai_summary_payload || item.openai_summary || null;
+      if (!summary || typeof summary !== 'object') {
+        return {
+          summary: '',
+          strengths: [],
+          localDrivers: [],
+          riskNotes: [],
+          dataLimitations: []
+        };
+      }
+
+      return {
+        summary: summary.summary || '',
+        strengths: Array.isArray(summary.strengths) ? summary.strengths.slice(0, 3) : [],
+        localDrivers: Array.isArray(summary.local_drivers) ? summary.local_drivers.slice(0, 3) : [],
+        riskNotes: Array.isArray(summary.risk_notes) ? summary.risk_notes.slice(0, 2) : [],
+        dataLimitations: Array.isArray(summary.data_limitations) ? summary.data_limitations.slice(0, 3) : []
+      };
+    }
+
+    function getOpenAiFunctionUrl() {
+      return `${CONFIG.supabaseUrl}/functions/v1/generate-suburb-report-summary`;
+    }
+
+    function getNumericMetric(value) {
+      const num = Number(value);
+      return Number.isFinite(num) ? num : null;
+    }
+
+    function getPercentMetric(value, metric) {
+      if (value === null || value === undefined || value === '') return null;
+      const num = normalizePercentValue(value, metric);
+      return Number.isFinite(num) ? num : null;
+    }
+
+    function buildOpenAiSummaryPayload(item) {
+      return {
+        suburb: {
+          suburb_key: item.suburb,
+          name: compactName(item.suburb),
+          state: item.state || '',
+          postcode: item.postcode || ''
+        },
+        metrics: {
+          median_price: getNumericMetric(getReportMetric(item, 'median_price')),
+          median_rent_weekly: getNumericMetric(getReportMetric(item, 'median_rent_weekly')),
+          gross_yield_pct: getPercentMetric(getReportMetric(item, 'gross_yield'), 'gross_yield'),
+          vacancy_rate_pct: getPercentMetric(item.vacancy_rate, 'vacancy_rate'),
+          days_on_market: getNumericMetric(item.days_on_market),
+          vendor_discount_pct: getPercentMetric(item.vendor_discount_pct, 'vendor_discount_pct'),
+          growth_score: getNumericMetric(item.base_growth_score),
+          yield_score: getNumericMetric(item.base_yield_score),
+          demand_score: getNumericMetric(item.base_demand_score),
+          risk_penalty: getNumericMetric(item.base_risk_score),
+          total_score: getNumericMetric(item.base_total_score),
+          population_2025: getNumericMetric(item.population_2025),
+          population_growth_pct: getPercentMetric(item.population_growth_pct, 'population_growth_pct'),
+          population_growth_vs_state_pct: getPercentMetric(item.population_growth_vs_state_pct, 'population_growth_pct'),
+          population_growth_score: getNumericMetric(item.base_population_growth_score)
+        }
+      };
+    }
+
+    async function fetchOpenAiReportSummary(item) {
+      const response = await fetch(getOpenAiFunctionUrl(), {
+        method: 'POST',
+        headers: getSupabaseFunctionHeaders(),
+        body: JSON.stringify(buildOpenAiSummaryPayload(item))
+      });
+
+      const responseText = await response.text();
+      let data = {};
+      try {
+        data = responseText ? JSON.parse(responseText) : {};
+      } catch (_) {
+        data = { error: responseText };
+      }
+
+      if (!response.ok) {
+        const errorMessage = data.error || response.statusText || responseText || 'Unknown error';
+        throw new Error(`AI summary function failed for ${compactName(item.suburb)} (HTTP ${response.status}): ${errorMessage}`);
+      }
+
+      return data;
+    }
+
+    async function enrichReportItemsWithOpenAiSummaries(reportItems) {
+      const enriched = [];
+
+      for (let index = 0; index < reportItems.length; index += 1) {
+        const reportItem = reportItems[index];
+        setReportStatus(`Fetching AI suburb context ${index + 1} of ${reportItems.length}...`, 'info');
+
+        try {
+          const aiData = await fetchOpenAiReportSummary(reportItem.item);
+          enriched.push({
+            ...reportItem,
+            item: {
+              ...reportItem.item,
+              report_summary: aiData.report_summary || null,
+              context_facts: aiData.context_facts || null,
+              ai_context_cache_id: aiData.context_cache_id || null,
+              ai_summary_cache_id: aiData.summary_cache_id || null,
+              ai_summary_error: null
+            }
+          });
+        } catch (error) {
+          enriched.push({
+            ...reportItem,
+            item: {
+              ...reportItem.item,
+              report_summary: null,
+              context_facts: null,
+              ai_summary_error: error.message || String(error)
+            }
+          });
+        }
+      }
+
+      return enriched;
+    }
+
+    function getOpenAiContextFacts(item) {
+      const payload = item.context_facts;
+      if (!payload || typeof payload !== 'object') return [];
+
+      const facts = payload.facts && typeof payload.facts === 'object'
+        ? payload.facts
+        : payload;
+      const rows = [];
+      const addFact = (category, fact) => {
+        if (!fact || typeof fact !== 'object') return;
+        const name = fact.name || category;
+        const text = fact.fact || '';
+        if (!text) return;
+        rows.push({
+          category,
+          name,
+          text,
+          evidenceUrl: fact.evidence_url || ''
+        });
+      };
+
+      ['healthcare', 'activity_centres', 'local_drivers', 'transport', 'education', 'infrastructure'].forEach((category) => {
+        const categoryFacts = facts[category];
+        if (Array.isArray(categoryFacts)) {
+          categoryFacts.forEach((fact) => addFact(category, fact));
+        }
+      });
+
+      if (facts.nearest_major_city && typeof facts.nearest_major_city === 'object') {
+        const city = facts.nearest_major_city;
+        rows.push({
+          category: 'nearest_major_city',
+          name: city.name || 'Nearest major/regional city',
+          text: city.distance_km === null || city.distance_km === undefined
+            ? 'Distance not available from cited context.'
+            : `Approx. ${city.distance_km} km from ${city.name}.`,
+          evidenceUrl: city.evidence_url || ''
+        });
+      }
+
+      return rows.slice(0, 4);
+    }
+
+    function buildReportAiList(items) {
+      if (!items.length) {
+        return '<p>OpenAI data was not available for this section.</p>';
+      }
+
+      return `
+        <ul class="report-ai-list">
+          ${items.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
+        </ul>
+      `;
+    }
+
+    function buildReportAiContextList(items) {
+      if (!items.length) {
+        return '<p>No cited local context facts were returned for this suburb.</p>';
+      }
+
+      return `
+        <ul class="report-ai-list">
+          ${items.map((item) => `
+            <li>
+              <span>
+                <strong>${escapeHtml(item.name)}:</strong> ${escapeHtml(item.text)}
+                ${item.evidenceUrl ? `<span class="report-ai-source">${escapeHtml(item.evidenceUrl)}</span>` : ''}
+              </span>
+            </li>
+          `).join('')}
+        </ul>
+      `;
+    }
+
+    function formatReportMonth(dateValue) {
+      const date = dateValue ? new Date(dateValue) : new Date();
+      if (Number.isNaN(date.getTime())) return 'N/A';
+      return date.toLocaleDateString('en-AU', { month: 'long', year: 'numeric' });
+    }
+
+    function formatReportDate(dateValue) {
+      const date = dateValue ? new Date(dateValue) : new Date();
+      if (Number.isNaN(date.getTime())) return 'N/A';
+      return date.toLocaleDateString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function getReportInputMoney(id, fallback = 'N/A') {
+      const input = document.getElementById(id);
+      return formatMoney(input?.value || null, fallback);
+    }
+
+    function getReportInputOop(id, fallback = 'N/A') {
+      const input = document.getElementById(id);
+      const value = formatMoney(input?.value || null, fallback);
+      return value === fallback ? fallback : `${value}/wk`;
+    }
+
+    function buildReportScoreRows(scoreRows) {
+      return scoreRows.map(({ label, value, icon, color, prominent }) => {
+        const score = getScore(value);
+        const width = Math.round(score * 10);
+        const displayValue = prominent ? `${Math.round(score * 10)}/100` : `${formatScoreValue(value)}/10`;
         return `
-          <div class="report-bar" style="height:${height}px;background:${reportColors(index)}">
-            <strong>${score.toFixed(1)}</strong>
-            <span class="report-bar-label">${escapeHtml(compactName(item.suburb))}</span>
+          <div class="report-score-row${prominent ? ' primary' : ''}" data-report-field="${escapeAttr(label.toLowerCase().replaceAll(' ', '_'))}">
+            <div class="report-score-icon" style="--metric-accent:${escapeAttr(color)}">${escapeHtml(icon)}</div>
+            <span>${escapeHtml(label)}</span>
+            <div class="report-score-track"><div class="report-score-fill" style="--score-width:${width}%;--score-color:${escapeAttr(color)}"></div></div>
+            <strong>${displayValue}</strong>
           </div>
         `;
       }).join('');
     }
 
-    function buildRadarChart(suburbs) {
-      const center = 105;
-      const maxRadius = 78;
-      const axes = [
-        { label: 'Yield', key: 'base_yield_score', x: 105, y: 18 },
-        { label: 'Growth', key: 'base_growth_score', x: 192, y: 105 },
-        { label: 'Demand', key: 'base_demand_score', x: 105, y: 192 },
-        { label: 'Risk', key: 'base_risk_score', x: 18, y: 105 }
-      ];
-      const rings = [0.25, 0.5, 0.75, 1].map((r) => {
-        const d = axes.map((axis, i) => `${i === 0 ? 'M' : 'L'} ${center + (axis.x - center) * r} ${center + (axis.y - center) * r}`).join(' ');
-        return `<path d="${d} Z" fill="none" stroke="#dbe2ee" stroke-width="1"/>`;
-      }).join('');
-      const lines = axes.map((axis) => `<line x1="${center}" y1="${center}" x2="${axis.x}" y2="${axis.y}" stroke="#e2e8f0"/>`).join('');
-      const polygons = suburbs.map(({ item }, index) => {
-        const points = axes.map((axis) => {
-          const score = getScore(item[axis.key]) / 10;
-          const x = center + (axis.x - center) * score;
-          const y = center + (axis.y - center) * score;
-          return `${x},${y}`;
-        }).join(' ');
-        return `<polygon points="${points}" fill="none" stroke="${reportColors(index)}" stroke-width="3"/>`;
-      }).join('');
-      const labels = axes.map((axis) => `<text x="${axis.x}" y="${axis.y}" text-anchor="middle" font-size="13" font-weight="700" fill="#071942">${axis.label}</text>`).join('');
-      return `<svg class="report-radar" viewBox="0 0 210 210">${rings}${lines}${polygons}${labels}</svg>`;
-    }
-
-    function buildTrendChart() {
-      return `
-        <div class="report-unavailable-chart">
-          Historical price trend is not shown because verified historical suburb price data has not been ingested yet.
-        </div>
-      `;
-    }
-
-    function buildReportDataPanel(suburbs) {
-      const suburbRows = suburbs.slice(0, 3).map(({ item }) => `
-        <div>
-          <span>${escapeHtml(compactName(item.suburb))}</span>
-          <strong>${escapeHtml(item.state || 'N/A')} ${escapeHtml(item.postcode || '')}</strong>
+    function buildReportMetricTiles(viewModel) {
+      return viewModel.keyMetrics.map((metric) => `
+        <div class="report-metric" data-report-field="${escapeAttr(metric.field)}" style="--metric-bg:${escapeAttr(metric.bg)};--metric-border:${escapeAttr(metric.border)};--metric-accent:${escapeAttr(metric.color)}">
+          <div class="report-metric-icon">${escapeHtml(metric.icon)}</div>
+          <span>${escapeHtml(metric.label)}</span>
+          <strong>${metric.value}</strong>
         </div>
       `).join('');
-
-      return `
-        <div class="report-data-panel">
-          <strong>Verified Data Scope</strong>
-          <p>This report uses the recommendation snapshot stored for the selected run. Map coordinates and historical price-series data are not shown until those datasets are ingested.</p>
-          <div class="report-data-list">${suburbRows}</div>
-        </div>
-      `;
     }
 
-    function getReportInsight(suburbs, strategy) {
-      const top = suburbs[0]?.item;
-      const second = suburbs[1]?.item;
-      const topName = top ? compactName(top.suburb) : 'The top suburb';
-      const secondName = second ? compactName(second.suburb) : 'the next option';
-      const focus = strategy === 'growth' ? 'growth-focused fundamentals' : 'yield and cashflow fundamentals';
-      if (suburbs.length === 1) {
-        return `${topName} is the strongest match in this shortlist based on ${focus}, while still requiring normal due diligence on property type, condition, and local market depth.`;
-      }
-      return `${topName} is the strongest match in this shortlist based on ${focus}. ${secondName} provides a useful comparison point, while the full shortlist balances price, rent, demand and risk considerations.`;
+    function buildReportSignalTiles(viewModel) {
+      return viewModel.marketSignals.map((signal) => `
+        <div class="report-signal" data-report-field="${escapeAttr(signal.field)}" style="--metric-accent:${escapeAttr(signal.color)};background:${escapeAttr(signal.bg)}">
+          <div class="report-signal-icon">${escapeHtml(signal.icon)}</div>
+          <div>
+            <span>${escapeHtml(signal.label)}</span>
+            <strong>${signal.value}</strong>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function buildPopulationRows(viewModel) {
+      return viewModel.populationRows.map((row) => `
+        <div class="report-stat-row" data-report-field="${escapeAttr(row.field)}">
+          <div class="report-mini-icon" style="--metric-accent:${escapeAttr(row.color)}">${escapeHtml(row.icon)}</div>
+          <span>${escapeHtml(row.label)}</span>
+          <strong>${row.value}</strong>
+        </div>
+      `).join('');
+    }
+
+    function buildRecommendationTextFromViewModel(viewModel) {
+      const strength = viewModel.overallScore >= 82 ? 'a strong' : viewModel.overallScore >= 72 ? 'a good' : 'a review-worthy';
+      return `${viewModel.suburbName} is ${strength} shortlist option based on overall score first, with ${viewModel.strategyLabel.toLowerCase()} used as a secondary ranking signal. Confirm property-level risks, local supply, and current rental evidence before committing.`;
+    }
+
+    function createReportSuburbViewModel(reportDraft, suburbEntry, index, totalPages) {
+      const item = suburbEntry.item;
+      const strategy = document.getElementById('strategy').value;
+      const population = item.population_2025 ?? item.population ?? item.population_estimate_2025;
+      const report = reportDraft.report || {};
+      const reportDate = report.report_date || report.created_at || new Date().toISOString();
+      const overallScore = getInvestmentScore(item);
+      const aiSummary = getReportAiSummary(item);
+      const aiContextFacts = getOpenAiContextFacts(item);
+      const budgetValue = getPositiveNumberInput('budget');
+      const maxOopValue = getPositiveNumberInput('maxOop');
+      const estimatedOopValue = Number(item.estimated_oop);
+      const medianPriceValue = Number(getReportMetric(item, 'median_price'));
+      const fitsBudget = Number.isFinite(budgetValue) && Number.isFinite(medianPriceValue)
+        ? medianPriceValue <= budgetValue
+        : null;
+      const fitsOop = Number.isFinite(maxOopValue) && Number.isFinite(estimatedOopValue)
+        ? estimatedOopValue <= maxOopValue
+        : null;
+      const populationGrowth = formatPercent(item.population_growth_pct, 'population_growth_pct');
+      const populationGrowthVsState = formatPercent(item.population_growth_vs_state_pct, 'population_growth_pct');
+      const populationMeaning = item.population_growth_vs_state_pct === null || item.population_growth_vs_state_pct === undefined
+        ? 'Population benchmark data is not available for this suburb, so population momentum should be read cautiously.'
+        : Number(item.population_growth_vs_state_pct) >= 0
+          ? `${compactName(item.suburb)} is growing faster than the loaded state benchmark, indicating stronger future demand potential.`
+          : `${compactName(item.suburb)} is growing slower than the loaded state benchmark, so demand momentum should be reviewed carefully.`;
+
+      return {
+        reportCode: report.report_code || '',
+        customerName: report.customer_name || 'Customer',
+        generatedMonth: formatReportMonth(reportDate),
+        generatedDate: formatReportDate(reportDate),
+        budget: getReportInputMoney('budget'),
+        maxOop: getReportInputOop('maxOop'),
+        runDate: formatReportDate(currentRecommendation?.created_at || report.created_at || new Date().toISOString()),
+        pageNumber: index + 1,
+        totalPages,
+        overallRank: suburbEntry.sourceRank || index + 1,
+        selectedOrder: index + 1,
+        suburbName: compactName(item.suburb),
+        state: item.state || '',
+        postcode: item.postcode || '',
+        strategy,
+        strategyLabel: strategy === 'growth' ? 'Capital Growth' : 'Rental Yield',
+        overallScore,
+        verdict: getInvestmentVerdict(overallScore),
+        scoreRows: getReportScoreRows(item).map(([label, value, icon, color, prominent]) => ({ label, value, icon, color, prominent })),
+        executiveSummary: aiSummary.summary || `${compactName(item.suburb)} is shortlisted from the recommendation engine based on overall investment score and the customer’s budget and out-of-pocket constraints.`,
+        keyMetrics: [
+          { label: 'Median Price', field: 'median_price', value: formatMoney(getReportMetric(item, 'median_price')), icon: '⌂', color: '#2487f2', bg: '#edf6ff', border: '#cbe1fb' },
+          { label: 'Median Weekly Rent', field: 'median_rent_weekly', value: `${formatMoney(getReportMetric(item, 'median_rent_weekly'))}/wk`, icon: '⌁', color: '#35a853', bg: '#edf8ee', border: '#cbe9d1' },
+          { label: 'Gross Rental Yield', field: 'gross_yield', value: formatYield(getReportMetric(item, 'gross_yield')), icon: '%', color: '#8b5cf6', bg: '#f4eefc', border: '#ded0f6' },
+          { label: 'Vacancy Rate', field: 'vacancy_rate', value: formatPercent(item.vacancy_rate, 'vacancy_rate'), icon: '●', color: '#f59e0b', bg: '#fff4e5', border: '#ffd9a1' },
+          { label: 'Population (2025)', field: 'population_2025', value: formatNumber(population), icon: '♟', color: '#17a7a6', bg: '#ecfafa', border: '#bde8e8' },
+          { label: 'Estimated Weekly OOP', field: 'estimated_oop', value: `${formatMoney(item.estimated_oop)} /wk`, icon: '▣', color: '#d94687', bg: '#fff0f6', border: '#f5c4d7' }
+        ],
+        marketSignals: [
+          { label: 'Days on Market', field: 'days_on_market', value: formatDays(item.days_on_market), icon: '▦', color: '#f59e0b', bg: '#fffaf0' },
+          { label: 'Vendor Discount', field: 'vendor_discount_pct', value: formatPercent(item.vendor_discount_pct, 'vendor_discount_pct'), icon: '%', color: '#f97316', bg: '#fff7ed' },
+          { label: 'Stock on Market', field: 'stock_on_market_pct', value: formatPercent(item.stock_on_market_pct, 'stock_on_market_pct'), icon: '⌂', color: '#8b5cf6', bg: '#faf5ff' },
+          { label: 'Renters', field: 'renters_pct', value: formatPercent(item.renters_pct, 'renters_pct'), icon: '♟', color: '#2563eb', bg: '#eff6ff' },
+          { label: 'Population Growth vs State', field: 'population_growth_vs_state_pct', value: populationGrowthVsState, icon: '▥', color: '#17a7a6', bg: '#ecfeff' }
+        ],
+        populationRows: [
+          { label: 'Population (2025)', field: 'population_2025', value: formatNumber(population), icon: '♟', color: '#35a853' },
+          { label: 'Population Growth (2023-2025)', field: 'population_growth_pct', value: populationGrowth, icon: '▥', color: '#35a853' },
+          { label: 'Population Growth vs State', field: 'population_growth_vs_state_pct', value: populationGrowthVsState, icon: '↗', color: '#35a853' },
+          { label: 'Population Momentum Score', field: 'base_population_growth_score', value: `${formatScoreValue(item.base_population_growth_score)}/10`, icon: '▥', color: '#35a853' }
+        ],
+        fitsBudget: fitsBudget === null ? 'N/A' : fitsBudget ? 'Yes' : 'No',
+        fitsOop: fitsOop === null ? 'N/A' : fitsOop ? 'Yes' : 'No',
+        populationMeaning,
+        aiSummary,
+        aiContextFacts,
+        aiSummaryError: item.ai_summary_error || '',
+        suburbImageUrl: item.suburb_image_url || item.image_url || ''
+      };
+    }
+
+    function renderReportTemplatePage(viewModel) {
+      const imageStyle = viewModel.suburbImageUrl
+        ? ` style="background-image:url('${escapeAttr(viewModel.suburbImageUrl)}')"`
+        : '';
+      const imageClass = viewModel.suburbImageUrl ? 'report-hero-media has-image' : 'report-hero-media';
+
+      return `
+        <article class="report-page" data-report-page data-suburb="${escapeAttr(viewModel.suburbName)}">
+          <section class="report-hero">
+            <div class="report-hero-copy">
+              <div class="report-title-badge">
+                <div class="report-title-icon">▤</div>
+                <div>Suburb<br>Investment Report</div>
+              </div>
+              <h1 class="report-hero-title">${escapeHtml(viewModel.suburbName)}</h1>
+              <div class="report-hero-location">${escapeHtml(viewModel.state)} ${escapeHtml(viewModel.postcode)}</div>
+              <div class="report-prepared">
+                Prepared for <strong>${escapeHtml(viewModel.customerName)}</strong>
+                <p>Suburb investment report generated from your selected budget, out-of-pocket limit, and investment strategy.</p>
+              </div>
+            </div>
+            <div class="${imageClass}"${imageStyle}></div>
+            <div class="report-date-card">
+              <div class="report-title-icon">▦</div>
+              <div><span>Report Date</span><strong>${escapeHtml(viewModel.generatedMonth)}</strong></div>
+            </div>
+          </section>
+
+          <section class="report-band">
+            <div class="report-band-label">
+              <div class="report-band-icon">◎</div>
+              <div>Investment<br>Brief</div>
+            </div>
+            <div class="report-brief-grid">
+              <div class="report-brief-item"><div class="report-label">Budget</div><div class="report-value">${escapeHtml(viewModel.budget)}</div></div>
+              <div class="report-brief-item"><div class="report-label">Max Weekly<br>Out-of-Pocket</div><div class="report-value">${escapeHtml(viewModel.maxOop)}</div></div>
+              <div class="report-brief-item"><div class="report-label">Strategy</div><div class="report-value"><span class="report-pill">${escapeHtml(viewModel.strategy === 'growth' ? 'Growth' : 'Yield')}</span></div></div>
+              <div class="report-brief-item"><div class="report-label">Run Date</div><div class="report-value">${escapeHtml(viewModel.runDate)}</div></div>
+            </div>
+          </section>
+
+          <section class="report-band rank">
+            <div class="report-band-label">
+              <div class="report-band-icon">✪</div>
+              <div>Suburb<br>Ranking</div>
+            </div>
+            <div class="report-rank-grid">
+              <div class="report-rank-item"><div class="report-label">Overall Rank</div><div class="report-rank-number">${String(viewModel.overallRank).padStart(2, '0')}</div></div>
+              <div class="report-rank-item"><div class="report-label">Selected Report Order</div><div class="report-rank-number">${String(viewModel.selectedOrder).padStart(2, '0')}</div></div>
+              <div class="report-rank-item"><div class="report-label">Ranking Method</div><div class="report-value">Suburbs are ranked primarily by overall investment score, with the selected strategy score used as a tiebreaker.</div></div>
+            </div>
+          </section>
+
+          <section class="report-section">
+            <h2 class="report-section-title">Key Investment Metrics</h2>
+            <div class="report-metrics-layout">
+              <div>
+                <div class="report-metric-grid">${buildReportMetricTiles(viewModel)}</div>
+                <p class="report-help-text">ⓘ Estimated weekly out-of-pocket (OOP) is a modelled estimate and may vary. Affordability Score module coming soon.</p>
+              </div>
+              <aside class="report-affordability">
+                <h3>Affordability Checks</h3>
+                <div class="report-check-row"><div class="report-check-icon">✓</div><div><div class="report-label">Fits Budget</div><div class="report-value">${escapeHtml(viewModel.fitsBudget)}</div></div></div>
+                <div class="report-check-row"><div class="report-check-icon">✓</div><div><div class="report-label">Fits Max OOP</div><div class="report-value">${escapeHtml(viewModel.fitsOop)}</div></div></div>
+                <p class="report-help-text" style="color:#064e3b;margin:0">All returned suburbs meet your criteria when the source values are available.</p>
+              </aside>
+            </div>
+          </section>
+
+          <section class="report-section">
+            <h2 class="report-section-title">Market Indicators</h2>
+            <div class="report-signal-grid">${buildReportSignalTiles(viewModel)}</div>
+          </section>
+
+          <section class="report-lower-grid">
+            <div class="report-section">
+              <h2 class="report-section-title">Population & Growth</h2>
+              <div class="report-population-body">
+                <div>
+                  <div class="report-stat-list">${buildPopulationRows(viewModel)}</div>
+                  <p class="report-help-text">ⓘ Population metrics are sourced from 2023–2025 data. Some suburbs may have missing data shown as N/A.</p>
+                </div>
+                <div class="report-meaning-card">
+                  <div class="report-mini-icon" style="--metric-accent:#35a853">▥</div>
+                  <strong>What this means</strong>
+                  ${escapeHtml(viewModel.populationMeaning)}
+                </div>
+              </div>
+            </div>
+
+            <div class="report-section">
+              <h2 class="report-section-title">Investment Scores <span style="font-size:12px;font-weight:500;text-transform:none">(Out of 10)</span></h2>
+              <div class="report-score-list">${buildReportScoreRows(viewModel.scoreRows)}</div>
+              <p class="report-help-text">ⓘ Scores are based on a 0–10 scale. Overall score is shown out of 100 in ranking logic.</p>
+            </div>
+          </section>
+
+          <section class="report-ai-section">
+            <div class="report-ai-card full">
+              <h3>AI Commentary</h3>
+              <p>${escapeHtml(viewModel.aiSummary.summary || viewModel.aiSummaryError || 'OpenAI commentary was not available for this suburb.')}</p>
+            </div>
+            <div class="report-ai-card">
+              <h3>Strengths</h3>
+              ${buildReportAiList(viewModel.aiSummary.strengths)}
+            </div>
+            <div class="report-ai-card">
+              <h3>Local Drivers</h3>
+              ${buildReportAiList(viewModel.aiSummary.localDrivers)}
+            </div>
+            <div class="report-ai-card">
+              <h3>Risk Notes</h3>
+              ${buildReportAiList(viewModel.aiSummary.riskNotes)}
+            </div>
+            <div class="report-ai-card">
+              <h3>Cited Local Context</h3>
+              ${buildReportAiContextList(viewModel.aiContextFacts)}
+            </div>
+          </section>
+
+          <section class="report-meta-footer">
+            <div class="report-meta-cell">
+              <div class="report-mini-icon" style="--metric-accent:#0b4c9c">◇</div>
+              <div><div class="report-label">Report Code</div><div class="report-value" style="font-size:12px">${escapeHtml(viewModel.reportCode)}</div></div>
+            </div>
+            <div class="report-meta-cell">
+              <div class="report-mini-icon" style="--metric-accent:#0b4c9c">▦</div>
+              <div><div class="report-label">Report Date</div><div class="report-value">${escapeHtml(viewModel.generatedMonth)}</div></div>
+            </div>
+            <div class="report-meta-cell">
+              <div class="report-mini-icon" style="--metric-accent:#0b4c9c">▤</div>
+              <div><div class="report-label">Strategy</div><div class="report-value"><span class="report-pill">${escapeHtml(viewModel.strategy === 'growth' ? 'Growth' : 'Yield')}</span></div></div>
+            </div>
+            <div class="report-meta-cell note">
+              This report is based on available data as of ${escapeHtml(viewModel.generatedMonth)} and is for informational purposes only. Please review with a professional before making investment decisions.
+            </div>
+          </section>
+
+          <footer class="report-footer">
+            <span><strong>FuturLens</strong> suburb investment report</span>
+            <span>${String(viewModel.pageNumber).padStart(2, '0')} of ${String(viewModel.totalPages).padStart(2, '0')}</span>
+          </footer>
+        </article>
+      `;
     }
 
     function buildReportPreview(reportDraft) {
-      const suburbs = reportDraft.suburbs.slice(0, 5);
-      const strategy = document.getElementById('strategy').value;
-      const generatedDate = new Date().toLocaleDateString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
-      const reportCode = escapeHtml(reportDraft.report.report_code);
-      const customerName = escapeHtml(reportDraft.report.customer_name || 'Customer');
-      const cards = suburbs.slice(0, 3).map(({ item }, index) => {
-        const name = escapeHtml(compactName(item.suburb));
-        const state = escapeHtml(item.state || '');
-        const postcode = escapeHtml(item.postcode || '');
-        const color = reportColors(index);
-        return `
-          <div class="report-suburb-card">
-            <div class="report-rank" style="color:${color}">#${index + 1}<br>Rank</div>
-            <h3 style="font-size:26px;font-weight:900;color:#08265c;margin:0">${name}</h3>
-            <p style="font-size:16px;margin:3px 0 0;color:#071942">${state} ${postcode}</p>
-            <div class="report-metric-grid">
-              <div class="report-metric"><div class="report-metric-label">Median Price</div><div class="report-metric-value">${formatMoney(getReportMetric(item, 'median_price'))}</div></div>
-              <div class="report-metric"><div class="report-metric-label">Weekly Rent</div><div class="report-metric-value">${formatMoney(getReportMetric(item, 'median_rent_weekly'))}</div></div>
-              <div class="report-metric"><div class="report-metric-label">Gross Yield</div><div class="report-metric-value" style="color:${color}">${formatYield(getReportMetric(item, 'gross_yield'))}</div></div>
-              <div class="report-metric"><div class="report-metric-label">Weekly OOP</div><div class="report-metric-value" style="color:${Number(item.estimated_oop) <= 0 ? '#2f9b45' : '#dc2626'}">${formatMoney(item.estimated_oop)}</div></div>
-            </div>
-          </div>
-        `;
-      }).join('');
-      const tableRows = [
-        ['Yield Score', '30%', 'base_yield_score'],
-        ['Growth Score', '25%', 'base_growth_score'],
-        ['Demand Score', '25%', 'base_demand_score'],
-        ['Risk Score', '20%', 'base_risk_score'],
-        ['Final Score', '100%', 'base_total_score']
-      ].map(([label, weight, key]) => `
-        <tr>
-          <td><strong>${label}</strong></td>
-          <td>${weight}</td>
-          ${suburbs.slice(0, 3).map(({ item }) => `<td><strong>${getScore(item[key]).toFixed(1)}</strong></td>`).join('')}
-        </tr>
-      `).join('');
-      const deepDive = suburbs.slice(0, 3).map(({ item }, index) => {
-        const color = reportColors(index);
-        const name = escapeHtml(compactName(item.suburb));
-        return `
-          <div class="report-deep-card" style="--accent:${color}">
-            <div>
-              <h3 style="font-size:26px;font-weight:900;color:#08265c;margin:4px 0">${name}</h3>
-              <p style="font-size:16px;margin:0 0 12px">${escapeHtml(item.state || '')} ${escapeHtml(item.postcode || '')}</p>
-              <div class="report-stat-row"><span>Vacancy Rate</span><span>${formatPercent(item.vacancy_rate, 'vacancy_rate')}</span></div>
-              <div class="report-stat-row"><span>% Renters</span><span>${formatPercent(item.renters_pct, 'renters_pct')}</span></div>
-              <div class="report-stat-row"><span>Days on Market</span><span>${item.days_on_market ? Math.round(item.days_on_market) : 'N/A'}</span></div>
-              <div class="report-stat-row"><span>Vendor Discount</span><span>${formatPercent(item.vendor_discount_pct, 'vendor_discount_pct')}</span></div>
-            </div>
-            <div>
-              <h4 style="margin:0 0 8px;text-align:center;font-weight:900;color:#08265c">Median Price Trend</h4>
-              ${buildTrendChart()}
-            </div>
-            <div>
-              <h4 style="margin:0 0 8px;font-weight:900;color:#08265c">Investment Insight</h4>
-              <p style="font-size:15px;line-height:1.5;margin:0">${escapeHtml(getWhyText(item, strategy))}</p>
-              <div class="report-takeaway">
-                <strong style="color:${color}">Key Takeaway</strong><br>
-                ${strategy === 'growth' ? 'Strong candidate for a growth-focused review when balanced with affordability and market depth.' : 'Strong candidate for a cashflow-focused review when balanced with vacancy and demand signals.'}
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-      const finalCards = suburbs.slice(0, 3).map(({ item }, index) => {
-        const titles = ['Best for Yield', 'Best for Growth', 'Balanced Pick'];
-        return `
-          <div class="report-final-card">
-            <strong style="font-size:15px;color:${reportColors(index)}">${titles[index] || 'Selected Suburb'}</strong>
-            <h4 style="font-size:20px;font-weight:900;color:#08265c;margin:6px 0">${escapeHtml(compactName(item.suburb))}</h4>
-            <p style="font-size:14px;margin:0">Selected from the engine-ranked shortlist for ${customerName}'s profile.</p>
-          </div>
-        `;
-      }).join('');
+      const suburbs = reportDraft.suburbs.slice(0, REPORT_MAX_SUBURBS);
+      const pages = suburbs
+        .map((suburbEntry, index) => renderReportTemplatePage(createReportSuburbViewModel(reportDraft, suburbEntry, index, suburbs.length)))
+        .join('');
 
-      return `
-        <div class="report-page">
-          <div class="report-header">
-            <div class="report-brand"><div class="report-brand-mark">⌂</div><div>FUTURLENS<br><span style="font-weight:500;letter-spacing:0.18em">PROPERTY INTELLIGENCE</span></div></div>
-            <div class="report-kicker">Investment Suburb Analysis Report<br><span style="font-size:14px;font-weight:500">Generated on ${generatedDate}</span><span class="report-page-badge">Page 1 of 2</span></div>
-          </div>
-          <h1 class="report-title">Top Suburbs Matched to Your Investment Profile</h1>
-          <div class="report-subtitle">Personalised investment suburb report prepared for <strong>${customerName}</strong> • ${reportCode}</div>
-          <div class="report-personal-note">
-            <strong>Dear ${customerName},</strong><br>
-            Based on your investment brief, borrowing comfort, and selected strategy, this report compares the suburbs that best matched your profile and highlights the shortlist prepared for your review.
-          </div>
-          <div class="report-grid-3">${cards}</div>
-          <div style="display:grid;grid-template-columns:300px 1fr 1.35fr;gap:18px;margin-top:18px">
-            <div><h3 class="report-section-title">Data Scope</h3>${buildReportDataPanel(suburbs)}</div>
-            <div><h3 class="report-section-title">Overall Score Comparison</h3><table class="report-compare-table"><thead><tr><th>Metric</th><th>Weight</th>${suburbs.slice(0, 3).map(({ item }) => `<th>${escapeHtml(compactName(item.suburb))}</th>`).join('')}</tr></thead><tbody>${tableRows}</tbody></table></div>
-            <div><h3 class="report-section-title">Score Comparison</h3><div class="report-panel report-chart-grid"><div><h4 style="text-align:center;margin:0 0 12px">Overall Final Score</h4><div class="report-bars">${buildBarChart(suburbs.slice(0, 3))}</div></div><div><h4 style="text-align:center;margin:0 0 2px">Score Breakdown</h4>${buildRadarChart(suburbs.slice(0, 3))}</div></div></div>
-          </div>
-          <div class="report-insight"><div style="font-size:44px">♢</div><div><strong>Key Insight</strong><br>${escapeHtml(getReportInsight(suburbs, strategy))}</div></div>
-          <p style="font-size:14px;margin:16px 0 0"><strong>Disclaimer:</strong> This report is for informational purposes only and does not constitute financial or investment advice.</p>
-        </div>
-        <div class="report-page">
-          <div class="report-header">
-            <div class="report-brand"><div class="report-brand-mark">⌂</div><div>FUTURLENS<br><span style="font-weight:500;letter-spacing:0.18em">PROPERTY INTELLIGENCE</span></div></div>
-            <div class="report-kicker">Investment Suburb Analysis Report <span class="report-page-badge">Page 2 of 2</span></div>
-          </div>
-          <h2 class="report-section-title" style="font-size:24px">Suburb Deep Dive</h2>
-          ${deepDive}
-          <h2 class="report-section-title" style="border-top:2px solid #08265c;padding-top:10px">Final Recommendation</h2>
-          <div class="report-final-grid">${finalCards}<div class="report-final-card primary"><strong style="font-size:17px">Overall Recommendation for ${customerName}</strong><p style="font-size:14px;line-height:1.5">Based on your selected strategy and borrowing constraints, ${escapeHtml(compactName(suburbs[0]?.item?.suburb || 'the top suburb'))} is the strongest match in this shortlist, with the remaining selections providing useful comparison and diversification options.</p></div></div>
-          <div class="report-small-note"><strong>Overall Commentary for ${customerName}</strong><br>All selected suburbs present investment opportunities with different strengths. Your final choice should align with risk tolerance, time horizon, property type, and due diligence findings.</div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:18px;font-size:14px;color:#334155">
-            <span>FuturLens helps investors make smarter property decisions.</span>
-            <div class="report-powered-by"><span>Powered by</span><span class="report-powered-logo" aria-label="FuturLens"><span class="brand-mark" aria-hidden="true"><span></span></span><span class="brand-word">futurlens</span></span></div>
-          </div>
-        </div>
-      `;
+      return `<div class="report-document" data-report-document>${pages}</div>`;
     }
 
     function openReportPreview(reportDraft = latestReportDraft) {
@@ -1463,7 +2086,7 @@
 
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF({
-        orientation: 'landscape',
+        orientation: 'portrait',
         unit: 'mm',
         format: 'a4',
         compress: true
@@ -1760,7 +2383,7 @@
                   />
                   <div>
                     <h4 class="text-lg font-bold text-slate-900">${suburbName}</h4>
-                    <p class="text-xs text-slate-600 mt-1">Recommended for ${strategyLabel}</p>
+                    <p class="text-xs text-slate-600 mt-1">Ranked by overall score; ${strategyLabel} used as tiebreaker</p>
                   </div>
                 </div>
                 <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold ${badgeClass}">Rank #${s.rank}</span>
@@ -1865,11 +2488,19 @@
           throw new Error(JSON.stringify(data, null, 2));
         }
 
+        setReportStatus('Loading population and source-backed report fields...', 'info');
+        const reportItemsWithPopulation = await enrichReportItemsWithPopulationMetrics(getSelectedReportItems(selectedSuburbs));
+        const reportItems = await enrichReportItemsWithOpenAiSummaries(reportItemsWithPopulation);
         latestReportDraft = {
           report: data,
-          suburbs: getSelectedReportItems(selectedSuburbs)
+          suburbs: reportItems
         };
-        setReportStatus(`Report draft created: ${data.report_code}`, 'success');
+        const aiFailureCount = reportItems.filter(({ item }) => item.ai_summary_error).length;
+        const aiSuccessCount = reportItems.length - aiFailureCount;
+        const aiStatusText = aiFailureCount
+          ? ` AI summaries loaded for ${aiSuccessCount}/${reportItems.length} suburbs.`
+          : ' AI summaries loaded.';
+        setReportStatus(`Report draft created: ${data.report_code}.${aiStatusText}`, aiFailureCount ? 'info' : 'success');
         openReportPreview(latestReportDraft);
       } catch (error) {
         setReportStatus(error.message || String(error), 'error');
@@ -1933,6 +2564,7 @@
         { label: 'Stock on Market %', value: formatPercent(suburb.stock_on_market_pct, 'stock_on_market_pct'), icon: '📦' },
         { label: 'Days on Market', value: suburb.days_on_market ? `${Math.round(suburb.days_on_market)} days` : 'N/A', icon: '⏱️' },
         { label: 'Vendor Discount %', value: formatPercent(suburb.vendor_discount_pct, 'vendor_discount_pct'), icon: '💸' },
+        { label: 'Population (2025)', value: formatNumber(suburb.population_2025), icon: '👥' },
         { label: 'Population Growth', value: formatPercent(suburb.population_growth_pct, 'population_growth_pct'), icon: '📈' },
         { label: 'Population Growth vs State', value: formatPercent(suburb.population_growth_vs_state_pct, 'population_growth_pct'), icon: '📈' },
         { label: 'Infrastructure Score', value: suburb.infrastructure_score ? Math.round(suburb.infrastructure_score) : 'N/A', icon: '🏗️' },

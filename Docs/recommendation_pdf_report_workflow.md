@@ -219,6 +219,25 @@ Recommended flow:
 
 Current frontend implementation:
 
+## AI Structured Suburb Summary
+
+Future report commentary should follow the structured OpenAI contract documented here:
+
+- [openai_structured_suburb_summary_contract.md](openai_structured_suburb_summary_contract.md)
+
+Cache table setup:
+- [create_openai_suburb_summary_cache_tables.sql](../sql/create_openai_suburb_summary_cache_tables.sql)
+
+Edge Function setup:
+- [openai_suburb_summary_edge_function.md](openai_suburb_summary_edge_function.md)
+
+New report mock label mapping:
+- [report_mock_label_data_mapping.md](report_mock_label_data_mapping.md)
+- [report_design_data_values_inventory.md](report_design_data_values_inventory.md)
+
+Implementation rule:
+- complete the cache table setup before adding Edge Function or frontend integration
+
 ```text
 suburb-app/index.html
 ```

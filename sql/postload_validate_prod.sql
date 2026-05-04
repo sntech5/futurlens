@@ -15,6 +15,10 @@ select 'suburb_population_metrics', count(*) from public.suburb_population_metri
 union all
 select 'suburb_population_metrics_staging', count(*) from public.suburb_population_metrics_staging
 union all
+select 'suburb_ai_context_facts', count(*) from public.suburb_ai_context_facts
+union all
+select 'suburb_report_ai_summaries', count(*) from public.suburb_report_ai_summaries
+union all
 select 'recommendation_runs', count(*) from public.recommendation_runs
 union all
 select 'recommendations', count(*) from public.recommendations
@@ -33,6 +37,16 @@ where m.suburb_key is null;
 
 select count(*) as population_metrics_without_suburb
 from public.suburb_population_metrics s
+left join public.suburbs m on m.suburb_key = s.suburb_key
+where m.suburb_key is null;
+
+select count(*) as ai_context_facts_without_suburb
+from public.suburb_ai_context_facts s
+left join public.suburbs m on m.suburb_key = s.suburb_key
+where m.suburb_key is null;
+
+select count(*) as ai_summaries_without_suburb
+from public.suburb_report_ai_summaries s
 left join public.suburbs m on m.suburb_key = s.suburb_key
 where m.suburb_key is null;
 
