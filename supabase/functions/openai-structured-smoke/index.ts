@@ -39,10 +39,15 @@ serve(async (req) => {
 
   try {
     const openAiApiKey = requiredEnv("OPENAI_API_KEY");
-    const model = Deno.env.get("OPENAI_MODEL") ?? "gpt-5";
+    const aiProvider = Deno.env.get("AI_PROVIDER") ?? "openai";
+    if (aiProvider !== "openai") {
+      throw new Error(`Unsupported AI_PROVIDER: ${aiProvider}`);
+    }
+    const model = Deno.env.get("AI_MODEL") ?? "gpt-4o";
+    const aiApiUrl = Deno.env.get("AI_API_URL") ?? "https://api.openai.com/v1/responses";
     const startedAt = Date.now();
 
-    const response = await fetch("https://api.openai.com/v1/responses", {
+    const response = await fetch(aiApiUrl, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${openAiApiKey}`,

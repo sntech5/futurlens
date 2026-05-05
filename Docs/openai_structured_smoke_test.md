@@ -33,7 +33,7 @@ curl -i --max-time 60 -X POST 'https://mvmhapzbidspyzdkkyyp.supabase.co/function
 {
   "ok": true,
   "elapsed_ms": 1234,
-  "model": "gpt-5",
+  "model": "gpt-4o",
   "result": {
     "ok": true,
     "summary": "Structured output works.",

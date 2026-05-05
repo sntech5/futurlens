@@ -37,7 +37,7 @@ curl -i --max-time 120 -X POST 'https://mvmhapzbidspyzdkkyyp.supabase.co/functio
 {
   "ok": true,
   "elapsed_ms": 12345,
-  "model": "gpt-5-2025-08-07",
+  "model": "gpt-4o",
   "status": "completed",
   "incomplete_details": null,
   "result": {

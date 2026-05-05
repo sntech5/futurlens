@@ -1,0 +1,2 @@
+[functions.refresh-suburb-context-batch]
+verify_jwt = false

@@ -24,14 +24,19 @@ serve(async (req) => {
     const postcode = stringOrDefault(payload.postcode, "4670");
 
     const openAiApiKey = requiredEnv("OPENAI_API_KEY");
-    const model = Deno.env.get("OPENAI_MODEL") ?? "gpt-5";
+    const aiProvider = Deno.env.get("AI_PROVIDER") ?? "openai";
+    if (aiProvider !== "openai") {
+      throw new Error(`Unsupported AI_PROVIDER: ${aiProvider}`);
+    }
+    const model = Deno.env.get("AI_MODEL") ?? "gpt-4o";
+    const aiApiUrl = Deno.env.get("AI_API_URL") ?? "https://api.openai.com/v1/responses";
     const startedAt = Date.now();
     const abortController = new AbortController();
     const timeoutId = setTimeout(() => abortController.abort(), WEB_SEARCH_TIMEOUT_MS);
 
     let response: Response;
     try {
-      response = await fetch("https://api.openai.com/v1/responses", {
+      response = await fetch(aiApiUrl, {
         method: "POST",
         signal: abortController.signal,
         headers: {

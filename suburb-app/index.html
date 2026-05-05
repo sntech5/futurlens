@@ -303,12 +303,15 @@
       overflow: hidden;
       background: linear-gradient(135deg, #b8d7ef 0%, #6aa1c6 45%, #0f766e 100%);
     }
-    .report-hero-media.has-image {
-      background-size: cover;
-      background-position: center;
+    .report-hero-media.has-map iframe {
+      width: 100%;
+      height: 100%;
+      min-height: 330px;
+      border: 0;
+      display: block;
     }
-    .report-hero-media:not(.has-image)::before {
-      content: "Suburb image not loaded";
+    .report-hero-media:not(.has-map)::before {
+      content: "Suburb map not loaded";
       position: absolute;
       right: 34px;
       top: 42px;
@@ -1114,6 +1117,12 @@
       return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
     }
 
+    function getGoogleMapsEmbedUrl(suburbName, state, postcode = '') {
+      if (!CONFIG.googleMapsEmbedApiKey) return '';
+      const query = getGoogleMapsQuery(`${suburbName} ${postcode}`.trim(), state);
+      return `https://www.google.com/maps/embed/v1/place?key=${encodeURIComponent(CONFIG.googleMapsEmbedApiKey)}&q=${encodeURIComponent(query)}&zoom=12`;
+    }
+
     function renderMapPanel(suburbName, state) {
       const query = getGoogleMapsQuery(suburbName, state);
       const searchUrl = getGoogleMapsSearchUrl(query);
@@ -1499,13 +1508,16 @@
           dataLimitations: []
         };
       }
+      const compactList = (value, limit) => Array.isArray(value)
+        ? value.filter((entry) => isReportDisplayValueAvailable(entry)).slice(0, limit)
+        : [];
 
       return {
-        summary: summary.summary || '',
-        strengths: Array.isArray(summary.strengths) ? summary.strengths.slice(0, 3) : [],
-        localDrivers: Array.isArray(summary.local_drivers) ? summary.local_drivers.slice(0, 3) : [],
-        riskNotes: Array.isArray(summary.risk_notes) ? summary.risk_notes.slice(0, 2) : [],
-        dataLimitations: Array.isArray(summary.data_limitations) ? summary.data_limitations.slice(0, 3) : []
+        summary: isReportDisplayValueAvailable(summary.summary) ? summary.summary : '',
+        strengths: compactList(summary.strengths, 3),
+        localDrivers: compactList(summary.local_drivers, 3),
+        riskNotes: compactList(summary.risk_notes, 2),
+        dataLimitations: compactList(summary.data_limitations, 3)
       };
     }
 
@@ -1525,6 +1537,9 @@
     }
 
     function buildOpenAiSummaryPayload(item) {
+      const strategy = document.getElementById('strategy').value;
+      const normalizeScoreForAi = (value) => hasNumericScore(value) ? getScore(value) : null;
+
       return {
         suburb: {
           suburb_key: item.suburb,
@@ -1532,6 +1547,8 @@
           state: item.state || '',
           postcode: item.postcode || ''
         },
+        strategy,
+        strategy_label: strategy === 'growth' ? 'Capital Growth' : 'Rental Yield',
         metrics: {
           median_price: getNumericMetric(getReportMetric(item, 'median_price')),
           median_rent_weekly: getNumericMetric(getReportMetric(item, 'median_rent_weekly')),
@@ -1548,6 +1565,20 @@
           population_growth_pct: getPercentMetric(item.population_growth_pct, 'population_growth_pct'),
           population_growth_vs_state_pct: getPercentMetric(item.population_growth_vs_state_pct, 'population_growth_pct'),
           population_growth_score: getNumericMetric(item.base_population_growth_score)
+        },
+        normalized_scores: {
+          total_score: normalizeScoreForAi(item.base_total_score),
+          growth_score: normalizeScoreForAi(item.base_growth_score),
+          yield_score: normalizeScoreForAi(item.base_yield_score),
+          demand_score: normalizeScoreForAi(item.base_demand_score),
+          risk_penalty: normalizeScoreForAi(item.base_risk_score),
+          population_growth_score: normalizeScoreForAi(item.base_population_growth_score)
+        },
+        score_scale: {
+          range: '0 to 10',
+          positive_scores: 'For total_score, growth_score, yield_score, demand_score, and population_growth_score: higher is better. 8-10 is strong, 7-7.9 is good, 4-6.9 is moderate, below 4 is weak.',
+          risk_penalty: 'For risk_penalty only: lower is better. 0-3 is low risk, 4-6 is moderate risk, above 6 is elevated risk.',
+          interpretation_rule: 'Never describe a positive score of 7 or above as low, weak, poor, or a risk.'
         }
       };
     }
@@ -1580,7 +1611,7 @@
 
       for (let index = 0; index < reportItems.length; index += 1) {
         const reportItem = reportItems[index];
-        setReportStatus(`Fetching AI suburb context ${index + 1} of ${reportItems.length}...`, 'info');
+        setReportStatus(`Generating report commentary ${index + 1} of ${reportItems.length}...`, 'info');
 
         try {
           const aiData = await fetchOpenAiReportSummary(reportItem.item);
@@ -1611,6 +1642,10 @@
       return enriched;
     }
 
+    function isValidReportEvidenceUrl(value) {
+      return /^https?:\/\//i.test(String(value || '').trim());
+    }
+
     function getOpenAiContextFacts(item) {
       const payload = item.context_facts;
       if (!payload || typeof payload !== 'object') return [];
@@ -1623,12 +1658,13 @@
         if (!fact || typeof fact !== 'object') return;
         const name = fact.name || category;
         const text = fact.fact || '';
-        if (!text) return;
+        const evidenceUrl = fact.evidence_url || '';
+        if (!text || !isValidReportEvidenceUrl(evidenceUrl)) return;
         rows.push({
           category,
           name,
           text,
-          evidenceUrl: fact.evidence_url || ''
+          evidenceUrl
         });
       };
 
@@ -1641,24 +1677,21 @@
 
       if (facts.nearest_major_city && typeof facts.nearest_major_city === 'object') {
         const city = facts.nearest_major_city;
-        rows.push({
-          category: 'nearest_major_city',
-          name: city.name || 'Nearest major/regional city',
-          text: city.distance_km === null || city.distance_km === undefined
-            ? 'Distance not available from cited context.'
-            : `Approx. ${city.distance_km} km from ${city.name}.`,
-          evidenceUrl: city.evidence_url || ''
-        });
+        const evidenceUrl = city.evidence_url || '';
+        if (city.name && isReportDisplayValueAvailable(city.distance_km) && isValidReportEvidenceUrl(evidenceUrl)) {
+          rows.push({
+            category: 'nearest_major_city',
+            name: city.name || 'Nearest major/regional city',
+            text: `Approx. ${city.distance_km} km from ${city.name}.`,
+            evidenceUrl
+          });
+        }
       }
 
-      return rows.slice(0, 4);
+      return rows.filter((row) => row.text).slice(0, 4);
     }
 
     function buildReportAiList(items) {
-      if (!items.length) {
-        return '<p>OpenAI data was not available for this section.</p>';
-      }
-
       return `
         <ul class="report-ai-list">
           ${items.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
@@ -1667,10 +1700,6 @@
     }
 
     function buildReportAiContextList(items) {
-      if (!items.length) {
-        return '<p>No cited local context facts were returned for this suburb.</p>';
-      }
-
       return `
         <ul class="report-ai-list">
           ${items.map((item) => `
@@ -1683,6 +1712,19 @@
           `).join('')}
         </ul>
       `;
+    }
+
+    function isReportDisplayValueAvailable(value) {
+      const text = String(value ?? '').trim();
+      return Boolean(text) && text !== 'N/A' && text !== '-' && text !== '$NaN' && text !== 'NaN';
+    }
+
+    function appendReportUnit(value, unit) {
+      return isReportDisplayValueAvailable(value) ? `${value}${unit}` : '';
+    }
+
+    function hasReportItems(items) {
+      return Array.isArray(items) && items.length > 0;
     }
 
     function formatReportMonth(dateValue) {
@@ -1709,7 +1751,7 @@
     }
 
     function buildReportScoreRows(scoreRows) {
-      return scoreRows.map(({ label, value, icon, color, prominent }) => {
+      return scoreRows.filter(({ value }) => hasNumericScore(value)).map(({ label, value, icon, color, prominent }) => {
         const score = getScore(value);
         const width = Math.round(score * 10);
         const displayValue = prominent ? `${Math.round(score * 10)}/100` : `${formatScoreValue(value)}/10`;
@@ -1725,7 +1767,7 @@
     }
 
     function buildReportMetricTiles(viewModel) {
-      return viewModel.keyMetrics.map((metric) => `
+      return viewModel.keyMetrics.filter((metric) => isReportDisplayValueAvailable(metric.value)).map((metric) => `
         <div class="report-metric" data-report-field="${escapeAttr(metric.field)}" style="--metric-bg:${escapeAttr(metric.bg)};--metric-border:${escapeAttr(metric.border)};--metric-accent:${escapeAttr(metric.color)}">
           <div class="report-metric-icon">${escapeHtml(metric.icon)}</div>
           <span>${escapeHtml(metric.label)}</span>
@@ -1735,7 +1777,7 @@
     }
 
     function buildReportSignalTiles(viewModel) {
-      return viewModel.marketSignals.map((signal) => `
+      return viewModel.marketSignals.filter((signal) => isReportDisplayValueAvailable(signal.value)).map((signal) => `
         <div class="report-signal" data-report-field="${escapeAttr(signal.field)}" style="--metric-accent:${escapeAttr(signal.color)};background:${escapeAttr(signal.bg)}">
           <div class="report-signal-icon">${escapeHtml(signal.icon)}</div>
           <div>
@@ -1747,13 +1789,46 @@
     }
 
     function buildPopulationRows(viewModel) {
-      return viewModel.populationRows.map((row) => `
+      return viewModel.populationRows.filter((row) => isReportDisplayValueAvailable(row.value)).map((row) => `
         <div class="report-stat-row" data-report-field="${escapeAttr(row.field)}">
           <div class="report-mini-icon" style="--metric-accent:${escapeAttr(row.color)}">${escapeHtml(row.icon)}</div>
           <span>${escapeHtml(row.label)}</span>
           <strong>${row.value}</strong>
         </div>
       `).join('');
+    }
+
+    function buildReportAiCard(title, contentHtml, { full = false } = {}) {
+      if (!contentHtml) return '';
+      return `
+        <div class="report-ai-card${full ? ' full' : ''}">
+          <h3>${escapeHtml(title)}</h3>
+          ${contentHtml}
+        </div>
+      `;
+    }
+
+    function buildReportAiSection(viewModel) {
+      const cards = [
+        viewModel.aiSummary.summary
+          ? buildReportAiCard('AI Commentary', `<p>${escapeHtml(viewModel.aiSummary.summary)}</p>`, { full: true })
+          : '',
+        hasReportItems(viewModel.aiSummary.strengths)
+          ? buildReportAiCard('Strengths', buildReportAiList(viewModel.aiSummary.strengths))
+          : '',
+        hasReportItems(viewModel.aiSummary.localDrivers)
+          ? buildReportAiCard('Local Drivers', buildReportAiList(viewModel.aiSummary.localDrivers))
+          : '',
+        hasReportItems(viewModel.aiSummary.riskNotes)
+          ? buildReportAiCard('Risk Notes', buildReportAiList(viewModel.aiSummary.riskNotes))
+          : '',
+        hasReportItems(viewModel.aiContextFacts)
+          ? buildReportAiCard('Cited Local Context', buildReportAiContextList(viewModel.aiContextFacts))
+          : ''
+      ].filter(Boolean);
+
+      if (!cards.length) return '';
+      return `<section class="report-ai-section">${cards.join('')}</section>`;
     }
 
     function buildRecommendationTextFromViewModel(viewModel) {
@@ -1782,8 +1857,11 @@
         : null;
       const populationGrowth = formatPercent(item.population_growth_pct, 'population_growth_pct');
       const populationGrowthVsState = formatPercent(item.population_growth_vs_state_pct, 'population_growth_pct');
+      const medianRent = formatMoney(getReportMetric(item, 'median_rent_weekly'));
+      const estimatedOop = formatMoney(item.estimated_oop);
+      const populationMomentumScore = formatScoreValue(item.base_population_growth_score);
       const populationMeaning = item.population_growth_vs_state_pct === null || item.population_growth_vs_state_pct === undefined
-        ? 'Population benchmark data is not available for this suburb, so population momentum should be read cautiously.'
+        ? ''
         : Number(item.population_growth_vs_state_pct) >= 0
           ? `${compactName(item.suburb)} is growing faster than the loaded state benchmark, indicating stronger future demand potential.`
           : `${compactName(item.suburb)} is growing slower than the loaded state benchmark, so demand momentum should be reviewed carefully.`;
@@ -1811,11 +1889,11 @@
         executiveSummary: aiSummary.summary || `${compactName(item.suburb)} is shortlisted from the recommendation engine based on overall investment score and the customer’s budget and out-of-pocket constraints.`,
         keyMetrics: [
           { label: 'Median Price', field: 'median_price', value: formatMoney(getReportMetric(item, 'median_price')), icon: '⌂', color: '#2487f2', bg: '#edf6ff', border: '#cbe1fb' },
-          { label: 'Median Weekly Rent', field: 'median_rent_weekly', value: `${formatMoney(getReportMetric(item, 'median_rent_weekly'))}/wk`, icon: '⌁', color: '#35a853', bg: '#edf8ee', border: '#cbe9d1' },
+          { label: 'Median Weekly Rent', field: 'median_rent_weekly', value: appendReportUnit(medianRent, '/wk'), icon: '⌁', color: '#35a853', bg: '#edf8ee', border: '#cbe9d1' },
           { label: 'Gross Rental Yield', field: 'gross_yield', value: formatYield(getReportMetric(item, 'gross_yield')), icon: '%', color: '#8b5cf6', bg: '#f4eefc', border: '#ded0f6' },
           { label: 'Vacancy Rate', field: 'vacancy_rate', value: formatPercent(item.vacancy_rate, 'vacancy_rate'), icon: '●', color: '#f59e0b', bg: '#fff4e5', border: '#ffd9a1' },
           { label: 'Population (2025)', field: 'population_2025', value: formatNumber(population), icon: '♟', color: '#17a7a6', bg: '#ecfafa', border: '#bde8e8' },
-          { label: 'Estimated Weekly OOP', field: 'estimated_oop', value: `${formatMoney(item.estimated_oop)} /wk`, icon: '▣', color: '#d94687', bg: '#fff0f6', border: '#f5c4d7' }
+          { label: 'Estimated Weekly OOP', field: 'estimated_oop', value: appendReportUnit(estimatedOop, ' /wk'), icon: '▣', color: '#d94687', bg: '#fff0f6', border: '#f5c4d7' }
         ],
         marketSignals: [
           { label: 'Days on Market', field: 'days_on_market', value: formatDays(item.days_on_market), icon: '▦', color: '#f59e0b', bg: '#fffaf0' },
@@ -1828,23 +1906,52 @@
           { label: 'Population (2025)', field: 'population_2025', value: formatNumber(population), icon: '♟', color: '#35a853' },
           { label: 'Population Growth (2023-2025)', field: 'population_growth_pct', value: populationGrowth, icon: '▥', color: '#35a853' },
           { label: 'Population Growth vs State', field: 'population_growth_vs_state_pct', value: populationGrowthVsState, icon: '↗', color: '#35a853' },
-          { label: 'Population Momentum Score', field: 'base_population_growth_score', value: `${formatScoreValue(item.base_population_growth_score)}/10`, icon: '▥', color: '#35a853' }
+          { label: 'Population Momentum Score', field: 'base_population_growth_score', value: appendReportUnit(populationMomentumScore, '/10'), icon: '▥', color: '#35a853' }
         ],
         fitsBudget: fitsBudget === null ? 'N/A' : fitsBudget ? 'Yes' : 'No',
         fitsOop: fitsOop === null ? 'N/A' : fitsOop ? 'Yes' : 'No',
         populationMeaning,
         aiSummary,
         aiContextFacts,
-        aiSummaryError: item.ai_summary_error || '',
-        suburbImageUrl: item.suburb_image_url || item.image_url || ''
+        suburbMapUrl: getGoogleMapsEmbedUrl(compactName(item.suburb), item.state || '', item.postcode || '')
       };
     }
 
     function renderReportTemplatePage(viewModel) {
-      const imageStyle = viewModel.suburbImageUrl
-        ? ` style="background-image:url('${escapeAttr(viewModel.suburbImageUrl)}')"`
+      const mapClass = viewModel.suburbMapUrl ? 'report-hero-media has-map' : 'report-hero-media';
+      const mapHtml = viewModel.suburbMapUrl
+        ? `<iframe src="${escapeAttr(viewModel.suburbMapUrl)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>`
         : '';
-      const imageClass = viewModel.suburbImageUrl ? 'report-hero-media has-image' : 'report-hero-media';
+      const metricTiles = buildReportMetricTiles(viewModel);
+      const signalTiles = buildReportSignalTiles(viewModel);
+      const populationRows = buildPopulationRows(viewModel);
+      const scoreRows = buildReportScoreRows(viewModel.scoreRows);
+      const hasAffordability = isReportDisplayValueAvailable(viewModel.fitsBudget) || isReportDisplayValueAvailable(viewModel.fitsOop);
+      const aiSection = buildReportAiSection(viewModel);
+      const lowerSection = populationRows || scoreRows
+        ? `<section class="report-lower-grid">
+            ${populationRows ? `<div class="report-section">
+              <h2 class="report-section-title">Population & Growth</h2>
+              <div class="report-population-body">
+                <div>
+                  <div class="report-stat-list">${populationRows}</div>
+                  <p class="report-help-text">ⓘ Population metrics are sourced from 2023–2025 data where available.</p>
+                </div>
+                ${viewModel.populationMeaning ? `<div class="report-meaning-card">
+                  <div class="report-mini-icon" style="--metric-accent:#35a853">▥</div>
+                  <strong>What this means</strong>
+                  ${escapeHtml(viewModel.populationMeaning)}
+                </div>` : ''}
+              </div>
+            </div>` : ''}
+
+            ${scoreRows ? `<div class="report-section">
+              <h2 class="report-section-title">Investment Scores <span style="font-size:12px;font-weight:500;text-transform:none">(Out of 10)</span></h2>
+              <div class="report-score-list">${scoreRows}</div>
+              <p class="report-help-text">ⓘ Scores are based on a 0–10 scale. Overall score is shown out of 100 in ranking logic.</p>
+            </div>` : ''}
+          </section>`
+        : '';
 
       return `
         <article class="report-page" data-report-page data-suburb="${escapeAttr(viewModel.suburbName)}">
@@ -1861,7 +1968,7 @@
                 <p>Suburb investment report generated from your selected budget, out-of-pocket limit, and investment strategy.</p>
               </div>
             </div>
-            <div class="${imageClass}"${imageStyle}></div>
+            <div class="${mapClass}">${mapHtml}</div>
             <div class="report-date-card">
               <div class="report-title-icon">▦</div>
               <div><span>Report Date</span><strong>${escapeHtml(viewModel.generatedMonth)}</strong></div>
@@ -1893,72 +2000,30 @@
             </div>
           </section>
 
-          <section class="report-section">
+          ${metricTiles ? `<section class="report-section">
             <h2 class="report-section-title">Key Investment Metrics</h2>
             <div class="report-metrics-layout">
               <div>
-                <div class="report-metric-grid">${buildReportMetricTiles(viewModel)}</div>
+                <div class="report-metric-grid">${metricTiles}</div>
                 <p class="report-help-text">ⓘ Estimated weekly out-of-pocket (OOP) is a modelled estimate and may vary. Affordability Score module coming soon.</p>
               </div>
-              <aside class="report-affordability">
+              ${hasAffordability ? `<aside class="report-affordability">
                 <h3>Affordability Checks</h3>
-                <div class="report-check-row"><div class="report-check-icon">✓</div><div><div class="report-label">Fits Budget</div><div class="report-value">${escapeHtml(viewModel.fitsBudget)}</div></div></div>
-                <div class="report-check-row"><div class="report-check-icon">✓</div><div><div class="report-label">Fits Max OOP</div><div class="report-value">${escapeHtml(viewModel.fitsOop)}</div></div></div>
+                ${isReportDisplayValueAvailable(viewModel.fitsBudget) ? `<div class="report-check-row"><div class="report-check-icon">✓</div><div><div class="report-label">Fits Budget</div><div class="report-value">${escapeHtml(viewModel.fitsBudget)}</div></div></div>` : ''}
+                ${isReportDisplayValueAvailable(viewModel.fitsOop) ? `<div class="report-check-row"><div class="report-check-icon">✓</div><div><div class="report-label">Fits Max OOP</div><div class="report-value">${escapeHtml(viewModel.fitsOop)}</div></div></div>` : ''}
                 <p class="report-help-text" style="color:#064e3b;margin:0">All returned suburbs meet your criteria when the source values are available.</p>
-              </aside>
+              </aside>` : ''}
             </div>
-          </section>
+          </section>` : ''}
 
-          <section class="report-section">
+          ${signalTiles ? `<section class="report-section">
             <h2 class="report-section-title">Market Indicators</h2>
-            <div class="report-signal-grid">${buildReportSignalTiles(viewModel)}</div>
-          </section>
+            <div class="report-signal-grid">${signalTiles}</div>
+          </section>` : ''}
 
-          <section class="report-lower-grid">
-            <div class="report-section">
-              <h2 class="report-section-title">Population & Growth</h2>
-              <div class="report-population-body">
-                <div>
-                  <div class="report-stat-list">${buildPopulationRows(viewModel)}</div>
-                  <p class="report-help-text">ⓘ Population metrics are sourced from 2023–2025 data. Some suburbs may have missing data shown as N/A.</p>
-                </div>
-                <div class="report-meaning-card">
-                  <div class="report-mini-icon" style="--metric-accent:#35a853">▥</div>
-                  <strong>What this means</strong>
-                  ${escapeHtml(viewModel.populationMeaning)}
-                </div>
-              </div>
-            </div>
+          ${lowerSection}
 
-            <div class="report-section">
-              <h2 class="report-section-title">Investment Scores <span style="font-size:12px;font-weight:500;text-transform:none">(Out of 10)</span></h2>
-              <div class="report-score-list">${buildReportScoreRows(viewModel.scoreRows)}</div>
-              <p class="report-help-text">ⓘ Scores are based on a 0–10 scale. Overall score is shown out of 100 in ranking logic.</p>
-            </div>
-          </section>
-
-          <section class="report-ai-section">
-            <div class="report-ai-card full">
-              <h3>AI Commentary</h3>
-              <p>${escapeHtml(viewModel.aiSummary.summary || viewModel.aiSummaryError || 'OpenAI commentary was not available for this suburb.')}</p>
-            </div>
-            <div class="report-ai-card">
-              <h3>Strengths</h3>
-              ${buildReportAiList(viewModel.aiSummary.strengths)}
-            </div>
-            <div class="report-ai-card">
-              <h3>Local Drivers</h3>
-              ${buildReportAiList(viewModel.aiSummary.localDrivers)}
-            </div>
-            <div class="report-ai-card">
-              <h3>Risk Notes</h3>
-              ${buildReportAiList(viewModel.aiSummary.riskNotes)}
-            </div>
-            <div class="report-ai-card">
-              <h3>Cited Local Context</h3>
-              ${buildReportAiContextList(viewModel.aiContextFacts)}
-            </div>
-          </section>
+          ${aiSection}
 
           <section class="report-meta-footer">
             <div class="report-meta-cell">

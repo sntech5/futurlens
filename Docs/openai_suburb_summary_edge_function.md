@@ -44,8 +44,27 @@ Set these in Supabase before deploying/running the function:
 
 ```sh
 supabase secrets set OPENAI_API_KEY=...
-supabase secrets set OPENAI_MODEL=gpt-5
+supabase secrets set AI_PROVIDER=openai
+supabase secrets set AI_MODEL=gpt-4o
+supabase secrets set AI_API_URL=https://api.openai.com/v1/responses
 supabase secrets set FUTURLENS_SUPABASE_SERVICE_ROLE_KEY=...
+```
+
+For local runs, keep the same model value in `suburb-app/.env`:
+
+```text
+AI_PROVIDER=openai
+AI_MODEL=gpt-4o
+AI_API_URL=https://api.openai.com/v1/responses
+```
+
+To test Gemini Flash-Lite instead:
+
+```sh
+supabase secrets set AI_PROVIDER=gemini
+supabase secrets set AI_MODEL=gemini-2.5-flash-lite
+supabase secrets set AI_API_URL='https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent'
+supabase secrets set GEMINI_API_KEY=...
 ```
 
 The function also expects the standard Supabase project URL:
@@ -54,7 +73,7 @@ The function also expects the standard Supabase project URL:
 SUPABASE_URL
 ```
 
-Do not expose `OPENAI_API_KEY` or `SUPABASE_SERVICE_ROLE_KEY` in frontend config.
+Do not expose `OPENAI_API_KEY`, `GEMINI_API_KEY`, or `SUPABASE_SERVICE_ROLE_KEY` in frontend config.
 Do not expose `FUTURLENS_SUPABASE_SERVICE_ROLE_KEY` in frontend config.
 
 Security note:
