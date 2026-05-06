@@ -58,9 +58,10 @@ Interpret scores exactly as supplied:
 - All normalized_scores are on a 0 to 10 scale.
 - For total_score, growth_score, yield_score, demand_score, and population_growth_score: higher is better. 8-10 is strong, 7-7.9 is good, 4-6.9 is moderate, below 4 is weak.
 - For risk_penalty only: lower is better. 0-3 is low risk, 4-6 is moderate risk, above 6 is elevated risk.
+- For stock_on_market_pct: lower generally means tighter listed supply. Below 1% is very tight supply and should not be described as stock pressure. 1-2% is tight, 2-4% is moderate, 4-6% is elevated, and above 6% is high listed-supply pressure.
 - Never describe a positive score of 7 or above as low, weak, poor, or a risk. For example, yield_score 9.3/10 is a strong yield signal, not a low yield signal.
 - Use the selected strategy to decide emphasis. For a Capital Growth strategy, yield can be a secondary strength or neutral point; do not call a strong yield score a risk just because the strategy is growth. For a Rental Yield strategy, growth can be secondary.
-- Put only genuinely adverse signals in risk_notes: positive score below 4, risk_penalty above 6, or clearly adverse raw metrics where supplied. If no clear adverse signal exists, return an empty risk_notes array.
+- Put only genuinely adverse signals in risk_notes: positive score below 4, risk_penalty above 6, stock_on_market_pct at least 4%, or clearly adverse raw metrics where supplied. If stock_on_market_pct is below 1% and risk_penalty is 0-3, treat it as low supply-risk rather than stock pressure. If no clear adverse signal exists, return an empty risk_notes array.
 
 Be concise, cautious, and factual. Do not guarantee performance. Prefer "may support", "is associated with", "based on supplied metrics", and "where source data is available". Omit missing facts or note them only in data_limitations.
 
@@ -251,7 +252,7 @@ serve(async (req) => {
         useWebSearch: false,
         state: payload.suburb.state,
       });
-      sanitizeSummaryPayload(summaryPayload, summaryInput.normalized_scores as JsonObject);
+      sanitizeSummaryPayload(summaryPayload, summaryInput.normalized_scores as JsonObject, summaryInput.metrics as JsonObject);
 
       summaryRow = await upsertSummaryCache(supabase, {
         suburb_key: payload.suburb.suburb_key,
@@ -295,6 +296,10 @@ function defaultScoreScale() {
       "For total_score, growth_score, yield_score, demand_score, and population_growth_score: higher is better. 8-10 is strong, 7-7.9 is good, 4-6.9 is moderate, below 4 is weak.",
     risk_penalty:
       "For risk_penalty only: lower is better. 0-3 is low risk, 4-6 is moderate risk, above 6 is elevated risk.",
+    stock_on_market_pct:
+      "For stock_on_market_pct: lower generally means tighter listed supply. Below 1% is very tight supply and should not be described as stock pressure. 1-2% is tight, 2-4% is moderate, 4-6% is elevated, and above 6% is high listed-supply pressure.",
+    risk_notes_rule:
+      "Only mention stock-on-market in risk_notes when stock_on_market_pct is at least 4% or risk_penalty is above 6. If stock_on_market_pct is below 1% and risk_penalty is 0-3, treat it as low supply-risk rather than pressure.",
     interpretation_rule: "Never describe a positive score of 7 or above as low, weak, poor, or a risk.",
   };
 }
@@ -317,14 +322,29 @@ function normalizeScore(value: unknown) {
   return Math.max(0, Math.min(10, normalized));
 }
 
-function sanitizeSummaryPayload(summaryPayload: JsonObject, normalizedScores: JsonObject) {
+function sanitizeSummaryPayload(summaryPayload: JsonObject, normalizedScores: JsonObject, metrics: JsonObject) {
   const riskNotes = summaryPayload.risk_notes;
   if (!Array.isArray(riskNotes)) return;
 
   summaryPayload.risk_notes = riskNotes.filter((note) => {
     if (typeof note !== "string") return false;
+    if (contradictsLowStockRisk(note, normalizedScores, metrics)) return false;
     return !contradictsStrongScore(note, normalizedScores);
   });
+}
+
+function contradictsLowStockRisk(note: string, normalizedScores: JsonObject, metrics: JsonObject) {
+  const text = note.toLowerCase();
+  const mentionsStockPressure = /\b(stock|supply|listing|listed|inventory)\b/.test(text)
+    && /\b(pressure|risk|concern|elevated|high|oversupply|excess)\b/.test(text);
+  if (!mentionsStockPressure) return false;
+
+  const riskPenalty = Number(normalizedScores.risk_penalty);
+  const stockOnMarketPct = Number(metrics.stock_on_market_pct);
+  return Number.isFinite(riskPenalty)
+    && Number.isFinite(stockOnMarketPct)
+    && riskPenalty <= 3
+    && stockOnMarketPct < 1;
 }
 
 function contradictsStrongScore(note: string, normalizedScores: JsonObject) {
