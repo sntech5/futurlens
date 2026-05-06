@@ -1,13 +1,28 @@
--- Reference: Docs/sql_reference_patch_run_recommendation_engine.md
--- Patch: prevent NOT NULL failures on recommendations.top_suburbs
--- Context: public.run_recommendation_engine(p_run_id uuid)
+-- Purpose:
+-- Make the selected investment strategy the primary recommendation ranking.
 --
--- Apply this in Supabase SQL Editor. It preserves the 1-parameter signature
--- and ensures no-match runs write top_suburbs = '[]'::jsonb.
+-- Why:
+-- The previous recommendation order used base_total_score first and only used
+-- the selected strategy score as a tiebreaker. Because total scores rarely tie,
+-- growth and yield strategies often returned the same suburb order.
+--
+-- Ranking after this patch:
+-- - growth strategy: base_growth_score desc, then base_total_score desc
+-- - yield strategy: gross_yield desc, then estimated_oop asc, then base_total_score desc
+--
+-- Yield note:
+-- base_yield_score is currently capped at 10 once gross_yield reaches 5%.
+-- That makes many suburbs tie at 10/10 and causes base_total_score to become
+-- the practical ranking driver. For yield strategy, raw gross_yield is the
+-- better primary ranking metric until base_yield_score is redesigned.
+--
+-- Apply in Supabase SQL Editor.
 
 create or replace function public.run_recommendation_engine(p_run_id uuid)
 returns void
 language plpgsql
+security definer
+set search_path = public
 as $$
 declare
   v_user_profile_id uuid;
@@ -15,13 +30,13 @@ declare
   v_max_oop numeric;
   v_strategy_type text;
   v_top_suburbs jsonb;
+  v_updated_run_count integer;
 begin
-  -- Read run inputs from source-of-truth table.
   select
     rr.user_profile_id,
     rr.input_budget,
     rr.max_out_of_pocket,
-    rr.strategy_type
+    lower(trim(rr.strategy_type))
   into
     v_user_profile_id,
     v_budget,
@@ -38,8 +53,10 @@ begin
     raise exception 'run_recommendation_engine: missing required run inputs for run_id %', p_run_id;
   end if;
 
-  -- Build recommendation payload.
-  -- IMPORTANT: jsonb_agg returns NULL when no rows match, so wrap with COALESCE.
+  if v_strategy_type not in ('growth', 'yield') then
+    raise exception 'run_recommendation_engine: unsupported strategy_type % for run_id %', v_strategy_type, p_run_id;
+  end if;
+
   select coalesce(
     jsonb_agg(
       jsonb_build_object(
@@ -96,7 +113,6 @@ begin
   where s.median_price <= v_budget
     and (((s.median_price * 0.8 * 0.06) / 52) - s.median_rent_weekly) <= v_max_oop;
 
-  -- Double-guard before insert.
   v_top_suburbs := coalesce(v_top_suburbs, '[]'::jsonb);
 
   insert into public.recommendations (
@@ -122,5 +138,11 @@ begin
   set run_status = 'completed',
       completed_at = now()
   where id = p_run_id;
+
+  get diagnostics v_updated_run_count = row_count;
+
+  if v_updated_run_count <> 1 then
+    raise exception 'run_recommendation_engine: failed to mark run % as completed', p_run_id;
+  end if;
 end;
 $$;

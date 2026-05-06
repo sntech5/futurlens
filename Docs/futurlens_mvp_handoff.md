@@ -434,8 +434,8 @@ Reason:
    - `median_price <= input_budget`
    - estimated OOP <= `max_out_of_pocket`
 5. Sort by:
-   - `base_growth_score desc` if strategy is `growth`
-   - `base_yield_score desc` if strategy is `yield`
+   - `base_growth_score desc` first if strategy is `growth`, with `base_total_score` as quality tiebreaker
+   - `base_yield_score desc` first if strategy is `yield`, with `base_total_score` as quality tiebreaker
 6. Build `top_suburbs` JSON
 7. Insert row into `recommendations`
 

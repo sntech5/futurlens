@@ -48,7 +48,7 @@ These come from `public.recommendations.top_suburbs[]` and report selection logi
 
 | Label idea | Field | Example | Notes |
 | --- | --- | --- | --- |
-| Rank | array position / `source_rank` | `01` | Ranking is overall score first, then strategy score tiebreaker |
+| Rank | array position / `source_rank` | `01` | Ranking is selected strategy score first, then overall score tiebreaker |
 | Report order | `report_rank` | `01` | User-selected order in report |
 | Suburb name | `suburb` formatted | `Mawson Lakes` | Source key example: `MAWSON LAKES_SA_5095` |
 | State | `state` | `SA` | From `public.suburbs` |
@@ -57,7 +57,7 @@ These come from `public.recommendations.top_suburbs[]` and report selection logi
 Ranking explanation:
 
 ```text
-Suburbs are ranked primarily by overall investment score, with the selected strategy score used as a tiebreaker.
+Suburbs are ranked primarily by the selected strategy score, with overall investment score used as a quality tiebreaker.
 ```
 
 ## Core Market Metrics

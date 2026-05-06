@@ -68,12 +68,23 @@ begin
         'base_demand_score', s.base_demand_score,
         'base_risk_score', s.base_risk_score,
         'base_total_score', s.base_total_score,
+        'strategy_rank_score',
+          case
+            when v_strategy_type = 'growth' then s.base_growth_score
+            when v_strategy_type = 'yield' then s.gross_yield
+          end,
         'refreshed_at', s.refreshed_at
       )
       order by
-        s.base_total_score desc nulls last,
         case when v_strategy_type = 'growth' then s.base_growth_score end desc nulls last,
-        case when v_strategy_type = 'yield' then s.base_yield_score end desc nulls last,
+        case when v_strategy_type = 'yield' then s.gross_yield end desc nulls last,
+        case
+          when v_strategy_type = 'yield'
+            then (((s.median_price * 0.8 * 0.06) / 52) - s.median_rent_weekly)
+        end asc nulls last,
+        s.base_total_score desc nulls last,
+        s.base_demand_score desc nulls last,
+        s.base_risk_score asc nulls last,
         s.suburb_key asc
     ),
     '[]'::jsonb
@@ -101,7 +112,8 @@ begin
     v_strategy_type,
     case
       when jsonb_array_length(v_top_suburbs) = 0 then 'No suburbs matched the selected budget and weekly out-of-pocket constraints.'
-      else 'Suburbs are ranked primarily by overall investment score, with the selected strategy score used as a tiebreaker.'
+      when v_strategy_type = 'growth' then 'Suburbs are ranked primarily by capital growth score, with overall investment score used as a quality tiebreaker.'
+      else 'Suburbs are ranked primarily by rental yield score, with overall investment score used as a quality tiebreaker.'
     end
   );
 
