@@ -32,7 +32,9 @@ const configJs = `window.APP_CONFIG = {
   supabaseKey: ${JSON.stringify(env.SUPABASE_ANON_KEY)},
   supabaseFunctionJwt: ${JSON.stringify(env.SUPABASE_FUNCTION_JWT || env.SUPABASE_LEGACY_ANON_KEY || env.SUPABASE_ANON_JWT || '')},
   userProfileId: ${JSON.stringify(env.USER_PROFILE_ID)},
-  googleMapsEmbedApiKey: ${JSON.stringify(env.GOOGLE_MAPS_EMBED_API_KEY || '')}
+  googleMapsEmbedApiKey: ${JSON.stringify(env.GOOGLE_MAPS_EMBED_API_KEY || '')},
+  googleMapsStaticApiKey: ${JSON.stringify(env.GOOGLE_MAPS_STATIC_API_KEY || env.GOOGLE_MAPS_EMBED_API_KEY || '')},
+  googleMapsStaticSignature: ${JSON.stringify(env.GOOGLE_MAPS_STATIC_SIGNATURE || '')}
 };
 `;
 

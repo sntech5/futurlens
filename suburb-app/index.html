@@ -303,12 +303,14 @@
       overflow: hidden;
       background: linear-gradient(135deg, #b8d7ef 0%, #6aa1c6 45%, #0f766e 100%);
     }
-    .report-hero-media.has-map iframe {
+    .report-hero-media.has-map iframe,
+    .report-hero-media.has-map img {
       width: 100%;
       height: 100%;
       min-height: 330px;
       border: 0;
       display: block;
+      object-fit: cover;
     }
     .report-hero-media:not(.has-map)::before {
       content: "Suburb map not loaded";
@@ -1123,6 +1125,29 @@
       return `https://www.google.com/maps/embed/v1/place?key=${encodeURIComponent(CONFIG.googleMapsEmbedApiKey)}&q=${encodeURIComponent(query)}&zoom=12`;
     }
 
+    function getGoogleMapsStaticMapUrl(suburbName, state, postcode = '') {
+      const apiKey = CONFIG.googleMapsStaticApiKey || CONFIG.googleMapsEmbedApiKey || '';
+      if (!apiKey) return '';
+
+      const query = getGoogleMapsQuery(`${suburbName} ${postcode}`.trim(), state);
+      const params = new URLSearchParams({
+        center: query,
+        zoom: '13',
+        size: '640x360',
+        scale: '2',
+        maptype: 'roadmap',
+        key: apiKey
+      });
+
+      params.append('markers', `color:0x0b4c9c|label:${String(suburbName || 'S').trim().charAt(0).toUpperCase() || 'S'}|${query}`);
+
+      if (CONFIG.googleMapsStaticSignature) {
+        params.set('signature', CONFIG.googleMapsStaticSignature);
+      }
+
+      return `https://maps.googleapis.com/maps/api/staticmap?${params.toString()}`;
+    }
+
     function renderMapPanel(suburbName, state) {
       const query = getGoogleMapsQuery(suburbName, state);
       const searchUrl = getGoogleMapsSearchUrl(query);
@@ -1217,7 +1242,10 @@
         reasons.push(`yield score is ${formatScoreValue(item.base_yield_score)}/10`);
       }
 
-      return `Included in the shortlist because ${reasons.join(', ')}. Ranking is primarily by overall investment score, with the selected strategy score used as a tiebreaker.`;
+      const rankingBasis = strategy === 'growth'
+        ? 'capital growth score'
+        : 'rental yield score';
+      return `Included in the shortlist because ${reasons.join(', ')}. Ranking is primarily by ${rankingBasis}, with overall investment score used as a quality tiebreaker.`;
     }
 
     function formatSuburbName(raw) {
@@ -1307,6 +1335,16 @@
       const num = Number(value);
       if (!Number.isFinite(num)) return fallback;
       return new Intl.NumberFormat('en-AU', { maximumFractionDigits: 0 }).format(num);
+    }
+
+    function getPositivePopulationValue(value) {
+      const num = Number(value);
+      return Number.isFinite(num) && num > 0 ? num : null;
+    }
+
+    function formatPopulation(value, fallback = 'N/A') {
+      const population = getPositivePopulationValue(value);
+      return population === null ? fallback : formatNumber(population, fallback);
     }
 
     function formatDays(value) {
@@ -1426,10 +1464,29 @@
         .map(({ item }) => item.suburb)
         .filter(Boolean);
 
-      const missingPopulation = reportItems.some(({ item }) => item.population_2025 === null || item.population_2025 === undefined);
+      const missingPopulation = reportItems.some(({ item }) => getPositivePopulationValue(item.population_2025) === null);
       if (!suburbKeys.length || !missingPopulation) return reportItems;
 
-      const keyList = suburbKeys.map((key) => `"${String(key).replaceAll('"', '\\"')}"`).join(',');
+      const populationByKey = await fetchPopulationMetricsBySuburbKey(suburbKeys);
+      return reportItems.map(({ item, ...rest }) => ({
+        ...rest,
+        item: {
+          ...item,
+          population_2025: getPositivePopulationValue(item.population_2025)
+            ?? getPositivePopulationValue(populationByKey.get(item.suburb))
+            ?? null,
+          population_data_available: (
+            getPositivePopulationValue(item.population_2025) !== null
+          ) || getPositivePopulationValue(populationByKey.get(item.suburb)) !== null
+        }
+      }));
+    }
+
+    async function fetchPopulationMetricsBySuburbKey(suburbKeys) {
+      const uniqueKeys = Array.from(new Set(suburbKeys.filter(Boolean)));
+      if (!uniqueKeys.length) return new Map();
+
+      const keyList = uniqueKeys.map((key) => `"${String(key).replaceAll('"', '\\"')}"`).join(',');
       const response = await fetch(
         `${CONFIG.supabaseUrl}/rest/v1/suburb_population_metrics?suburb_key=in.(${encodeURIComponent(keyList)})&select=suburb_key,population_2025`,
         {
@@ -1443,17 +1500,35 @@
         throw new Error(JSON.stringify(rows, null, 2));
       }
 
-      const populationByKey = new Map(rows.map((row) => [row.suburb_key, row.population_2025]));
-      return reportItems.map(({ item, ...rest }) => ({
-        ...rest,
-        item: {
+      return new Map(rows.map((row) => [row.suburb_key, row.population_2025]));
+    }
+
+    async function enrichRecommendationRowsWithPopulationMetrics(recommendationRows) {
+      if (!Array.isArray(recommendationRows) || !recommendationRows.length) return recommendationRows;
+
+      const suburbKeys = recommendationRows.flatMap((recommendation) => (
+        recommendation.top_suburbs || []
+      ).map((item) => item.suburb));
+
+      const hasMissingPopulation = recommendationRows.some((recommendation) => (
+        recommendation.top_suburbs || []
+      ).some((item) => getPositivePopulationValue(item.population_2025) === null));
+
+      if (!hasMissingPopulation) return recommendationRows;
+
+      const populationByKey = await fetchPopulationMetricsBySuburbKey(suburbKeys);
+
+      return recommendationRows.map((recommendation) => ({
+        ...recommendation,
+        top_suburbs: (recommendation.top_suburbs || []).map((item) => ({
           ...item,
-          population_2025: item.population_2025 ?? populationByKey.get(item.suburb) ?? null,
+          population_2025: getPositivePopulationValue(item.population_2025)
+            ?? getPositivePopulationValue(populationByKey.get(item.suburb))
+            ?? null,
           population_data_available: (
-            item.population_2025 !== null
-            && item.population_2025 !== undefined
-          ) || populationByKey.has(item.suburb)
-        }
+            getPositivePopulationValue(item.population_2025) !== null
+          ) || getPositivePopulationValue(populationByKey.get(item.suburb)) !== null
+        }))
       }));
     }
 
@@ -1839,7 +1914,9 @@
     function createReportSuburbViewModel(reportDraft, suburbEntry, index, totalPages) {
       const item = suburbEntry.item;
       const strategy = document.getElementById('strategy').value;
-      const population = item.population_2025 ?? item.population ?? item.population_estimate_2025;
+      const population = getPositivePopulationValue(item.population_2025)
+        ?? getPositivePopulationValue(item.population)
+        ?? getPositivePopulationValue(item.population_estimate_2025);
       const report = reportDraft.report || {};
       const reportDate = report.report_date || report.created_at || new Date().toISOString();
       const overallScore = getInvestmentScore(item);
@@ -1892,7 +1969,7 @@
           { label: 'Median Weekly Rent', field: 'median_rent_weekly', value: appendReportUnit(medianRent, '/wk'), icon: '⌁', color: '#35a853', bg: '#edf8ee', border: '#cbe9d1' },
           { label: 'Gross Rental Yield', field: 'gross_yield', value: formatYield(getReportMetric(item, 'gross_yield')), icon: '%', color: '#8b5cf6', bg: '#f4eefc', border: '#ded0f6' },
           { label: 'Vacancy Rate', field: 'vacancy_rate', value: formatPercent(item.vacancy_rate, 'vacancy_rate'), icon: '●', color: '#f59e0b', bg: '#fff4e5', border: '#ffd9a1' },
-          { label: 'Population (2025)', field: 'population_2025', value: formatNumber(population), icon: '♟', color: '#17a7a6', bg: '#ecfafa', border: '#bde8e8' },
+          { label: 'Population (2025)', field: 'population_2025', value: formatPopulation(population), icon: '♟', color: '#17a7a6', bg: '#ecfafa', border: '#bde8e8' },
           { label: 'Estimated Weekly OOP', field: 'estimated_oop', value: appendReportUnit(estimatedOop, ' /wk'), icon: '▣', color: '#d94687', bg: '#fff0f6', border: '#f5c4d7' }
         ],
         marketSignals: [
@@ -1903,7 +1980,7 @@
           { label: 'Population Growth vs State', field: 'population_growth_vs_state_pct', value: populationGrowthVsState, icon: '▥', color: '#17a7a6', bg: '#ecfeff' }
         ],
         populationRows: [
-          { label: 'Population (2025)', field: 'population_2025', value: formatNumber(population), icon: '♟', color: '#35a853' },
+          { label: 'Population (2025)', field: 'population_2025', value: formatPopulation(population), icon: '♟', color: '#35a853' },
           { label: 'Population Growth (2023-2025)', field: 'population_growth_pct', value: populationGrowth, icon: '▥', color: '#35a853' },
           { label: 'Population Growth vs State', field: 'population_growth_vs_state_pct', value: populationGrowthVsState, icon: '↗', color: '#35a853' },
           { label: 'Population Momentum Score', field: 'base_population_growth_score', value: appendReportUnit(populationMomentumScore, '/10'), icon: '▥', color: '#35a853' }
@@ -1913,14 +1990,14 @@
         populationMeaning,
         aiSummary,
         aiContextFacts,
-        suburbMapUrl: getGoogleMapsEmbedUrl(compactName(item.suburb), item.state || '', item.postcode || '')
+        suburbMapUrl: getGoogleMapsStaticMapUrl(compactName(item.suburb), item.state || '', item.postcode || '')
       };
     }
 
     function renderReportTemplatePage(viewModel) {
       const mapClass = viewModel.suburbMapUrl ? 'report-hero-media has-map' : 'report-hero-media';
       const mapHtml = viewModel.suburbMapUrl
-        ? `<iframe src="${escapeAttr(viewModel.suburbMapUrl)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>`
+        ? `<img src="${escapeAttr(viewModel.suburbMapUrl)}" alt="${escapeAttr(`${viewModel.suburbName} suburb map`)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" />`
         : '';
       const metricTiles = buildReportMetricTiles(viewModel);
       const signalTiles = buildReportSignalTiles(viewModel);
@@ -1996,7 +2073,7 @@
             <div class="report-rank-grid">
               <div class="report-rank-item"><div class="report-label">Overall Rank</div><div class="report-rank-number">${String(viewModel.overallRank).padStart(2, '0')}</div></div>
               <div class="report-rank-item"><div class="report-label">Selected Report Order</div><div class="report-rank-number">${String(viewModel.selectedOrder).padStart(2, '0')}</div></div>
-              <div class="report-rank-item"><div class="report-label">Ranking Method</div><div class="report-value">Suburbs are ranked primarily by overall investment score, with the selected strategy score used as a tiebreaker.</div></div>
+              <div class="report-rank-item"><div class="report-label">Ranking Method</div><div class="report-value">Suburbs are ranked primarily by ${escapeHtml(viewModel.strategyLabel.toLowerCase())} score, with overall investment score used as a quality tiebreaker.</div></div>
             </div>
           </section>
 
@@ -2448,7 +2525,7 @@
                   />
                   <div>
                     <h4 class="text-lg font-bold text-slate-900">${suburbName}</h4>
-                    <p class="text-xs text-slate-600 mt-1">Ranked by overall score; ${strategyLabel} used as tiebreaker</p>
+                    <p class="text-xs text-slate-600 mt-1">Ranked by ${strategyLabel.toLowerCase()} score; overall score used as tiebreaker</p>
                   </div>
                 </div>
                 <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold ${badgeClass}">Rank #${s.rank}</span>
@@ -2629,7 +2706,7 @@
         { label: 'Stock on Market %', value: formatPercent(suburb.stock_on_market_pct, 'stock_on_market_pct'), icon: '📦' },
         { label: 'Days on Market', value: suburb.days_on_market ? `${Math.round(suburb.days_on_market)} days` : 'N/A', icon: '⏱️' },
         { label: 'Vendor Discount %', value: formatPercent(suburb.vendor_discount_pct, 'vendor_discount_pct'), icon: '💸' },
-        { label: 'Population (2025)', value: formatNumber(suburb.population_2025), icon: '👥' },
+        { label: 'Population (2025)', value: formatPopulation(suburb.population_2025), icon: '👥' },
         { label: 'Population Growth', value: formatPercent(suburb.population_growth_pct, 'population_growth_pct'), icon: '📈' },
         { label: 'Population Growth vs State', value: formatPercent(suburb.population_growth_vs_state_pct, 'population_growth_pct'), icon: '📈' },
         { label: 'Infrastructure Score', value: suburb.infrastructure_score ? Math.round(suburb.infrastructure_score) : 'N/A', icon: '🏗️' },
@@ -2802,7 +2879,7 @@
 
     async function fetchResult(runId) {
       const response = await fetch(
-        `${CONFIG.supabaseUrl}/rest/v1/recommendations?recommendation_run_id=eq.${encodeURIComponent(runId)}&select=*`,
+        `${CONFIG.supabaseUrl}/rest/v1/recommendations?recommendation_run_id=eq.${encodeURIComponent(runId)}&select=*&order=created_at.desc&limit=1`,
         {
           method: 'GET',
           headers: getSupabaseHeaders({
@@ -2862,8 +2939,9 @@
 
         setStatus('Fetching results...');
         const result = await fetchResult(run.id);
+        const enrichedResult = await enrichRecommendationRowsWithPopulationMetrics(result);
 
-        renderResult(result, selectedStrategy);
+        renderResult(enrichedResult, selectedStrategy);
         setStatus('Done');
       } catch (error) {
         if (isNoMatchTopSuburbsError(error)) {
