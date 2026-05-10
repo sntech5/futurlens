@@ -1704,12 +1704,34 @@
       return null;
     }
 
+    function calculateStrategyTotalScore(item, strategy = getCurrentStrategy()) {
+      if (!item) return null;
+
+      const growthScore = hasNumericScore(item.base_growth_score) ? getScore(item.base_growth_score) : null;
+      const yieldScore = hasNumericScore(item.base_yield_score) ? getScore(item.base_yield_score) : null;
+      const demandScore = hasNumericScore(item.base_demand_score) ? getScore(item.base_demand_score) : null;
+      const riskScore = hasNumericScore(item.base_risk_score) ? getScore(item.base_risk_score) : null;
+
+      if ([growthScore, yieldScore, demandScore, riskScore].some((score) => score === null)) {
+        return null;
+      }
+
+      const riskSafetyScore = 10 - riskScore;
+      const total = strategy === 'yield'
+        ? yieldScore * 0.40 + demandScore * 0.30 + growthScore * 0.15 + riskSafetyScore * 0.15
+        : growthScore * 0.45 + demandScore * 0.25 + yieldScore * 0.15 + riskSafetyScore * 0.15;
+
+      return Math.max(0, Math.min(10, total));
+    }
+
     function getStrategyTotalScore(item, strategy = getCurrentStrategy()) {
       if (!item) return null;
       if (strategy === 'yield') {
         return getFirstScoreValue(
           item.selected_strategy_total_score,
           item.base_yield_strategy_total_score,
+          item.strategy_rank_score,
+          calculateStrategyTotalScore(item, strategy),
           item.base_yield_score
         );
       }
@@ -1717,6 +1739,8 @@
       return getFirstScoreValue(
         item.selected_strategy_total_score,
         item.base_growth_strategy_total_score,
+        item.strategy_rank_score,
+        calculateStrategyTotalScore(item, strategy),
         item.base_growth_score
       );
     }
