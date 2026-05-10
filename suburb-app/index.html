@@ -1394,11 +1394,36 @@
       };
     }
 
+    function getSortableScore(value, { inverse = false } = {}) {
+      if (!hasNumericScore(value)) return inverse ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY;
+      return getScore(value);
+    }
+
+    function sortSuburbsByStrategy(items, strategy) {
+      const primaryScoreKey = strategy === 'yield' ? 'base_yield_score' : 'base_growth_score';
+      return [...(items || [])].sort((a, b) => {
+        const strategyDelta = getSortableScore(getStrategyTotalScore(b, strategy)) - getSortableScore(getStrategyTotalScore(a, strategy));
+        if (strategyDelta !== 0) return strategyDelta;
+
+        const primaryDelta = getSortableScore(b[primaryScoreKey]) - getSortableScore(a[primaryScoreKey]);
+        if (primaryDelta !== 0) return primaryDelta;
+
+        const demandDelta = getSortableScore(b.base_demand_score) - getSortableScore(a.base_demand_score);
+        if (demandDelta !== 0) return demandDelta;
+
+        const riskDelta = getSortableScore(a.base_risk_score, { inverse: true }) - getSortableScore(b.base_risk_score, { inverse: true });
+        if (riskDelta !== 0) return riskDelta;
+
+        return String(a.suburb || '').localeCompare(String(b.suburb || ''));
+      });
+    }
+
     function getWhyText(item, strategy) {
       const reasons = [];
       const rankingBasis = getStrategyRankingLabel(strategy);
+      const strategyTotalLabel = getStrategyTotalLabel(strategy).toLowerCase();
 
-      reasons.push(`overall investment score is ${formatScoreValue(item.base_total_score)}/10`);
+      reasons.push(`${strategyTotalLabel} is ${formatScoreValue(getStrategyTotalScore(item, strategy))}/10`);
 
       if (item.estimated_oop !== undefined && item.estimated_oop !== null) {
         reasons.push(`estimated weekly out of pocket is ${formatMoney(item.estimated_oop)}`);
@@ -1417,7 +1442,7 @@
         reasons.push(`yield score is ${formatScoreValue(item.base_yield_score)}/10`);
       }
 
-      return `Included in the shortlist because ${reasons.join(', ')}. Ranking is primarily by ${rankingBasis}, with overall investment score used as a quality tiebreaker.`;
+      return `Included in the shortlist because ${reasons.join(', ')}. Ranking uses ${rankingBasis}, with the primary ${getStrategyPrimaryScoreLabel(strategy)} used as a tiebreaker.`;
     }
 
     function formatSuburbName(raw) {
@@ -1668,14 +1693,53 @@
       return inverse ? `${band} penalty` : `${band} score`;
     }
 
-    function getStrategyRankingLabel(strategy) {
-      return strategy === 'yield' ? 'gross rental yield' : 'capital growth score';
+    function getCurrentStrategy() {
+      return document.getElementById('strategy')?.value || 'growth';
     }
 
-    function getTotalScoreInsight(suburb) {
-      const total = formatScoreValue(suburb.base_total_score);
-      const band = getScorePhrase(suburb.base_total_score);
-      return `Overall score is ${total}/10, a ${band}. It blends growth, yield and demand, then subtracts the risk penalty.`;
+    function getFirstScoreValue(...values) {
+      for (const value of values) {
+        if (hasNumericScore(value)) return getScore(value);
+      }
+      return null;
+    }
+
+    function getStrategyTotalScore(item, strategy = getCurrentStrategy()) {
+      if (!item) return null;
+      if (strategy === 'yield') {
+        return getFirstScoreValue(
+          item.selected_strategy_total_score,
+          item.base_yield_strategy_total_score,
+          item.base_yield_score
+        );
+      }
+
+      return getFirstScoreValue(
+        item.selected_strategy_total_score,
+        item.base_growth_strategy_total_score,
+        item.base_growth_score
+      );
+    }
+
+    function getStrategyTotalLabel(strategy = getCurrentStrategy()) {
+      return strategy === 'yield' ? 'Yield Strategy Score' : 'Growth Strategy Score';
+    }
+
+    function getStrategyPrimaryScoreLabel(strategy = getCurrentStrategy()) {
+      return strategy === 'yield' ? 'yield score' : 'growth score';
+    }
+
+    function getStrategyRankingLabel(strategy) {
+      return strategy === 'yield' ? 'yield strategy score' : 'growth strategy score';
+    }
+
+    function getTotalScoreInsight(suburb, strategy = getCurrentStrategy()) {
+      const totalScore = getStrategyTotalScore(suburb, strategy);
+      const total = formatScoreValue(totalScore);
+      const band = getScorePhrase(totalScore);
+      const primary = strategy === 'yield' ? 'yield' : 'growth';
+      const secondary = strategy === 'yield' ? 'growth' : 'yield';
+      return `${getStrategyTotalLabel(strategy)} is ${total}/10, a ${band}. It blends ${primary}, demand, ${secondary}, and risk safety where lower risk improves the total.`;
     }
 
     function getGrowthScoreInsight(suburb) {
@@ -1703,7 +1767,7 @@
     function getYieldScoreInsight(suburb) {
       const band = getScorePhrase(suburb.base_yield_score);
       const yieldPct = formatYield(getReportMetric(suburb, 'gross_yield'));
-      return `Yield score is a ${band}; gross rental yield is ${yieldPct}. Yield strategy ranking uses raw gross yield first because the score can cap at 10/10.`;
+      return `Yield score is a ${band}; gross rental yield is ${yieldPct}. Yield strategy ranking uses the yield strategy score, which blends yield, demand, growth, and risk safety.`;
     }
 
     function getDemandScoreInsight(suburb) {
@@ -1806,8 +1870,8 @@
       return item[key] ?? item[fallbackMap[key]];
     }
 
-    function getInvestmentScore(item) {
-      return Math.round(getScore(item.base_total_score || item.base_growth_score || item.base_yield_score) * 10);
+    function getInvestmentScore(item, strategy = getCurrentStrategy()) {
+      return Math.round(getScore(getStrategyTotalScore(item, strategy)) * 10);
     }
 
     function getInvestmentVerdict(score) {
@@ -1817,7 +1881,7 @@
       return 'Review';
     }
 
-    function getReportScoreRows(item) {
+    function getReportScoreRows(item, strategy = getCurrentStrategy()) {
       const riskPenalty = Number(item.base_risk_score);
       const riskColor = !Number.isFinite(riskPenalty)
         ? '#94a3b8'
@@ -1828,7 +1892,7 @@
             : '#ef4444';
 
       return [
-        ['Total Score', item.base_total_score, '🏆', '#0b4c9c', true],
+        [getStrategyTotalLabel(strategy), getStrategyTotalScore(item, strategy), '🏆', '#0b4c9c', true],
         ['Capital Growth Score', item.base_growth_score, '↗', '#35a853', false],
         ['Rental Yield Score', item.base_yield_score, '$', '#8b5cf6', false],
         ['Rental Demand Score', item.base_demand_score, '●', '#f59e0b', false],
@@ -1888,7 +1952,9 @@
         ['base_growth_score', ['growth', 'capital']],
         ['base_demand_score', ['demand']],
         ['base_population_growth_score', ['population', 'momentum']],
-        ['base_total_score', ['overall', 'total']]
+        ['selected_strategy_total_score', ['strategy', 'overall', 'total']],
+        ['base_growth_strategy_total_score', ['growth strategy']],
+        ['base_yield_strategy_total_score', ['yield strategy']]
       ];
       return positiveScoreChecks.some(([scoreKey, keywords]) => {
         const score = getScore(item[scoreKey]);
@@ -1914,6 +1980,7 @@
     function buildOpenAiSummaryPayload(item) {
       const strategy = document.getElementById('strategy').value;
       const normalizeScoreForAi = (value) => hasNumericScore(value) ? getScore(value) : null;
+      const selectedStrategyTotal = getStrategyTotalScore(item, strategy);
 
       return {
         suburb: {
@@ -1936,14 +2003,20 @@
           yield_score: getNumericMetric(item.base_yield_score),
           demand_score: getNumericMetric(item.base_demand_score),
           risk_penalty: getNumericMetric(item.base_risk_score),
-          total_score: getNumericMetric(item.base_total_score),
+          selected_strategy_total_score: getNumericMetric(selectedStrategyTotal),
+          growth_strategy_total_score: getNumericMetric(item.base_growth_strategy_total_score),
+          yield_strategy_total_score: getNumericMetric(item.base_yield_strategy_total_score),
+          total_score: getNumericMetric(selectedStrategyTotal),
           population_2025: getNumericMetric(item.population_2025),
           population_growth_pct: getPercentMetric(item.population_growth_pct, 'population_growth_pct'),
           population_growth_vs_state_pct: getPercentMetric(item.population_growth_vs_state_pct, 'population_growth_pct'),
           population_growth_score: getNumericMetric(item.base_population_growth_score)
         },
         normalized_scores: {
-          total_score: normalizeScoreForAi(item.base_total_score),
+          total_score: normalizeScoreForAi(selectedStrategyTotal),
+          selected_strategy_total_score: normalizeScoreForAi(selectedStrategyTotal),
+          growth_strategy_total_score: normalizeScoreForAi(item.base_growth_strategy_total_score),
+          yield_strategy_total_score: normalizeScoreForAi(item.base_yield_strategy_total_score),
           growth_score: normalizeScoreForAi(item.base_growth_score),
           yield_score: normalizeScoreForAi(item.base_yield_score),
           demand_score: normalizeScoreForAi(item.base_demand_score),
@@ -1952,7 +2025,8 @@
         },
         score_scale: {
           range: '0 to 10',
-          positive_scores: 'For total_score, growth_score, yield_score, demand_score, and population_growth_score: higher is better. 8-10 is strong, 7-7.9 is good, 4-6.9 is moderate, below 4 is weak.',
+          positive_scores: 'For selected_strategy_total_score, growth_strategy_total_score, yield_strategy_total_score, growth_score, yield_score, demand_score, and population_growth_score: higher is better. 8-10 is strong, 7-7.9 is good, 4-6.9 is moderate, below 4 is weak.',
+          strategy_total: 'selected_strategy_total_score is the main recommendation score for the selected strategy. Growth strategy total blends growth, demand, yield, and risk safety. Yield strategy total blends yield, demand, growth, and risk safety.',
           risk_penalty: 'For risk_penalty only: lower is better. 0-3 is low risk, 4-6 is moderate risk, above 6 is elevated risk.',
           stock_on_market_pct: 'For stock_on_market_pct: lower generally means tighter listed supply. Below 1% is very tight supply and should not be described as stock pressure. 1-2% is tight, 2-4% is moderate, 4-6% is elevated, and above 6% is high listed-supply pressure.',
           risk_notes_rule: 'Only mention stock-on-market in risk_notes when stock_on_market_pct is at least 4% or risk_penalty is above 6. If stock_on_market_pct is below 1% and risk_penalty is 0-3, treat it as low supply-risk rather than pressure.',
@@ -2238,7 +2312,7 @@
 
     function buildRecommendationTextFromViewModel(viewModel) {
       const strength = viewModel.overallScore >= 82 ? 'a strong' : viewModel.overallScore >= 72 ? 'a good' : 'a review-worthy';
-      return `${viewModel.suburbName} is ${strength} shortlist option for the ${viewModel.strategyLabel.toLowerCase()} strategy. Ranking uses ${getStrategyRankingLabel(viewModel.strategy)} first, with overall score as a quality tiebreaker; confirm property-level risks and current rental evidence before committing.`;
+      return `${viewModel.suburbName} is ${strength} shortlist option for the ${viewModel.strategyLabel.toLowerCase()} strategy. Ranking uses ${getStrategyRankingLabel(viewModel.strategy)}, with ${getStrategyPrimaryScoreLabel(viewModel.strategy)} as the first tiebreaker; confirm property-level risks and current rental evidence before committing.`;
     }
 
     function createReportSuburbViewModel(reportDraft, suburbEntry, index, totalPages) {
@@ -2249,7 +2323,7 @@
         ?? getPositivePopulationValue(item.population_estimate_2025);
       const report = reportDraft.report || {};
       const reportDate = report.report_date || report.created_at || new Date().toISOString();
-      const overallScore = getInvestmentScore(item);
+      const overallScore = getInvestmentScore(item, strategy);
       const aiSummary = getReportAiSummary(item);
       const aiContextFacts = getOpenAiContextFacts(item);
       const budgetValue = getPositiveNumberInput('budget');
@@ -2292,8 +2366,8 @@
         strategyLabel: strategy === 'growth' ? 'Capital Growth' : 'Rental Yield',
         overallScore,
         verdict: getInvestmentVerdict(overallScore),
-        scoreRows: getReportScoreRows(item).map(([label, value, icon, color, prominent]) => ({ label, value, icon, color, prominent })),
-        executiveSummary: aiSummary.summary || `${compactName(item.suburb)} is shortlisted for the ${strategy === 'growth' ? 'capital growth' : 'rental yield'} strategy based on the selected ranking metric, overall score, budget and out-of-pocket constraints.`,
+        scoreRows: getReportScoreRows(item, strategy).map(([label, value, icon, color, prominent]) => ({ label, value, icon, color, prominent })),
+        executiveSummary: aiSummary.summary || `${compactName(item.suburb)} is shortlisted for the ${strategy === 'growth' ? 'capital growth' : 'rental yield'} strategy based on the selected strategy score, budget and out-of-pocket constraints.`,
         keyMetrics: [
           { label: 'Median Price', field: 'median_price', value: formatMoney(getReportMetric(item, 'median_price')), icon: 'money', color: '#2487f2', bg: '#edf6ff', border: '#cbe1fb' },
           { label: 'Median Weekly Rent', field: 'median_rent_weekly', value: appendReportUnit(medianRent, '/wk'), icon: 'rent', color: '#35a853', bg: '#edf8ee', border: '#cbe9d1' },
@@ -2404,7 +2478,7 @@
               <div class="report-rank-grid">
                 <div class="report-rank-item"><div class="report-label">Overall Rank</div><div class="report-rank-number">${String(viewModel.overallRank).padStart(2, '0')}</div></div>
                 <div class="report-rank-item"><div class="report-label">Selected Report Order</div><div class="report-rank-number">${String(viewModel.selectedOrder).padStart(2, '0')}</div></div>
-                <div class="report-rank-item"><div class="report-label">Ranking Method</div><div class="report-value">Suburbs are ranked primarily by ${escapeHtml(getStrategyRankingLabel(viewModel.strategy))}, with overall investment score used as a quality tiebreaker.</div></div>
+                <div class="report-rank-item"><div class="report-label">Ranking Method</div><div class="report-value">Suburbs are ranked by ${escapeHtml(getStrategyRankingLabel(viewModel.strategy))}, with ${escapeHtml(getStrategyPrimaryScoreLabel(viewModel.strategy))} used as the first tiebreaker.</div></div>
               </div>
             </section>
 
@@ -2755,8 +2829,11 @@
       }
 
       const recommendation = rows[0];
-      currentRecommendation = recommendation;
-      const suburbs = recommendation.top_suburbs || [];
+      const suburbs = sortSuburbsByStrategy(recommendation.top_suburbs || [], selectedStrategy);
+      currentRecommendation = {
+        ...recommendation,
+        top_suburbs: suburbs
+      };
       const strategyIcon = selectedStrategy === 'growth' ? '📈' : '💵';
       const strategyLabel = selectedStrategy === 'growth' ? 'Capital Growth' : 'Rental Yield';
       const accentClass = selectedStrategy === 'growth' ? 'border-l-4 border-indigo-500' : 'border-l-4 border-blue-500';
@@ -2843,7 +2920,7 @@
                   />
                   <div>
                     <h4 class="text-lg font-bold text-slate-900">${suburbName}</h4>
-                    <p class="text-xs text-slate-600 mt-1">Ranked by ${getStrategyRankingLabel(selectedStrategy)}; overall score used as tiebreaker</p>
+                    <p class="text-xs text-slate-600 mt-1">Ranked by ${getStrategyRankingLabel(selectedStrategy)}; ${getStrategyPrimaryScoreLabel(selectedStrategy)} used as tiebreaker</p>
                   </div>
                 </div>
                 <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold ${badgeClass}">Rank #${s.rank}</span>
@@ -3013,6 +3090,7 @@
     function buildDetailContent(suburb, suburbName) {
       const state = suburb.state || 'Unknown';
       const postcode = suburb.postcode || 'N/A';
+      const strategy = getCurrentStrategy();
 
       const metrics = [
         { label: 'Location', value: `${suburbName}, ${state} ${postcode}` },
@@ -3060,9 +3138,9 @@
       ];
 
       const totalScore = {
-        label: 'Total Score',
-        value: suburb.base_total_score,
-        insight: getTotalScoreInsight(suburb)
+        label: getStrategyTotalLabel(strategy),
+        value: getStrategyTotalScore(suburb, strategy),
+        insight: getTotalScoreInsight(suburb, strategy)
       };
 
       let html = `

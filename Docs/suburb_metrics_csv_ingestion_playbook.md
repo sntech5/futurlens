@@ -237,6 +237,13 @@ Legacy compatibility note:
 Use this sequence when adding or refreshing suburb market metrics without a full
 domain reset.
 
+Supabase SQL run sheet:
+- [incremental_suburb_key_metrics_refresh_runbook.sql](../sql/incremental_suburb_key_metrics_refresh_runbook.sql)
+
+The run sheet is numbered for Supabase SQL Editor and includes market staging,
+suburb master sync, quarterly load, population audit/load, score refresh, AI
+context enqueue, and post-load integrity gates.
+
 ### 0. Preflight Snapshot
 
 Pipeline stage: `preflight`

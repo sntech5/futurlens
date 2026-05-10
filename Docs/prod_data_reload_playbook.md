@@ -63,10 +63,10 @@ Population metric transform:
 - [create_suburb_population_metrics_staging.sql](../sql/create_suburb_population_metrics_staging.sql)
 - [load_suburb_population_metrics_from_staging.sql](../sql/load_suburb_population_metrics_from_staging.sql)
 - [find_quarterly_suburbs_missing_population_metrics.sql](../sql/find_quarterly_suburbs_missing_population_metrics.sql)
-- [patch_growth_score_with_population_momentum.sql](../sql/patch_growth_score_with_population_momentum.sql)
+- [validate_scoring_model_v2.sql](../sql/validate_scoring_model_v2.sql)
 - Population CSVs must be imported into `suburb_population_metrics_staging` first, not directly into `suburb_population_metrics`.
 - The population loader converts whole-number decimal text like `2808.0` into integer population values.
-- `refresh_base_growth_scores()` now blends market momentum with source-backed population growth.
+- `refresh_base_growth_scores()` blends market momentum with source-backed population growth and updates strategy-specific total scores.
 - After every market-metric load, run the missing-population audit. Remaining
   gaps must be documented and reports must omit population fields rather than
   inventing values.

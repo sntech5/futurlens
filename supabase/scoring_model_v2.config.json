@@ -1,0 +1,187 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "model_version": "scoring_model_v2",
+  "status": "draft",
+  "runtime_note": "Postgres functions do not read this repository file at runtime. If this JSON changes, the related SQL scoring functions must be regenerated or manually updated and redeployed before the new formula is executed.",
+  "score_scale": {
+    "range": [0, 10],
+    "positive_scores": {
+      "0_to_3": "weak_or_adverse",
+      "4_to_6": "moderate_or_neutral",
+      "7_to_8": "good",
+      "9_to_10": "strong"
+    },
+    "risk_score": {
+      "0_to_3": "low_risk",
+      "4_to_6": "moderate_risk",
+      "7_to_10": "elevated_risk"
+    }
+  },
+  "affordability_gates": {
+    "exclude_when": [
+      "median_price > user_budget",
+      "estimated_weekly_out_of_pocket > user_max_weekly_out_of_pocket"
+    ],
+    "ranking_rule": "Affordability gates filter recommendations. They do not rank a suburb higher once the suburb passes the gates."
+  },
+  "metric_bands": {
+    "gross_yield_pct": [
+      { "lt": 3.5, "band": "weak" },
+      { "gte": 3.5, "lt": 4.5, "band": "moderate" },
+      { "gte": 4.5, "lt": 5.5, "band": "good" },
+      { "gte": 5.5, "lte": 7.0, "band": "strong" },
+      { "gt": 7.0, "band": "very_strong_check_risk_separately" }
+    ],
+    "stock_on_market_pct": [
+      { "lt": 1.0, "band": "very_tight_listed_supply" },
+      { "gte": 1.0, "lt": 2.0, "band": "tight_listed_supply" },
+      { "gte": 2.0, "lt": 4.0, "band": "moderate_listed_supply" },
+      { "gte": 4.0, "lt": 6.0, "band": "elevated_listed_supply" },
+      { "gte": 6.0, "band": "high_listed_supply_pressure" }
+    ]
+  },
+  "component_scores": {
+    "base_yield_score": {
+      "purpose": "Rental return strength.",
+      "output_scale": "0_to_10",
+      "formula": "piecewise_linear(gross_yield_pct): 3.0%=0, 4.5%=5, 5.5%=7, 7.0%=9, 8.0%+=10",
+      "inputs": {
+        "gross_yield_pct": {
+          "source_field": "gross_yield",
+          "source_storage": "decimal_ratio",
+          "formula_transform": "gross_yield * 100",
+          "direction": "higher_is_better"
+        }
+      }
+    },
+    "base_demand_score": {
+      "purpose": "Rental and market tightness.",
+      "output_scale": "0_to_10",
+      "method": "weighted_normalized_components",
+      "inputs": {
+        "vacancy_rate": {
+          "weight": 0.4,
+          "direction": "lower_is_better"
+        },
+        "days_on_market": {
+          "weight": 0.3,
+          "direction": "lower_is_better"
+        },
+        "renters_pct": {
+          "weight": 0.15,
+          "direction": "higher_is_better"
+        },
+        "stock_on_market_pct": {
+          "weight": 0.15,
+          "direction": "lower_is_better"
+        }
+      }
+    },
+    "base_growth_score": {
+      "purpose": "Capital growth potential from population momentum and sale-market tightness.",
+      "output_scale": "0_to_10",
+      "method": "weighted_normalized_components",
+      "explicit_exclusions": [
+        "vacancy_rate",
+        "gross_yield"
+      ],
+      "inputs": {
+        "base_population_growth_score": {
+          "weight": 0.35,
+          "direction": "higher_is_better",
+          "missing_data_rule": "Do not invent population growth. For MVP, either redistribute this weight across remaining growth inputs or use a neutral component only when clearly labelled as neutral."
+        },
+        "days_on_market": {
+          "weight": 0.25,
+          "direction": "lower_is_better"
+        },
+        "stock_on_market_pct": {
+          "weight": 0.25,
+          "direction": "lower_is_better"
+        },
+        "vendor_discount_pct": {
+          "weight": 0.15,
+          "direction": "lower_discount_magnitude_is_better",
+          "formula_transform": "abs(vendor_discount_pct)"
+        }
+      }
+    },
+    "base_risk_score": {
+      "purpose": "Downside and caution signal. Lower is better.",
+      "output_scale": "0_to_10",
+      "method": "weighted_normalized_components",
+      "inputs": {
+        "stock_on_market_pct": {
+          "weight": 0.3,
+          "direction": "higher_increases_risk"
+        },
+        "vacancy_rate": {
+          "weight": 0.25,
+          "direction": "higher_increases_risk"
+        },
+        "days_on_market": {
+          "weight": 0.2,
+          "direction": "higher_increases_risk"
+        },
+        "vendor_discount_pct": {
+          "weight": 0.15,
+          "direction": "higher_discount_magnitude_increases_risk",
+          "formula_transform": "abs(vendor_discount_pct)"
+        },
+        "data_missing_penalty": {
+          "weight": 0.1,
+          "direction": "higher_increases_risk"
+        }
+      }
+    }
+  },
+  "strategy_total_scores": {
+    "base_growth_strategy_total_score": {
+      "output_scale": "0_to_10",
+      "formula": "base_growth_score * 0.45 + base_demand_score * 0.25 + base_yield_score * 0.15 + (10 - base_risk_score) * 0.15",
+      "inputs": {
+        "base_growth_score": 0.45,
+        "base_demand_score": 0.25,
+        "base_yield_score": 0.15,
+        "base_risk_safety_score": 0.15
+      }
+    },
+    "base_yield_strategy_total_score": {
+      "output_scale": "0_to_10",
+      "formula": "base_yield_score * 0.40 + base_demand_score * 0.30 + base_growth_score * 0.15 + (10 - base_risk_score) * 0.15",
+      "inputs": {
+        "base_yield_score": 0.4,
+        "base_demand_score": 0.3,
+        "base_growth_score": 0.15,
+        "base_risk_safety_score": 0.15
+      }
+    }
+  },
+  "recommendation_ranking": {
+    "growth": [
+      { "field": "base_growth_strategy_total_score", "direction": "desc", "nulls": "last" },
+      { "field": "base_growth_score", "direction": "desc", "nulls": "last" },
+      { "field": "base_demand_score", "direction": "desc", "nulls": "last" },
+      { "field": "base_risk_score", "direction": "asc", "nulls": "last" },
+      { "field": "suburb_key", "direction": "asc" }
+    ],
+    "yield": [
+      { "field": "base_yield_strategy_total_score", "direction": "desc", "nulls": "last" },
+      { "field": "base_yield_score", "direction": "desc", "nulls": "last" },
+      { "field": "base_demand_score", "direction": "desc", "nulls": "last" },
+      { "field": "base_risk_score", "direction": "asc", "nulls": "last" },
+      { "field": "suburb_key", "direction": "asc" }
+    ]
+  },
+  "retired_fields": {
+    "base_total_score": "Retired after scoring_model_v2. Use base_growth_strategy_total_score, base_yield_strategy_total_score, and selected_strategy_total_score in recommendation payloads."
+  },
+  "commentary_rules": [
+    "All commentary must be derived from score bands and raw metric bands.",
+    "stock_on_market_pct below 1% means very tight listed supply, not stock pressure.",
+    "base_risk_score from 0 to 3 means low risk penalty.",
+    "A positive score above 7/10 must not be described as weak, low, poor, or a risk.",
+    "Growth strategy may mention strong yield as a secondary strength.",
+    "Yield strategy may mention strong growth as a secondary strength."
+  ]
+}
