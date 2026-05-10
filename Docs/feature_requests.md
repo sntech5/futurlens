@@ -4,6 +4,10 @@ Purpose:
 - capture product and operational improvements that should be considered after the current milestone work
 - keep useful ideas visible without derailing the active implementation path
 
+Related operational register:
+- Data-quality gaps and source-data follow-ups are tracked in
+  [data_technical_debt.md](data_technical_debt.md).
+
 ## Open Requests
 
 ### 1. CSV Header Normalizer For Staging Imports
