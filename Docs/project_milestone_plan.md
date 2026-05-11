@@ -76,7 +76,7 @@ Milestone 3:
 - document source, refresh date, and meaning for each factor
 
 Milestone 4:
-- apply or replace [patch_refresh_suburb_base_scores_no_made_up_data.sql](../sql/patch_refresh_suburb_base_scores_no_made_up_data.sql)
+- apply or replace [patch_drop_base_total_score_scoring_v2.sql](../sql/patch_drop_base_total_score_scoring_v2.sql)
 - load verified quarterly metric source rows before refreshing `suburb_base_scores`
 - validate that `suburb_base_scores` has no empty rows created from suburb master data alone
 - remove or clearly quarantine old demo/stale metric rows

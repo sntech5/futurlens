@@ -15,7 +15,8 @@ Last updated: 2026-04-23 (Australia/Sydney)
 
 2. Apply/confirm function patch
 ```sql
--- sql/patch_run_recommendation_engine_no_null_top_suburbs.sql
+-- sql/patch_drop_base_total_score_scoring_v2.sql
+-- sql/validate_scoring_model_v2.sql
 ```
 
 3. Apply/confirm report schema and functions
@@ -78,7 +79,8 @@ Staging go/no-go:
 
 3. Apply/confirm function patch
 ```sql
--- sql/patch_run_recommendation_engine_no_null_top_suburbs.sql
+-- sql/patch_drop_base_total_score_scoring_v2.sql
+-- sql/validate_scoring_model_v2.sql
 ```
 
 4. Apply/confirm report schema and functions

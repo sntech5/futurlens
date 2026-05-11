@@ -30,7 +30,8 @@ Data integrity guardrail:
 [preflight_prod_reload.sql](../sql/preflight_prod_reload.sql)
 
 2. Apply/confirm app functions:
-- [patch_run_recommendation_engine_no_null_top_suburbs.sql](../sql/patch_run_recommendation_engine_no_null_top_suburbs.sql)
+- [patch_drop_base_total_score_scoring_v2.sql](../sql/patch_drop_base_total_score_scoring_v2.sql)
+- [validate_scoring_model_v2.sql](../sql/validate_scoring_model_v2.sql)
 - [create_recommendation_report_tables.sql](../sql/create_recommendation_report_tables.sql)
 - [create_recommendation_report_functions.sql](../sql/create_recommendation_report_functions.sql)
 - [create_recommendation_report_storage.sql](../sql/create_recommendation_report_storage.sql)

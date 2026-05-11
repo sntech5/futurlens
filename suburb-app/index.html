@@ -278,6 +278,33 @@
       font-weight: 500;
     }
 
+    .access-status {
+      margin: 12px 0 0;
+      min-height: 18px;
+      color: #43506c;
+      font-size: 12px;
+      line-height: 1.4;
+      text-align: center;
+    }
+
+    .access-status.success {
+      color: #047857;
+      font-weight: 600;
+    }
+
+    .access-status.error {
+      color: #b91c1c;
+      font-weight: 600;
+    }
+
+    .hidden-field {
+      position: absolute;
+      left: -10000px;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+    }
+
     .note-lock {
       width: 18px;
       height: 18px;
@@ -543,8 +570,12 @@
           </ul>
         </div>
 
-        <form class="access-card" id="request-access" action="mailto:hello@futurlens.com" method="post" enctype="text/plain">
+        <form class="access-card" id="request-access">
           <h2>Try for Free</h2>
+          <div class="hidden-field" aria-hidden="true">
+            <label for="website">Website</label>
+            <input id="website" name="website" type="text" tabindex="-1" autocomplete="off" />
+          </div>
           <div class="field">
             <label for="name">Name</label>
             <input id="name" name="name" type="text" placeholder="Your full name" autocomplete="name" />
@@ -554,6 +585,7 @@
             <input id="email" name="email" type="email" placeholder="you@yourdomain.com" autocomplete="email" />
           </div>
           <button class="primary-btn" type="submit">Request Free Access</button>
+          <div class="access-status" id="accessStatus" role="status" aria-live="polite"></div>
           <p class="card-note">
             <span class="note-lock" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -663,5 +695,70 @@
       </div>
     </div>
   </footer>
+  <script src="./config.js"></script>
+  <script>
+    const accessForm = document.getElementById('request-access');
+    const accessStatus = document.getElementById('accessStatus');
+    const accessSubmit = accessForm?.querySelector('button[type="submit"]');
+
+    function setAccessStatus(message, type = '') {
+      if (!accessStatus) return;
+      accessStatus.textContent = message;
+      accessStatus.className = `access-status${type ? ` ${type}` : ''}`;
+    }
+
+    accessForm?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const formData = new FormData(accessForm);
+      const name = String(formData.get('name') || '').trim();
+      const email = String(formData.get('email') || '').trim();
+      const website = String(formData.get('website') || '').trim();
+      const supabaseUrl = window.APP_CONFIG?.supabaseUrl;
+      const supabaseKey = window.APP_CONFIG?.supabaseKey;
+
+      if (!name || !email) {
+        setAccessStatus('Enter your name and email to request access.', 'error');
+        return;
+      }
+
+      if (!supabaseUrl) {
+        setAccessStatus('Access request service is not configured yet.', 'error');
+        return;
+      }
+
+      accessSubmit.disabled = true;
+      setAccessStatus('Sending your access request...');
+
+      try {
+        const headers = { 'Content-Type': 'application/json' };
+        if (supabaseKey) {
+          headers.apikey = supabaseKey;
+        }
+
+        const response = await fetch(`${supabaseUrl}/functions/v1/request-access`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            name,
+            email,
+            website,
+            source: 'landing_page'
+          })
+        });
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok || data.ok === false) {
+          throw new Error(data.error || 'Unable to send access request.');
+        }
+
+        accessForm.reset();
+        setAccessStatus('Request received. Check your email for the app link shortly.', 'success');
+      } catch (error) {
+        setAccessStatus(error.message || 'Unable to send access request.', 'error');
+      } finally {
+        accessSubmit.disabled = false;
+      }
+    });
+  </script>
 </body>
 </html>

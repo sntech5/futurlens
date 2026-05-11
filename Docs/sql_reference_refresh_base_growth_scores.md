@@ -10,7 +10,10 @@ Purpose:
 
 The current deployable implementation is captured in:
 
-[patch_growth_score_with_population_momentum.sql](../sql/patch_growth_score_with_population_momentum.sql)
+[patch_drop_base_total_score_scoring_v2.sql](../sql/patch_drop_base_total_score_scoring_v2.sql)
+
+Historical implementation:
+[patch_growth_score_with_population_momentum.sql](../sql/archive/patch_growth_score_with_population_momentum.sql)
 
 That patch creates or replaces:
 
@@ -115,7 +118,10 @@ The base score load/refresh process must not create score rows from `public.subu
 
 The patch reference for the current no-made-up-data refresh pattern is:
 
-[patch_refresh_suburb_base_scores_no_made_up_data.sql](../sql/patch_refresh_suburb_base_scores_no_made_up_data.sql)
+[patch_drop_base_total_score_scoring_v2.sql](../sql/patch_drop_base_total_score_scoring_v2.sql)
+
+Historical guardrail patch:
+[patch_refresh_suburb_base_scores_no_made_up_data.sql](../sql/archive/patch_refresh_suburb_base_scores_no_made_up_data.sql)
 
 Key rule:
 - `public.refresh_suburb_base_scores()` loads raw metrics and simple derived scores from verified source rows only.

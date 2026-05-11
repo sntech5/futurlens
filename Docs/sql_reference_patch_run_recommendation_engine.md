@@ -1,7 +1,12 @@
-# SQL Reference: patch_run_recommendation_engine_no_null_top_suburbs.sql
+# SQL Reference: Archived run recommendation engine patch
 
 File:
-[patch_run_recommendation_engine_no_null_top_suburbs.sql](../sql/patch_run_recommendation_engine_no_null_top_suburbs.sql)
+[patch_run_recommendation_engine_no_null_top_suburbs.sql](../sql/archive/patch_run_recommendation_engine_no_null_top_suburbs.sql)
+
+Status:
+Archived. This patch is kept for incident history only. The current
+recommendation engine implementation is maintained through scoring v2 patches,
+especially [patch_drop_base_total_score_scoring_v2.sql](../sql/patch_drop_base_total_score_scoring_v2.sql).
 
 ## Context
 Fixes production/runtime failure where `recommendations.top_suburbs` violated NOT NULL on restrictive/no-match runs.
