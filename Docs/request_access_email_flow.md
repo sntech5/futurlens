@@ -1,7 +1,7 @@
 # Request Access Email Flow
 
 ## Purpose
-Capture landing-page access requests, notify Futurlens, and send the requester
+Capture landing-page access requests, notify Plenz, and send the requester
 an app access link without tying this flow to future authentication.
 
 ## Files
@@ -27,7 +27,7 @@ Set required secrets:
 ```bash
 supabase secrets set RESEND_API_KEY=re_xxxxx
 supabase secrets set ACCESS_NOTIFY_EMAIL=you@example.com
-supabase secrets set ACCESS_FROM_EMAIL="Futurlens <hello@yourdomain.com>"
+supabase secrets set ACCESS_FROM_EMAIL="Plenz <hello@yourdomain.com>"
 supabase secrets set APP_ACCESS_URL=https://your-site.example/app.html
 ```
 

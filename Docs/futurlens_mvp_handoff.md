@@ -1,4 +1,4 @@
-# FuturLens MVP Handoff
+# Plenz MVP Handoff
 
 _Last updated: 2026-04-22 (Australia/Sydney)_
 

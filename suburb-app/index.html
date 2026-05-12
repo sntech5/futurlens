@@ -3,20 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Futurlens - Property Investment Intelligence</title>
+  <title>Plenz - Property Investment Intelligence</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
       --ink: #07122f;
-      --muted: #43506c;
-      --blue: #1769e8;
-      --blue-soft: #dbeafe;
-      --line: #dfe7f2;
-      --panel: rgba(255, 255, 255, 0.86);
-      --soft: #f4f8ff;
-      --shadow: 0 28px 80px rgba(7, 18, 47, 0.12);
+      --muted: #34405f;
+      --blue: #5367b7;
+      --blue-soft: #edf5ff;
+      --line: #dbe7f4;
+      --panel: rgba(255, 255, 255, 0.88);
+      --soft: #f7fbff;
+      --shadow: 0 28px 80px rgba(45, 6, 80, 0.14);
     }
 
     * {
@@ -47,8 +47,8 @@
       display: grid;
       grid-template-rows: auto auto auto;
       background:
-        radial-gradient(circle at 75% 18%, rgba(23, 105, 232, 0.09), transparent 28rem),
-        linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
+        radial-gradient(circle at 75% 18%, rgba(83, 103, 183, 0.12), transparent 28rem),
+        linear-gradient(180deg, #f7fbff 0%, #ffffff 100%);
     }
 
     .hero {
@@ -57,7 +57,7 @@
       display: grid;
       grid-template-rows: auto 1fr auto;
       background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.94) 46%, rgba(255, 255, 255, 0.62) 68%, rgba(255, 255, 255, 0.08) 100%),
+        linear-gradient(180deg, rgba(247, 251, 255, 0.98) 0%, rgba(247, 251, 255, 0.94) 46%, rgba(247, 251, 255, 0.62) 68%, rgba(247, 251, 255, 0.08) 100%),
         url("https://images.unsplash.com/photo-1772326281137-b617cbf77c5f?auto=format&fit=crop&w=2200&q=85") center 58% / cover no-repeat;
     }
 
@@ -91,8 +91,9 @@
       display: inline-flex;
       align-items: center;
       gap: 14px;
-      color: #06183f;
+      color: #2d0650;
       line-height: 1;
+      overflow: hidden;
     }
 
     .brand-mark {
@@ -132,13 +133,25 @@
       height: 27px;
       border: 4px solid currentColor;
       border-radius: 50%;
-      background: radial-gradient(circle at 32% 28%, #ffffff 0 10%, #5e7cff 12% 28%, #2448f2 58%, #10206c 100%);
+      background: radial-gradient(circle at 32% 28%, #ffffff 0 10%, #b2f1ff 12% 28%, #5367b7 58%, #2d0650 100%);
     }
 
     .brand-word {
       font-size: 32px;
       font-weight: 500;
       letter-spacing: 0.14em;
+    }
+
+    .brand-logo img {
+      width: clamp(150px, 18vw, 220px);
+      height: auto;
+      display: block;
+    }
+
+    .site-footer-logo {
+      width: 84px;
+      height: auto;
+      display: block;
     }
 
     .nav-link {
@@ -201,7 +214,7 @@
       border-radius: 50%;
       color: var(--blue);
       background: var(--blue-soft);
-      box-shadow: inset 0 0 0 1px rgba(23, 105, 232, 0.12);
+      box-shadow: inset 0 0 0 1px rgba(83, 103, 183, 0.14);
     }
 
     .access-card {
@@ -233,7 +246,7 @@
     .field input {
       width: 100%;
       height: 50px;
-      border: 1px solid #d8e0ec;
+      border: 1px solid #dbe7f4;
       border-radius: 9px;
       padding: 0 22px;
       color: var(--ink);
@@ -244,11 +257,11 @@
 
     .field input:focus {
       border-color: var(--blue);
-      box-shadow: 0 0 0 4px rgba(23, 105, 232, 0.1);
+      box-shadow: 0 0 0 4px rgba(83, 103, 183, 0.12);
     }
 
     .field input::placeholder {
-      color: #8a95aa;
+      color: #6f7890;
     }
 
     .primary-btn {
@@ -261,10 +274,10 @@
       border-radius: 9px;
       cursor: pointer;
       color: #ffffff;
-      background: linear-gradient(135deg, #07122f, #111a37);
+      background: linear-gradient(135deg, #2d0650, #5367b7);
       font-size: 18px;
       font-weight: 700;
-      box-shadow: 0 12px 28px rgba(7, 18, 47, 0.18);
+      box-shadow: 0 12px 28px rgba(45, 6, 80, 0.22);
     }
 
     .card-note {
@@ -273,7 +286,7 @@
       align-items: center;
       justify-content: center;
       gap: 10px;
-      color: #5e6880;
+      color: #6f7890;
       font-size: 12px;
       font-weight: 500;
     }
@@ -281,7 +294,7 @@
     .access-status {
       margin: 12px 0 0;
       min-height: 18px;
-      color: #43506c;
+      color: #34405f;
       font-size: 12px;
       line-height: 1.4;
       text-align: center;
@@ -311,7 +324,7 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      color: #5e6880;
+      color: #6f7890;
       flex: 0 0 auto;
     }
 
@@ -370,8 +383,8 @@
       place-items: center;
       border-radius: 50%;
       color: var(--ink);
-      background: #f2f6fb;
-      box-shadow: inset 0 0 0 1px rgba(7, 18, 47, 0.03);
+      background: #edf5ff;
+      box-shadow: inset 0 0 0 1px rgba(45, 6, 80, 0.05);
     }
 
     .icon-shell svg {
@@ -399,8 +412,8 @@
       border-radius: 14px;
       text-align: center;
       background:
-        radial-gradient(circle at 12% 0%, rgba(23, 105, 232, 0.08), transparent 18rem),
-        linear-gradient(180deg, #f5f9ff 0%, #f3f7fc 100%);
+        radial-gradient(circle at 12% 0%, rgba(83, 103, 183, 0.10), transparent 18rem),
+        linear-gradient(180deg, #f7fbff 0%, #edf5ff 100%);
     }
 
     .outcome-grid {
@@ -431,7 +444,7 @@
     }
 
     .site-footer {
-      border-top: 1px solid #e2e8f0;
+      border-top: 1px solid #dbe7f4;
       background: rgba(255, 255, 255, 0.8);
     }
 
@@ -448,13 +461,13 @@
       align-items: center;
       justify-content: center;
       gap: 4px 12px;
-      color: #64748b;
+      color: #6f7890;
       font-size: 12px;
       line-height: 1.4;
     }
 
     .site-footer-brand {
-      color: #475569;
+      color: #34405f;
       font-weight: 500;
     }
 
@@ -462,12 +475,12 @@
       width: 4px;
       height: 4px;
       border-radius: 50%;
-      background: #cbd5e1;
+      background: #dbe7f4;
     }
 
     .site-footer-copy {
       margin-top: 8px;
-      color: #94a3b8;
+      color: #6f7890;
       font-size: 12px;
       line-height: 1.4;
     }
@@ -550,9 +563,8 @@
   <main class="page">
     <section class="hero">
       <header class="nav" aria-label="Primary">
-        <a class="brand-logo" href="./index.html" aria-label="FuturLens home">
-          <span class="brand-mark" aria-hidden="true"><span></span></span>
-          <span class="brand-word">futurlens</span>
+        <a class="brand-logo" href="./index.html" aria-label="Plenz home">
+          <img src="./images/plenz_logo.svg" alt="Plenz" />
         </a>
         <a class="nav-link" href="#request-access">Request Free Access</a>
       </header>
@@ -560,9 +572,9 @@
       <div class="hero-inner">
         <div class="copy">
           <h1>Find Australia’s<br />best suburbs to invest,<br />based on your clients’<br /><span>affordability and goals.</span></h1>
-          <p>Futurlens helps Buyers Agents, Mortgage Brokers &amp; Accountants deliver data-driven investment recommendations with confidence.</p>
+          <p>Plenz helps Buyers Agents, Mortgage Brokers &amp; Accountants deliver data-driven investment recommendations with confidence.</p>
 
-          <ul class="check-list" aria-label="Futurlens benefits">
+          <ul class="check-list" aria-label="Plenz benefits">
             <li><span class="check">✓</span><span>AI-powered suburb recommendations</span></li>
             <li><span class="check">✓</span><span>Aligns with financial goals &amp; budgets</span></li>
             <li><span class="check">✓</span><span>Save time. Impress your clients.</span></li>
@@ -602,7 +614,7 @@
 
     <section class="section" aria-labelledby="built-for">
       <h2 id="built-for">Built for property professionals</h2>
-      <p>Whether you’re helping a first home buyer or building a long-term investment strategy, Futurlens gives you the edge.</p>
+      <p>Whether you’re helping a first home buyer or building a long-term investment strategy, Plenz gives you the edge.</p>
 
       <div class="audiences">
         <article class="audience">
@@ -684,14 +696,14 @@
   <footer class="site-footer">
     <div class="site-footer-inner">
       <div class="site-footer-row">
-        <span class="site-footer-brand">FuturLens</span>
+        <img class="site-footer-logo" src="./images/plenz_logo.svg" alt="Plenz" />
         <span class="site-footer-dot"></span>
         <span>Australian property intelligence</span>
         <span class="site-footer-dot"></span>
         <span>Model outputs, not financial advice</span>
       </div>
       <div class="site-footer-copy">
-        &copy; 2026 FuturLens. All rights reserved.
+        &copy; 2026 Plenz. All rights reserved.
       </div>
     </div>
   </footer>

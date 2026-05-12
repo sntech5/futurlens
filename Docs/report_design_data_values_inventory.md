@@ -237,7 +237,7 @@ These appeared in the visual mock but are not currently source-backed.
 ## Recommended Page Sections For New Mock
 
 1. Header:
-   - FuturLens / client logo
+   - Plenz / client logo
    - Suburb Investment Report
    - Month/year
    - Prepared for `{customer_name}`
@@ -287,7 +287,7 @@ These appeared in the visual mock but are not currently source-backed.
 8. Footer:
    - Disclaimer
    - Page count
-   - Powered by FuturLens / client logo
+   - Powered by Plenz / client logo
 
 ## Example Mock Prompt
 

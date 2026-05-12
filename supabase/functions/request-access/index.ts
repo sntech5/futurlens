@@ -67,10 +67,10 @@ serve(async (req) => {
       from: fromEmail,
       to: [notifyEmail],
       reply_to: email,
-      subject: "New Futurlens access request",
+      subject: "New Plenz access request",
       html: buildNotifyHtml({ name, email, source }),
       text: [
-        "New Futurlens access request",
+        "New Plenz access request",
         `Name: ${name}`,
         `Email: ${email}`,
         `Source: ${source}`,
@@ -81,17 +81,17 @@ serve(async (req) => {
       from: fromEmail,
       to: [email],
       reply_to: replyTo,
-      subject: "Your Futurlens access link",
+      subject: "Your Plenz access link",
       html: buildWelcomeHtml({ name, appAccessUrl }),
       text: [
         `Hi ${name},`,
         "",
-        "Thanks for requesting access to Futurlens.",
+        "Thanks for requesting access to Plenz.",
         `You can open the app here: ${appAccessUrl}`,
         "",
-        "Futurlens helps property professionals find suburbs aligned with client affordability, budget, and investment strategy using data-backed scoring and report generation.",
+        "Plenz helps property professionals find suburbs aligned with client affordability, budget, and investment strategy using data-backed scoring and report generation.",
         "",
-        "Futurlens",
+        "Plenz",
       ].join("\n"),
     });
 
@@ -191,7 +191,7 @@ async function sendEmail(resendApiKey: string, body: JsonObject) {
 function buildNotifyHtml({ name, email, source }: { name: string; email: string; source: string }) {
   return `
     <div style="font-family:Arial,sans-serif;color:#07122f;line-height:1.5">
-      <h2>New Futurlens access request</h2>
+      <h2>New Plenz access request</h2>
       <p><strong>Name:</strong> ${escapeHtml(name)}</p>
       <p><strong>Email:</strong> ${escapeHtml(email)}</p>
       <p><strong>Source:</strong> ${escapeHtml(source)}</p>
@@ -202,15 +202,15 @@ function buildNotifyHtml({ name, email, source }: { name: string; email: string;
 function buildWelcomeHtml({ name, appAccessUrl }: { name: string; appAccessUrl: string }) {
   return `
     <div style="font-family:Arial,sans-serif;color:#07122f;line-height:1.55">
-      <h2>Your Futurlens access link</h2>
+      <h2>Your Plenz access link</h2>
       <p>Hi ${escapeHtml(name)},</p>
-      <p>Thanks for requesting access to Futurlens.</p>
+      <p>Thanks for requesting access to Plenz.</p>
       <p>
         <a href="${escapeHtml(appAccessUrl)}" style="display:inline-block;background:#07122f;color:#fff;text-decoration:none;padding:12px 18px;border-radius:8px;font-weight:700">
-          Open Futurlens
+          Open Plenz
         </a>
       </p>
-      <p>Futurlens helps property professionals find suburbs aligned with client affordability, budget, and investment strategy using data-backed scoring and report generation.</p>
+      <p>Plenz helps property professionals find suburbs aligned with client affordability, budget, and investment strategy using data-backed scoring and report generation.</p>
       <p style="color:#64748b;font-size:13px">If the button does not work, open this link: ${escapeHtml(appAccessUrl)}</p>
     </div>
   `;

@@ -1,7 +1,7 @@
 # Report Mock Label Data Mapping
 
 Purpose:
-- map each visible label in the new report mock to current FuturLens data
+- map each visible label in the new report mock to current Plenz data
 - identify source-backed fields, derived fields, and deliberate placeholders
 - prevent report labels from implying data that has not been loaded
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FuturLens - Suburb Recommendation</title>
+  <title>Plenz - Suburb Recommendation</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -36,8 +36,8 @@
     .slide-out {
       animation: slide-out-right 0.3s ease-out forwards;
     }
-    .growth-accent { @apply text-indigo-600; }
-    .yield-accent { @apply text-blue-600; }
+    .growth-accent { @apply text-indigo-700; }
+    .yield-accent { @apply text-sky-700; }
     input:focus, select:focus {
       @apply ring-2 ring-indigo-500;
     }
@@ -45,8 +45,9 @@
       display: inline-flex;
       align-items: center;
       gap: 14px;
-      color: #06183f;
+      color: #2d0650;
       line-height: 1;
+      overflow: hidden;
     }
     .brand-mark {
       width: 54px;
@@ -81,12 +82,29 @@
       height: 27px;
       border: 4px solid currentColor;
       border-radius: 50%;
-      background: radial-gradient(circle at 32% 28%, #ffffff 0 10%, #5e7cff 12% 28%, #2448f2 58%, #10206c 100%);
+      background: radial-gradient(circle at 32% 28%, #ffffff 0 10%, #b2f1ff 12% 28%, #5367b7 58%, #2d0650 100%);
     }
     .brand-word {
       font-size: 50px;
       font-weight: 500;
       letter-spacing: 0.22em;
+    }
+    .brand-logo img {
+      width: clamp(150px, 18vw, 220px);
+      height: auto;
+      display: block;
+    }
+    .footer-logo {
+      width: 84px;
+      height: auto;
+      display: block;
+    }
+    .report-footer-logo {
+      width: 52px;
+      height: auto;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 6px;
     }
     .detail-panel {
       position: fixed;
@@ -174,17 +192,17 @@
       transform: translateX(-50%) translateY(-2px);
     }
     :root {
-      --fl-ink: #050b2d;
-      --fl-navy: #07133b;
-      --fl-navy-2: #111a3f;
-      --fl-blue: #145ff2;
-      --fl-blue-2: #0f5de8;
-      --fl-blue-soft: #eaf2ff;
-      --fl-blue-soft-2: #f4f8ff;
-      --fl-border: #dbe4f0;
+      --fl-ink: #07122f;
+      --fl-navy: #2d0650;
+      --fl-navy-2: #182d6b;
+      --fl-blue: #5367b7;
+      --fl-blue-2: #b2f1ff;
+      --fl-blue-soft: #edf5ff;
+      --fl-blue-soft-2: #f7fbff;
+      --fl-border: #dbe7f4;
       --fl-muted: #34405f;
       --fl-muted-2: #6f7890;
-      --fl-page: #f8fbff;
+      --fl-page: #f7fbff;
       --fl-surface: #ffffff;
     }
     body {
@@ -254,7 +272,7 @@
     .from-slate-600,
     .from-slate-700 {
       --tw-gradient-from: var(--fl-navy) var(--tw-gradient-from-position) !important;
-      --tw-gradient-to: rgba(7, 19, 59, 0) var(--tw-gradient-to-position) !important;
+      --tw-gradient-to: rgba(45, 6, 80, 0) var(--tw-gradient-to-position) !important;
       --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
     }
     .to-indigo-700,
@@ -1058,9 +1076,8 @@
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <div class="flex items-center justify-between">
         <div>
-          <div class="brand-logo" aria-label="FuturLens">
-            <span class="brand-mark" aria-hidden="true"><span></span></span>
-            <span class="brand-word">futurlens</span>
+          <div class="brand-logo" aria-label="Plenz">
+            <img src="./images/plenz_logo.svg" alt="Plenz" />
           </div>
           <p class="text-sm text-slate-600 mt-1">Find the perfect Australian suburb for your investment strategy</p>
         </div>
@@ -1199,14 +1216,14 @@
   <footer class="border-t border-slate-200 bg-white/80">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center">
       <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-slate-500">
-        <span class="font-medium text-slate-600">FuturLens</span>
+        <img class="footer-logo" src="./images/plenz_logo.svg" alt="Plenz" />
         <span class="h-1 w-1 rounded-full bg-slate-300"></span>
         <span>Australian property intelligence</span>
         <span class="h-1 w-1 rounded-full bg-slate-300"></span>
         <span>Model outputs, not financial advice</span>
       </div>
       <div class="mt-2 text-xs text-slate-400">
-        &copy; 2026 FuturLens. All rights reserved.
+        &copy; 2026 Plenz. All rights reserved.
       </div>
     </div>
   </footer>
@@ -2677,7 +2694,7 @@
           </div>
 
           <footer class="report-footer">
-            <span><strong>FuturLens</strong> suburb investment report</span>
+            <span><img class="report-footer-logo" src="./images/plenz_logo.svg" alt="Plenz" />suburb investment report</span>
             <span class="report-footer-code">Report # ${escapeHtml(viewModel.reportCode || 'N/A')}</span>
             <span class="report-footer-page">Page ${String(viewModel.pageNumber).padStart(2, '0')} / ${String(viewModel.totalPages).padStart(2, '0')}</span>
           </footer>
