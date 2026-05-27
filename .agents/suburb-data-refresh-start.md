@@ -7,6 +7,7 @@ Use this prompt to start a refresh session with the suburb data refresh agent.
 I want to run a suburb data refresh.
 
 Use:
+- AGENTS.md
 - .agents/suburb-data-refresh-agent.md
 - .agents/suburb-data-refresh-checklist.md
 - Docs/suburb_data_refresh_agent_strategy.md
