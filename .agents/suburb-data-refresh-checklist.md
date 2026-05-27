@@ -73,6 +73,7 @@ Population metrics CSV, if provided, should include:
 ## 7. Population Coverage
 
 - [ ] Run missing population audit
+- [ ] If gaps exist, remind operator to use the `/abs-population-finder` skill in Manus to source verified population rows for the missing suburbs
 - [ ] If population CSV exists, truncate public.suburb_population_metrics_staging
 - [ ] Import population CSV into public.suburb_population_metrics_staging
 - [ ] Load public.suburb_population_metrics from staging

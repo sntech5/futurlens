@@ -1129,6 +1129,58 @@
           </div>
         </div>
 
+        <!-- State Selection -->
+        <div class="mb-8">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+            <label class="block text-sm font-semibold text-slate-700">
+              📍 Preferred States
+            </label>
+            <div class="flex items-center gap-3 text-xs font-semibold">
+              <button type="button" id="selectAllStatesBtn" class="text-indigo-700 hover:text-indigo-900">
+                Select all
+              </button>
+              <button type="button" id="clearStatesBtn" class="text-slate-500 hover:text-slate-700">
+                Clear
+              </button>
+            </div>
+          </div>
+          <div id="stateOptions" class="grid grid-cols-2 sm:grid-cols-4 gap-3" aria-label="Preferred states">
+            <label class="state-option flex items-center gap-3 rounded-lg border-2 border-indigo-500 bg-indigo-50 px-4 py-3 text-sm font-semibold text-slate-800 transition cursor-pointer">
+              <input type="checkbox" class="state-checkbox h-4 w-4 accent-indigo-600" value="NSW" checked />
+              <span>NSW</span>
+            </label>
+            <label class="state-option flex items-center gap-3 rounded-lg border-2 border-indigo-500 bg-indigo-50 px-4 py-3 text-sm font-semibold text-slate-800 transition cursor-pointer">
+              <input type="checkbox" class="state-checkbox h-4 w-4 accent-indigo-600" value="QLD" checked />
+              <span>QLD</span>
+            </label>
+            <label class="state-option flex items-center gap-3 rounded-lg border-2 border-indigo-500 bg-indigo-50 px-4 py-3 text-sm font-semibold text-slate-800 transition cursor-pointer">
+              <input type="checkbox" class="state-checkbox h-4 w-4 accent-indigo-600" value="VIC" checked />
+              <span>VIC</span>
+            </label>
+            <label class="state-option flex items-center gap-3 rounded-lg border-2 border-indigo-500 bg-indigo-50 px-4 py-3 text-sm font-semibold text-slate-800 transition cursor-pointer">
+              <input type="checkbox" class="state-checkbox h-4 w-4 accent-indigo-600" value="WA" checked />
+              <span>WA</span>
+            </label>
+            <label class="state-option flex items-center gap-3 rounded-lg border-2 border-indigo-500 bg-indigo-50 px-4 py-3 text-sm font-semibold text-slate-800 transition cursor-pointer">
+              <input type="checkbox" class="state-checkbox h-4 w-4 accent-indigo-600" value="SA" checked />
+              <span>SA</span>
+            </label>
+            <label class="state-option flex items-center gap-3 rounded-lg border-2 border-indigo-500 bg-indigo-50 px-4 py-3 text-sm font-semibold text-slate-800 transition cursor-pointer">
+              <input type="checkbox" class="state-checkbox h-4 w-4 accent-indigo-600" value="TAS" checked />
+              <span>TAS</span>
+            </label>
+            <label class="state-option flex items-center gap-3 rounded-lg border-2 border-indigo-500 bg-indigo-50 px-4 py-3 text-sm font-semibold text-slate-800 transition cursor-pointer">
+              <input type="checkbox" class="state-checkbox h-4 w-4 accent-indigo-600" value="ACT" checked />
+              <span>ACT</span>
+            </label>
+            <label class="state-option flex items-center gap-3 rounded-lg border-2 border-indigo-500 bg-indigo-50 px-4 py-3 text-sm font-semibold text-slate-800 transition cursor-pointer">
+              <input type="checkbox" class="state-checkbox h-4 w-4 accent-indigo-600" value="NT" checked />
+              <span>NT</span>
+            </label>
+          </div>
+          <p id="stateSelectionSummary" class="mt-2 text-xs text-slate-500">Searching all states and territories.</p>
+        </div>
+
         <!-- Strategy Selection -->
         <div class="mb-8">
           <label for="strategy" class="block text-sm font-semibold text-slate-700 mb-3">
@@ -1637,9 +1689,41 @@
       return Number.isFinite(value) && value > 0 ? value : null;
     }
 
+    function getSelectedStates() {
+      return Array.from(document.querySelectorAll('.state-checkbox:checked'))
+        .map(input => input.value)
+        .filter(Boolean);
+    }
+
+    function updateStateSelectionUi() {
+      const selectedStates = getSelectedStates();
+      const allCheckboxes = Array.from(document.querySelectorAll('.state-checkbox'));
+      const summary = document.getElementById('stateSelectionSummary');
+
+      allCheckboxes.forEach(input => {
+        const wrapper = input.closest('.state-option');
+        if (!wrapper) return;
+        wrapper.classList.toggle('border-indigo-500', input.checked);
+        wrapper.classList.toggle('bg-indigo-50', input.checked);
+        wrapper.classList.toggle('border-slate-300', !input.checked);
+        wrapper.classList.toggle('bg-white', !input.checked);
+      });
+
+      if (!summary) return;
+
+      if (selectedStates.length === allCheckboxes.length) {
+        summary.textContent = 'Searching all states and territories.';
+      } else if (selectedStates.length === 0) {
+        summary.textContent = 'Select at least one state or territory.';
+      } else {
+        summary.textContent = `Searching: ${selectedStates.join(', ')}.`;
+      }
+    }
+
     function validateRecommendationInputs() {
       const budget = getPositiveNumberInput('budget');
       const maxOop = getPositiveNumberInput('maxOop');
+      const selectedStates = getSelectedStates();
 
       if (!budget) {
         return 'Enter a budget greater than $0.';
@@ -1647,6 +1731,10 @@
 
       if (!maxOop) {
         return 'Enter a max weekly out-of-pocket amount greater than $0.';
+      }
+
+      if (!selectedStates.length) {
+        return 'Select at least one state or territory.';
       }
 
       return null;
@@ -3400,6 +3488,7 @@
     async function createRun() {
       const budget = Number(document.getElementById('budget').value);
       const strategy = document.getElementById('strategy').value;
+      const selectedStates = getSelectedStates();
 
       const response = await fetch(`${CONFIG.supabaseUrl}/rest/v1/recommendation_runs`, {
         method: 'POST',
@@ -3413,7 +3502,8 @@
           created_by: CONFIG.userProfileId,
           input_budget: budget,
           max_out_of_pocket: Number(document.getElementById('maxOop').value),
-          strategy_type: strategy
+          strategy_type: strategy,
+          selected_states: selectedStates
         })
       });
 
@@ -3518,7 +3608,7 @@
             [
               {
                 top_suburbs: [],
-                ai_summary: 'No suburbs met your budget and weekly out-of-pocket limits. Try increasing one of these limits.'
+                ai_summary: 'No suburbs met your budget, weekly out-of-pocket, and state filters. Try broadening your selected states or increasing one of the limits.'
               }
             ],
             selectedStrategy
@@ -3536,6 +3626,22 @@
     }
 
     document.getElementById('generateBtn').addEventListener('click', generateRecommendation);
+    document.querySelectorAll('.state-checkbox').forEach(input => {
+      input.addEventListener('change', updateStateSelectionUi);
+    });
+    document.getElementById('selectAllStatesBtn').addEventListener('click', () => {
+      document.querySelectorAll('.state-checkbox').forEach(input => {
+        input.checked = true;
+      });
+      updateStateSelectionUi();
+    });
+    document.getElementById('clearStatesBtn').addEventListener('click', () => {
+      document.querySelectorAll('.state-checkbox').forEach(input => {
+        input.checked = false;
+      });
+      updateStateSelectionUi();
+    });
+    updateStateSelectionUi();
     document.getElementById('findReportBtn').addEventListener('click', findGeneratedReport);
     document.getElementById('reportCodeInput').addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {

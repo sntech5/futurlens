@@ -74,6 +74,7 @@ Agent actions:
 - run quarterly metrics load
 - run base score refresh
 - audit population coverage
+- if population gaps exist and no population CSV is available, remind the operator to use the `/abs-population-finder` skill in Manus to source verified population rows for the missing suburbs
 - optionally guide population staging import/load
 - refresh scores again after population load
 - enqueue AI context refresh jobs

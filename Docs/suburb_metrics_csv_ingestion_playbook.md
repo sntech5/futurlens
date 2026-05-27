@@ -447,6 +447,9 @@ Inputs:
 
 Actions:
 - audit missing population coverage for all quarterly metric suburbs
+- if population gaps exist and no population CSV is available, use the
+  `/abs-population-finder` skill in Manus to source verified population rows
+  for the missing suburbs
 - if population CSV exists, load through staging and refresh population scores
 
 Outputs:
@@ -467,6 +470,9 @@ suburbs, check population coverage before app testing:
 
 If missing suburbs have source-backed population data available, load the
 population CSV through the population staging path:
+
+If source rows still need to be found, use the `/abs-population-finder` skill in
+Manus with the missing suburb list before creating the population CSV.
 
 ```sql
 truncate table public.suburb_population_metrics_staging restart identity;
