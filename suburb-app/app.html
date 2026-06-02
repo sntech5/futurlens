@@ -201,6 +201,21 @@
     .strategy-btn {
       box-shadow: 0 6px 14px rgba(8, 32, 74, 0.04);
     }
+    .state-dropdown summary::-webkit-details-marker {
+      display: none;
+    }
+    .state-dropdown summary {
+      list-style: none;
+    }
+    .state-dropdown[open] .state-dropdown-chevron {
+      transform: rotate(180deg);
+    }
+    .state-dropdown-menu {
+      box-shadow: 0 18px 34px rgba(8, 32, 74, 0.14);
+    }
+    .state-option {
+      min-height: 44px;
+    }
     .state-option:hover,
     .strategy-btn:hover {
       border-color: rgba(83, 103, 183, 0.5) !important;
@@ -1163,6 +1178,17 @@
         transform: none;
       }
     }
+    @media (max-width: 639px) {
+      .state-dropdown-menu {
+        position: static !important;
+        max-height: min(52vh, 320px);
+        margin-top: 8px;
+        overflow-y: auto;
+      }
+      .state-dropdown summary {
+        min-height: 60px;
+      }
+    }
   </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
@@ -1182,8 +1208,8 @@
 
   <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Input Form Section -->
-    <div class="criteria-panel rounded-lg overflow-hidden mb-8">
-      <div class="criteria-header px-6 py-5">
+    <div class="criteria-panel rounded-lg mb-8">
+      <div class="criteria-header rounded-t-lg px-6 py-5">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p class="text-xs font-bold uppercase tracking-[0.18em] text-white/65">Recommendation engine</p>
@@ -1237,56 +1263,56 @@
         </div>
 
         <!-- State Selection -->
-        <div class="criteria-control mb-6 rounded-lg p-4">
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-            <div>
-              <label class="block text-sm font-bold text-slate-700">Preferred States</label>
-              <p class="mt-1 text-xs text-slate-500">Choose one or more markets to include.</p>
+        <div class="mb-6">
+          <details id="stateDropdown" class="state-dropdown relative">
+            <summary class="criteria-control flex cursor-pointer items-center justify-between gap-4 rounded-lg px-4 py-3.5">
+              <div class="min-w-0">
+                <span class="block text-sm font-bold text-slate-700">Preferred States</span>
+                <span id="stateSelectionSummary" class="mt-1 block truncate text-xs text-slate-500">All states and territories</span>
+              </div>
+              <span class="state-dropdown-chevron shrink-0 text-sm font-black text-indigo-700 transition">v</span>
+            </summary>
+            <div class="state-dropdown-menu absolute left-0 right-0 top-[calc(100%+8px)] z-40 rounded-lg border border-slate-200 bg-white p-3">
+              <div id="stateOptions" class="grid grid-cols-2 gap-2 sm:grid-cols-4" aria-label="Preferred states">
+                <label class="state-option flex cursor-pointer items-center justify-between gap-3 rounded-lg border-2 border-indigo-500 bg-indigo-50 px-3 py-2.5 text-sm font-bold text-slate-800 transition">
+                  <input type="checkbox" class="state-checkbox h-4 w-4 accent-indigo-600" value="NSW" checked />
+                  <span>NSW</span>
+                </label>
+                <label class="state-option flex cursor-pointer items-center justify-between gap-3 rounded-lg border-2 border-indigo-500 bg-indigo-50 px-3 py-2.5 text-sm font-bold text-slate-800 transition">
+                  <input type="checkbox" class="state-checkbox h-4 w-4 accent-indigo-600" value="QLD" checked />
+                  <span>QLD</span>
+                </label>
+                <label class="state-option flex cursor-pointer items-center justify-between gap-3 rounded-lg border-2 border-indigo-500 bg-indigo-50 px-3 py-2.5 text-sm font-bold text-slate-800 transition">
+                  <input type="checkbox" class="state-checkbox h-4 w-4 accent-indigo-600" value="VIC" checked />
+                  <span>VIC</span>
+                </label>
+                <label class="state-option flex cursor-pointer items-center justify-between gap-3 rounded-lg border-2 border-indigo-500 bg-indigo-50 px-3 py-2.5 text-sm font-bold text-slate-800 transition">
+                  <input type="checkbox" class="state-checkbox h-4 w-4 accent-indigo-600" value="WA" checked />
+                  <span>WA</span>
+                </label>
+                <label class="state-option flex cursor-pointer items-center justify-between gap-3 rounded-lg border-2 border-indigo-500 bg-indigo-50 px-3 py-2.5 text-sm font-bold text-slate-800 transition">
+                  <input type="checkbox" class="state-checkbox h-4 w-4 accent-indigo-600" value="SA" checked />
+                  <span>SA</span>
+                </label>
+                <label class="state-option flex cursor-pointer items-center justify-between gap-3 rounded-lg border-2 border-indigo-500 bg-indigo-50 px-3 py-2.5 text-sm font-bold text-slate-800 transition">
+                  <input type="checkbox" class="state-checkbox h-4 w-4 accent-indigo-600" value="TAS" checked />
+                  <span>TAS</span>
+                </label>
+                <label class="state-option flex cursor-pointer items-center justify-between gap-3 rounded-lg border-2 border-indigo-500 bg-indigo-50 px-3 py-2.5 text-sm font-bold text-slate-800 transition">
+                  <input type="checkbox" class="state-checkbox h-4 w-4 accent-indigo-600" value="ACT" checked />
+                  <span>ACT</span>
+                </label>
+                <label class="state-option flex cursor-pointer items-center justify-between gap-3 rounded-lg border-2 border-indigo-500 bg-indigo-50 px-3 py-2.5 text-sm font-bold text-slate-800 transition">
+                  <input type="checkbox" class="state-checkbox h-4 w-4 accent-indigo-600" value="NT" checked />
+                  <span>NT</span>
+                </label>
+              </div>
+              <div class="mt-3 flex items-center justify-end gap-3 border-t border-slate-200 pt-3 text-xs font-bold">
+                <button type="button" id="selectAllStatesBtn" class="text-indigo-700 hover:text-indigo-900">Select all</button>
+                <button type="button" id="clearStatesBtn" class="text-slate-500 hover:text-slate-700">Clear</button>
+              </div>
             </div>
-            <div class="flex items-center gap-3 text-xs font-semibold">
-              <button type="button" id="selectAllStatesBtn" class="text-indigo-700 hover:text-indigo-900">
-                Select all
-              </button>
-              <button type="button" id="clearStatesBtn" class="text-slate-500 hover:text-slate-700">
-                Clear
-              </button>
-            </div>
-          </div>
-          <div id="stateOptions" class="grid grid-cols-2 sm:grid-cols-4 gap-2" aria-label="Preferred states">
-            <label class="state-option flex items-center justify-between gap-3 rounded-lg border-2 border-indigo-500 bg-indigo-50 px-3 py-2.5 text-sm font-bold text-slate-800 transition cursor-pointer">
-              <input type="checkbox" class="state-checkbox h-4 w-4 accent-indigo-600" value="NSW" checked />
-              <span>NSW</span>
-            </label>
-            <label class="state-option flex items-center justify-between gap-3 rounded-lg border-2 border-indigo-500 bg-indigo-50 px-3 py-2.5 text-sm font-bold text-slate-800 transition cursor-pointer">
-              <input type="checkbox" class="state-checkbox h-4 w-4 accent-indigo-600" value="QLD" checked />
-              <span>QLD</span>
-            </label>
-            <label class="state-option flex items-center justify-between gap-3 rounded-lg border-2 border-indigo-500 bg-indigo-50 px-3 py-2.5 text-sm font-bold text-slate-800 transition cursor-pointer">
-              <input type="checkbox" class="state-checkbox h-4 w-4 accent-indigo-600" value="VIC" checked />
-              <span>VIC</span>
-            </label>
-            <label class="state-option flex items-center justify-between gap-3 rounded-lg border-2 border-indigo-500 bg-indigo-50 px-3 py-2.5 text-sm font-bold text-slate-800 transition cursor-pointer">
-              <input type="checkbox" class="state-checkbox h-4 w-4 accent-indigo-600" value="WA" checked />
-              <span>WA</span>
-            </label>
-            <label class="state-option flex items-center justify-between gap-3 rounded-lg border-2 border-indigo-500 bg-indigo-50 px-3 py-2.5 text-sm font-bold text-slate-800 transition cursor-pointer">
-              <input type="checkbox" class="state-checkbox h-4 w-4 accent-indigo-600" value="SA" checked />
-              <span>SA</span>
-            </label>
-            <label class="state-option flex items-center justify-between gap-3 rounded-lg border-2 border-indigo-500 bg-indigo-50 px-3 py-2.5 text-sm font-bold text-slate-800 transition cursor-pointer">
-              <input type="checkbox" class="state-checkbox h-4 w-4 accent-indigo-600" value="TAS" checked />
-              <span>TAS</span>
-            </label>
-            <label class="state-option flex items-center justify-between gap-3 rounded-lg border-2 border-indigo-500 bg-indigo-50 px-3 py-2.5 text-sm font-bold text-slate-800 transition cursor-pointer">
-              <input type="checkbox" class="state-checkbox h-4 w-4 accent-indigo-600" value="ACT" checked />
-              <span>ACT</span>
-            </label>
-            <label class="state-option flex items-center justify-between gap-3 rounded-lg border-2 border-indigo-500 bg-indigo-50 px-3 py-2.5 text-sm font-bold text-slate-800 transition cursor-pointer">
-              <input type="checkbox" class="state-checkbox h-4 w-4 accent-indigo-600" value="NT" checked />
-              <span>NT</span>
-            </label>
-          </div>
-          <p id="stateSelectionSummary" class="mt-2 text-xs text-slate-500">Searching all states and territories.</p>
+          </details>
         </div>
 
         <!-- Strategy Selection -->
@@ -1839,11 +1865,11 @@
       if (!summary) return;
 
       if (selectedStates.length === allCheckboxes.length) {
-        summary.textContent = 'Searching all states and territories.';
+        summary.textContent = 'All states and territories';
       } else if (selectedStates.length === 0) {
-        summary.textContent = 'Select at least one state or territory.';
+        summary.textContent = 'Select at least one state or territory';
       } else {
-        summary.textContent = `Searching: ${selectedStates.join(', ')}.`;
+        summary.textContent = selectedStates.join(', ');
       }
     }
 
@@ -3839,6 +3865,12 @@
         input.checked = false;
       });
       updateStateSelectionUi();
+    });
+    document.addEventListener('click', (event) => {
+      const dropdown = document.getElementById('stateDropdown');
+      if (dropdown?.open && !dropdown.contains(event.target)) {
+        dropdown.open = false;
+      }
     });
     updateStateSelectionUi();
     document.getElementById('findReportBtn').addEventListener('click', findGeneratedReport);

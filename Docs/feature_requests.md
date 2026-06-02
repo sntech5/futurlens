@@ -271,3 +271,55 @@ Acceptance criteria:
 
 Suggested milestone fit:
 - Milestone 3 report-factor data quality follow-up, or Milestone 5 scoring-model review if population growth becomes a ranking factor
+
+### 5. Progressive Web App Mobile Install Experience
+
+Status:
+- requested
+
+Problem:
+- the app is currently a responsive web application, but mobile users do not yet get an app-like install/launch experience
+- moving directly to Capacitor or native iOS would add build, signing, App Store, and device-testing overhead before the mobile UX has been validated
+- the current product can likely deliver a useful mobile MVP through a PWA first
+
+Requested feature:
+- add Progressive Web App support to the existing `suburb-app` frontend so users can install Plenz to their mobile home screen and launch it like an app
+
+Desired behavior:
+- add a web app manifest with app name, short name, theme color, background color, display mode, start URL, and icons
+- add suitable app icons for iOS and general PWA usage
+- add a service worker that caches static app shell assets
+- keep Supabase/API data network-first so users do not see stale recommendation results
+- show a friendly fallback when the app is offline
+- support iPhone Safari "Add to Home Screen" as the first mobile-app validation path
+
+Initial scope:
+- installable app shell
+- correct name/icon when saved to mobile home screen
+- app opens to the main Plenz experience
+- static assets cache for faster repeat loads
+- no push notifications in MVP
+- no offline recommendation generation in MVP
+
+Out of scope for first pass:
+- App Store submission
+- Capacitor wrapper
+- native Swift/React Native rebuild
+- push notifications
+- full offline data storage
+
+Acceptance criteria:
+- Lighthouse/PWA checks confirm the app has a valid manifest and service worker
+- app can be added to iPhone home screen from Safari
+- installed app launches fullscreen or near-fullscreen with the correct icon/name
+- recommendation flow still works online after PWA changes
+- report generation/download behavior is not broken by service worker caching
+- offline state does not display stale generated recommendations as if they are fresh
+
+Why it matters:
+- gives the product an app-like mobile experience with minimal engineering overhead
+- validates mobile usability before committing to Capacitor or native app work
+- keeps the current web deployment model simple
+
+Suggested milestone fit:
+- Milestone 4 or 5 mobile experience improvement, before any Capacitor/iOS wrapper decision
