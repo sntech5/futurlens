@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Plenz — Property Investment Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Syne:wght@600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --midnight: #0f0e1a;
+    --deep:     #1a1830;
+    --panel:    #211f38;
+    --border:   #2e2b4a;
+    --plenz:    #3d2fa0;
+    --accent:   #6c5ce7;
+    --glow:     #a89df0;
+    --gold:     #f0c96c;
+    --text:     #e8e6f5;
+    --muted:    #8b87b0;
+    --white:    #ffffff;
+    --good:     #4ade80;
+    --warn:     #f59e0b;
+    --radius:   12px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--midnight);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 6vw;
+    height: 64px;
+    background: rgba(15,14,26,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none;
+  }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 16px;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+  .logo-text {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--white);
+    letter-spacing: -0.3px;
+  }
+
+  .nav-cta {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 9px 22px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    text-decoration: none;
+    font-family: 'Inter', sans-serif;
+  }
+  .nav-cta:hover { background: #7d6ef0; transform: translateY(-1px); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 80px 6vw 60px;
+    gap: 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .hero-left { flex: 1; min-width: 0; }
+
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(108,92,231,0.15);
+    border: 1px solid rgba(108,92,231,0.35);
+    padding: 5px 14px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--glow);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .eyebrow-dot {
+    width: 6px; height: 6px;
+    background: var(--glow);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  .hero-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(36px, 5vw, 62px);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -1.5px;
+    color: var(--white);
+    margin-bottom: 24px;
+  }
+  .hero-title .accent-line {
+    background: linear-gradient(90deg, var(--accent), var(--glow));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 18px;
+    color: var(--muted);
+    line-height: 1.65;
+    max-width: 480px;
+    margin-bottom: 40px;
+    font-weight: 400;
+  }
+
+  .hero-actions {
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 15px 32px;
+    border-radius: var(--radius);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    font-family: 'Inter', sans-serif;
+    display: inline-flex; align-items: center; gap: 8px;
+    text-decoration: none;
+    box-shadow: 0 0 32px rgba(108,92,231,0.35);
+  }
+  .btn-primary:hover {
+    background: #7d6ef0;
+    transform: translateY(-2px);
+    box-shadow: 0 0 48px rgba(108,92,231,0.5);
+  }
+  .btn-arrow { transition: transform 0.2s; }
+  .btn-primary:hover .btn-arrow { transform: translateX(4px); }
+
+  .hero-note {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* ── SUBURB CARD (hero right) ── */
+  .hero-right {
+    flex: 0 0 380px;
+    position: relative;
+  }
+
+  .suburb-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+    position: relative;
+    overflow: hidden;
+  }
+  .suburb-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--glow));
+    border-radius: 16px 16px 0 0;
+  }
+
+  .card-rank-row {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 16px;
+  }
+  .rank-badge {
+    background: var(--accent);
+    color: #fff;
+    border-radius: 8px;
+    padding: 6px 14px;
+    display: flex; flex-direction: column; align-items: center;
+    min-width: 60px;
+  }
+  .rank-label { font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.8; }
+  .rank-number { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; line-height: 1; }
+
+  .strategy-tag {
+    background: rgba(240,201,108,0.15);
+    border: 1px solid rgba(240,201,108,0.3);
+    color: var(--gold);
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .card-suburb-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 4px;
+    transition: opacity 0.3s;
+  }
+  .card-suburb-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 20px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .meta-pill {
+    background: var(--deep);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .card-metrics {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; margin-bottom: 20px;
+  }
+  .metric-tile {
+    background: var(--deep);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .metric-label { font-size: 10px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .metric-value { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: var(--white); }
+
+  .card-scores {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px; margin-bottom: 20px;
+  }
+  .score-item { text-align: center; }
+  .score-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .score-bar-wrap { height: 4px; background: var(--border); border-radius: 2px; margin-bottom: 5px; overflow: hidden; }
+  .score-bar { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--accent), var(--glow)); transition: width 0.6s ease; }
+  .score-val { font-size: 12px; font-weight: 600; color: var(--glow); }
+
+  .card-verdict {
+    background: rgba(74,222,128,0.08);
+    border: 1px solid rgba(74,222,128,0.2);
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .verdict-dot { width: 8px; height: 8px; background: var(--good); border-radius: 50%; flex-shrink: 0; }
+  .verdict-text { font-size: 13px; color: var(--good); font-weight: 500; }
+
+  /* floating decorative cards */
+  .card-float-1 {
+    position: absolute;
+    top: -20px; right: -30px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--muted);
+    opacity: 0.7;
+    transform: rotate(4deg);
+    pointer-events: none;
+  }
+  .float-1-val { font-weight: 700; color: var(--glow); font-size: 16px; }
+
+  /* ── STATS STRIP ── */
+  .stats-strip {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 32px 6vw;
+    display: flex;
+    justify-content: center;
+    gap: clamp(32px, 6vw, 80px);
+    flex-wrap: wrap;
+  }
+  .stat-item { text-align: center; }
+  .stat-number {
+    font-family: 'Syne', sans-serif;
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--white);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-number span { color: var(--accent); }
+  .stat-desc { font-size: 13px; color: var(--muted); }
+
+  /* ── FOR WHO ── */
+  .for-who {
+    padding: 100px 6vw;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .section-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 3.5vw, 44px);
+    font-weight: 800;
+    color: var(--white);
+    line-height: 1.15;
+    letter-spacing: -0.8px;
+    margin-bottom: 56px;
+    max-width: 560px;
+  }
+
+  .who-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .who-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px 28px;
+    transition: border-color 0.25s, transform 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .who-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-4px);
+  }
+  .who-card::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--glow));
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  .who-card:hover::after { opacity: 1; }
+
+  .who-icon {
+    width: 44px; height: 44px;
+    background: rgba(108,92,231,0.15);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+  .who-role {
+    font-family: 'Syne', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 10px;
+  }
+  .who-desc { font-size: 14px; color: var(--muted); line-height: 1.65; }
+
+  /* ── HOW IT WORKS ── */
+  .how-it-works {
+    padding: 80px 6vw 100px;
+    background: var(--deep);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .how-inner { max-width: 1200px; margin: 0 auto; }
+
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 56px;
+    position: relative;
+  }
+  .steps::before {
+    content: '';
+    position: absolute;
+    top: 28px; left: calc(16.66% + 16px); right: calc(16.66% + 16px);
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), var(--border), transparent);
+  }
+
+  .step {
+    padding: 0 24px 0 0;
+    position: relative;
+  }
+  .step-num {
+    width: 56px; height: 56px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--accent);
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 1;
+  }
+  .step-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 10px;
+  }
+  .step-desc { font-size: 14px; color: var(--muted); line-height: 1.65; }
+
+  /* ── CTA SECTION ── */
+  .cta-section {
+    padding: 120px 6vw;
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .cta-section .section-eyebrow { text-align: center; }
+  .cta-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(32px, 4.5vw, 56px);
+    font-weight: 800;
+    color: var(--white);
+    letter-spacing: -1px;
+    line-height: 1.1;
+    margin-bottom: 20px;
+  }
+  .cta-sub {
+    font-size: 17px;
+    color: var(--muted);
+    margin-bottom: 40px;
+    line-height: 1.65;
+  }
+  .cta-disclaimer { font-size: 12px; color: var(--muted); margin-top: 16px; opacity: 0.7; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 6vw;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .footer-copy { font-size: 13px; color: var(--muted); }
+  .footer-note { font-size: 12px; color: var(--muted); opacity: 0.6; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .hero { flex-direction: column; padding-top: 100px; text-align: center; }
+    .hero-sub { max-width: 100%; }
+    .hero-actions { justify-content: center; }
+    .hero-right { flex: 0 0 auto; width: 100%; max-width: 380px; }
+    .who-grid { grid-template-columns: 1fr; }
+    .steps { grid-template-columns: 1fr; gap: 40px; }
+    .steps::before { display: none; }
+    footer { flex-direction: column; text-align: center; }
+  }
+  @media (max-width: 600px) {
+    .stats-strip { gap: 28px; }
+    .card-float-1 { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="logo-icon">P</div>
+    <span class="logo-text">plenz</span>
+  </a>
+  <a class="nav-cta" href="./suburb-app/app.html">Get Started</a>
+</nav>
+
+<!-- HERO -->
+<section style="background: radial-gradient(ellipse 80% 60% at 70% 40%, rgba(108,92,231,0.12) 0%, transparent 70%), var(--midnight);">
+  <div class="hero">
+
+    <div class="hero-left">
+      <div class="hero-eyebrow">
+        <span class="eyebrow-dot"></span>
+        Australian Property Intelligence
+      </div>
+      <h1 class="hero-title">
+        Find Australia's<br/>
+        <span class="accent-line">best suburbs</span><br/>
+        to invest in.
+      </h1>
+      <p class="hero-sub">
+        Enter your budget, weekly affordability, and investment strategy. Plenz scores every suburb in Australia and ranks the best matches — in seconds.
+      </p>
+      <div class="hero-actions">
+        <a class="btn-primary" href="./suburb-app/app.html">
+          Get Started with Plenz
+          <span class="btn-arrow">→</span>
+        </a>
+      </div>
+      <p class="hero-note" style="margin-top:16px;">Model outputs only — not financial advice.</p>
+    </div>
+
+    <div class="hero-right">
+      <div class="card-float-1">
+        469 suburbs analysed<br/>
+        <span class="float-1-val">this quarter</span>
+      </div>
+
+      <div class="suburb-card">
+        <div class="card-rank-row">
+          <div class="rank-badge">
+            <span class="rank-label">Rank</span>
+            <span class="rank-number">#1</span>
+          </div>
+          <span class="strategy-tag" id="card-strategy">Capital Growth</span>
+        </div>
+
+        <div class="card-suburb-name" id="card-name">Chigwell</div>
+        <div class="card-suburb-meta">
+          <span class="meta-pill" id="card-state">TAS 7011</span>
+          <span>Ranked by strategy score</span>
+        </div>
+
+        <div class="card-metrics">
+          <div class="metric-tile">
+            <div class="metric-label">Median Price</div>
+            <div class="metric-value" id="card-price">$638k</div>
+          </div>
+          <div class="metric-tile">
+            <div class="metric-label">Weekly Rent</div>
+            <div class="metric-value" id="card-rent">$556</div>
+          </div>
+          <div class="metric-tile">
+            <div class="metric-label">Gross Yield</div>
+            <div class="metric-value" id="card-yield">4.5%</div>
+          </div>
+          <div class="metric-tile">
+            <div class="metric-label">Weekly OOP</div>
+            <div class="metric-value" id="card-oop">$33</div>
+          </div>
+        </div>
+
+        <div class="card-scores">
+          <div class="score-item">
+            <div class="score-label">Growth</div>
+            <div class="score-bar-wrap"><div class="score-bar" id="bar-growth" style="width:80%"></div></div>
+            <div class="score-val" id="val-growth">8/10</div>
+          </div>
+          <div class="score-item">
+            <div class="score-label">Demand</div>
+            <div class="score-bar-wrap"><div class="score-bar" id="bar-demand" style="width:91%"></div></div>
+            <div class="score-val" id="val-demand">9.1/10</div>
+          </div>
+          <div class="score-item">
+            <div class="score-label">Yield</div>
+            <div class="score-bar-wrap"><div class="score-bar" id="bar-yield" style="width:51%"></div></div>
+            <div class="score-val" id="val-yield">5.1/10</div>
+          </div>
+        </div>
+
+        <div class="card-verdict">
+          <div class="verdict-dot"></div>
+          <div class="verdict-text" id="card-verdict">Strong buy — fits your strategy and budget</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- STATS STRIP -->
+<div class="stats-strip">
+  <div class="stat-item">
+    <div class="stat-number">745<span>+</span></div>
+    <div class="stat-desc">Suburbs scored</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">6</div>
+    <div class="stat-desc">States covered</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">8</div>
+    <div class="stat-desc">Key metrics per suburb</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number"><span>&lt;</span>60s</div>
+    <div class="stat-desc">From inputs to shortlist</div>
+  </div>
+</div>
+
+<!-- FOR WHO -->
+<section class="for-who">
+  <p class="section-eyebrow">Built for property professionals</p>
+  <h2 class="section-title">The edge your clients are paying you for.</h2>
+  <div class="who-grid">
+    <div class="who-card">
+      <div class="who-icon">🔍</div>
+      <div class="who-role">Buyers Agents</div>
+      <p class="who-desc">Surface high-potential suburbs your clients haven't heard of yet — backed by data, not gut feel. Walk into every meeting with a ranked shortlist ready.</p>
+    </div>
+    <div class="who-card">
+      <div class="who-icon">📊</div>
+      <div class="who-role">Mortgage Brokers</div>
+      <p class="who-desc">Match loan structures to locations with strong cash flow fundamentals. Show clients exactly why a suburb works for their borrowing capacity.</p>
+    </div>
+    <div class="who-card">
+      <div class="who-icon">💼</div>
+      <div class="who-role">Accountants</div>
+      <p class="who-desc">Support investment decisions with suburb-level yield, demand, and risk data. Give clients confidence that their strategy is grounded in evidence.</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-it-works">
+  <div class="how-inner">
+    <p class="section-eyebrow">How it works</p>
+    <h2 class="section-title">Three inputs. One ranked shortlist.</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-title">Enter your criteria</div>
+        <p class="step-desc">Set your purchase budget, maximum weekly out-of-pocket spend, and whether you're targeting capital growth or rental yield.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-title">Plenz scores every suburb</div>
+        <p class="step-desc">Our engine runs each suburb through growth, yield, demand, and risk scores — filtering out anything that fails the hard criteria first.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-title">Review your ranked shortlist</div>
+        <p class="step-desc">Get a ranked list of the best-matching suburbs with full score breakdowns, weekly cash position, and a plain-English reason for each recommendation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <p class="section-eyebrow">Ready to find your next suburb?</p>
+  <h2 class="cta-title">Stop guessing.<br/>Start investing smarter.</h2>
+  <p class="cta-sub">Plenz turns complex property data into a clear, ranked shortlist — matched to your exact budget and strategy.</p>
+  <a class="btn-primary" href="./suburb-app/app.html" style="display:inline-flex;">
+    Get Started with Plenz
+    <span class="btn-arrow">→</span>
+  </a>
+  <p class="cta-disclaimer">Model outputs only — not financial advice. © 2026 Plenz.</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="nav-logo" style="display:flex;align-items:center;gap:10px;">
+    <div class="logo-icon">P</div>
+    <span class="logo-text">plenz</span>
+  </div>
+  <span class="footer-copy">© 2026 Plenz. All rights reserved.</span>
+  <span class="footer-note">Australian property intelligence — model outputs, not financial advice.</span>
+</footer>
+
+<script>
+// Cycle through example suburb cards to make the hero feel alive
+const suburbs = [
+  { name:"Chigwell", meta:"TAS 7011", price:"$638k", rent:"$556", yield:"4.5%", oop:"$33", strategy:"Capital Growth", g:"80%","gv":"8/10", d:"91%","dv":"9.1/10", y:"51%","yv":"5.1/10", verdict:"Strong buy — fits your strategy and budget" },
+  { name:"Campbellfield", meta:"VIC 3061", price:"$572k", rent:"$490", yield:"4.4%", oop:"$58", strategy:"Capital Growth", g:"75%","gv":"7.5/10", d:"88%","dv":"8.8/10", y:"48%","yv":"4.8/10", verdict:"Good fit — strong demand, low vendor discount" },
+  { name:"Woodridge", meta:"QLD 4114", price:"$498k", rent:"$510", yield:"5.3%", oop:"$12", strategy:"Rental Yield", g:"62%","gv":"6.2/10", d:"82%","dv":"8.2/10", y:"74%","yv":"7.4/10", verdict:"High yield — near cash-flow neutral at current rates" },
+  { name:"Maddington", meta:"WA 6109", price:"$445k", rent:"$480", yield:"5.6%", oop:"$8",  strategy:"Rental Yield", g:"59%","gv":"5.9/10", d:"85%","dv":"8.5/10", y:"78%","yv":"7.8/10", verdict:"Strong yield — low vacancy, tight rental supply" },
+];
+
+let current = 0;
+
+function updateCard(s) {
+  const fade = (id, val) => {
+    const el = document.getElementById(id);
+    el.style.opacity = '0';
+    setTimeout(() => { el.textContent = val; el.style.opacity = '1'; }, 220);
+  };
+  fade('card-name', s.name);
+  fade('card-state', s.meta);
+  fade('card-price', s.price);
+  fade('card-rent', s.rent);
+  fade('card-yield', s.yield);
+  fade('card-oop', s.oop);
+  fade('card-strategy', s.strategy);
+  fade('card-verdict', s.verdict);
+  fade('val-growth', s.gv);
+  fade('val-demand', s.dv);
+  fade('val-yield', s.yv);
+  setTimeout(() => {
+    document.getElementById('bar-growth').style.width = s.g;
+    document.getElementById('bar-demand').style.width = s.d;
+    document.getElementById('bar-yield').style.width  = s.y;
+  }, 220);
+}
+
+setInterval(() => {
+  current = (current + 1) % suburbs.length;
+  updateCard(suburbs[current]);
+}, 3500);
+</script>
+</body>
+</html>
